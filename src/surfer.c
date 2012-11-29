@@ -88,12 +88,6 @@ static char const * _authors[] =
 
 
 /* variables */
-#ifndef GDK_Back
-# define GDK_Back	0
-#endif
-#ifndef GDK_Forward
-# define GDK_Forward	0
-#endif
 static const DesktopAccel _surfer_accel[] =
 {
 	{ G_CALLBACK(on_close), GDK_CONTROL_MASK, GDK_KEY_W },
