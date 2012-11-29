@@ -759,15 +759,19 @@ void surfer_set_user_agent(Surfer * surfer, char const * user_agent)
 void surfer_set_zoom(Surfer * surfer, gdouble zoom)
 {
 	GtkWidget * view;
+#ifndef EMBEDDED
 	GtkWidget * widget;
+#endif
 
 	if((view = surfer_get_view(surfer)) == NULL)
 		return; /* consider the current tab only */
 	if(zoom < 0.0)
 	{
 		zoom = ghtml_get_zoom(view) * 100.0;
+#ifndef EMBEDDED
 		widget = gtk_bin_get_child(GTK_BIN(surfer->tb_zoom));
 		gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), zoom);
+#endif
 	}
 	else
 		ghtml_set_zoom(view, zoom);
