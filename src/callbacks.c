@@ -364,6 +364,15 @@ void on_console_execute(gpointer data)
 }
 
 
+/* on_find */
+void on_find(gpointer data)
+{
+	Surfer * surfer = data;
+
+	surfer_find(surfer, NULL);
+}
+
+
 /* on_forward */
 void on_forward(gpointer data)
 {

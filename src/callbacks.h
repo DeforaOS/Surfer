@@ -65,6 +65,7 @@ void on_help_contents(gpointer data);
 /* toolbar */
 void on_back(gpointer data);
 void on_close(gpointer data);
+void on_find(gpointer data);
 void on_forward(gpointer data);
 void on_fullscreen(gpointer data);
 void on_home(gpointer data);
