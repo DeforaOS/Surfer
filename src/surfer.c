@@ -98,6 +98,7 @@ static const DesktopAccel _surfer_accel[] =
 {
 	{ G_CALLBACK(on_close), GDK_CONTROL_MASK, GDK_KEY_W },
 #ifdef EMBEDDED
+	{ G_CALLBACK(on_stop), 0, GDK_KEY_Escape },
 	{ G_CALLBACK(on_open_url), GDK_CONTROL_MASK, GDK_KEY_L },
 	{ G_CALLBACK(on_refresh), GDK_CONTROL_MASK, GDK_KEY_R },
 	{ G_CALLBACK(on_normal_size), GDK_CONTROL_MASK, GDK_KEY_0 },
