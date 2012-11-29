@@ -497,6 +497,15 @@ static gboolean _switch_page_idle(gpointer data)
 }
 
 
+/* on_open_url */
+void on_open_url(gpointer data)
+{
+	Surfer * surfer = data;
+
+	on_file_open_url(surfer);
+}
+
+
 /* on_path_activate */
 void on_path_activate(gpointer data)
 {

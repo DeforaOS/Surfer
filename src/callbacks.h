@@ -71,6 +71,7 @@ void on_home(gpointer data);
 void on_new_tab(gpointer data);
 void on_new_window(gpointer data);
 void on_normal_size(gpointer data);
+void on_open_url(gpointer data);
 void on_path_activate(gpointer data);
 void on_preferences(gpointer data);
 void on_refresh(gpointer data);
