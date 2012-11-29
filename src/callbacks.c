@@ -502,7 +502,7 @@ void on_open_url(gpointer data)
 {
 	Surfer * surfer = data;
 
-	on_file_open_url(surfer);
+	surfer_open(surfer, NULL);
 }
 
 
