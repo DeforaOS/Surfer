@@ -23,7 +23,6 @@
 #include "../config.h"
 #define _(string) gettext(string)
 
-
 /* constants */
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
@@ -36,6 +35,8 @@
 #endif
 
 
+/* private */
+/* functions */
 /* usage */
 static int _usage(void)
 {
@@ -44,6 +45,8 @@ static int _usage(void)
 }
 
 
+/* public */
+/* functions */
 /* main */
 int main(int argc, char * argv[])
 {
