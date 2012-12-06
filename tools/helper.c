@@ -327,7 +327,7 @@ static void _open_dialog_activated(gpointer data)
 /* helper_open_man */
 static int _helper_open_man(Helper * helper, int section, char const * page)
 {
-	char const ** prefix[] =
+	char const * prefix[] =
 	{
 		DATADIR, PREFIX, "/usr/local/share", "/usr/local", "/usr/share",
 		NULL
@@ -344,7 +344,6 @@ static int _helper_open_man(Helper * helper, int section, char const * page)
 	{
 		snprintf(buf, sizeof(buf), "%s%s%d%s%s%s", *p, "/man/html",
 				section, "/", page, ".html");
-		fprintf(stderr, "DEBUG: %s\n", buf);
 		if(access(buf, R_OK) == 0)
 			break;
 	}
@@ -795,6 +794,7 @@ int main(int argc, char * argv[])
 	if((helper = _helper_new()) == NULL)
 		return 2;
 	if(section > 0)
+		/* XXX check for errors */
 		_helper_open_man(helper, section, argv[optind]);
 	else if(argv[optind] != NULL && devel != 0)
 		_helper_open_devel(helper, argv[optind]);
