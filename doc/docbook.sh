@@ -27,6 +27,7 @@
 #variables
 PREFIX="/usr/local"
 . "../config.sh"
+#executables
 DEBUG="_debug"
 INSTALL="install -m 0644"
 MKDIR="mkdir -m 0755 -p"
