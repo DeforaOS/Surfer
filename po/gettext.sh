@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2010-2012 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2010-2013 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -27,15 +27,16 @@
 #variables
 PREFIX="/usr/local"
 . "../config.sh"
+LOCALEDIR="$PREFIX/share/locale"
+POTFILES="POTFILES"
+#executables
 DEBUG="_debug"
 INSTALL="install -m 0644"
-LOCALEDIR="$PREFIX/share/locale"
 MKDIR="mkdir -p"
 MSGFMT="msgfmt"
 MSGINIT="msginit"
 MSGMERGE="msgmerge"
 RM="rm -f"
-POTFILES="POTFILES"
 XGETTEXT="xgettext --force-po"
 
 
@@ -51,7 +52,7 @@ _debug()
 #usage
 _usage()
 {
-	echo "Usage: gettext.sh [-i|-u][-P prefix] <target>" 1>&2
+	echo "Usage: gettext.sh [-c|-i|-u][-P prefix] target..." 1>&2
 	return 1
 }
 
@@ -93,10 +94,14 @@ _gettext_pot()
 
 
 #main
+clean=0
 install=0
 uninstall=0
-while getopts iuP: name; do
+while getopts "ciuP:" name; do
 	case "$name" in
+		c)
+			clean=1
+			;;
 		i)
 			uninstall=0
 			install=1
@@ -126,6 +131,9 @@ while [ $# -gt 0 ]; do
 	lang="${target%%.mo}"
 	lang="${lang%%.po}"
 	shift
+
+	#clean
+	[ "$clean" -ne 0 ] && continue
 
 	#uninstall
 	if [ "$uninstall" -eq 1 ]; then
