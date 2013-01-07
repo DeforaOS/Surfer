@@ -1,10 +1,10 @@
 TARGETS	= download.1 download.html helper.1 helper.html surfer.1 surfer.html
 PREFIX	= /usr/local
 DESTDIR	=
-RM	?= rm -f
-LN	?= ln -f
-MKDIR	?= mkdir -p
-INSTALL	?= install
+RM	= rm -f
+LN	= ln -f
+MKDIR	= mkdir -p
+INSTALL	= install
 
 
 all: $(TARGETS)

@@ -1,9 +1,9 @@
 PACKAGE	= Surfer
 VERSION	= 0.2.6
 SUBDIRS	= data doc po src tools
-RM	?= rm -f
-LN	?= ln -f
-TAR	?= tar -czvf
+RM	= rm -f
+LN	= ln -f
+TAR	= tar -czvf
 
 
 all: subdirs
