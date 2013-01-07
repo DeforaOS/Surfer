@@ -55,7 +55,7 @@ _usage()
 clean=0
 install=0
 uninstall=0
-while getopts "iuP:" "name"; do
+while getopts "ciuP:" name; do
 	case "$name" in
 		c)
 			clean=1
