@@ -26,6 +26,7 @@ it.mo: Surfer.pot it.po
 
 clean:
 	$(RM) -- $(Surfer.pot_OBJS) $(de.mo_OBJS) $(es.mo_OBJS) $(fr.mo_OBJS) $(it.mo_OBJS)
+	./gettext.sh -c -P "$(PREFIX)" -- "it.mo"
 
 distclean: clean
 	$(RM) -- $(TARGETS)

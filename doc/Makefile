@@ -29,6 +29,7 @@ surfer.html: surfer.xml
 
 clean:
 	$(RM) -- $(download.1_OBJS) $(download.html_OBJS) $(helper.1_OBJS) $(helper.html_OBJS) $(surfer.1_OBJS) $(surfer.html_OBJS)
+	./docbook.sh -c -P "$(PREFIX)" -- "surfer.html"
 
 distclean: clean
 	$(RM) -- $(TARGETS)
