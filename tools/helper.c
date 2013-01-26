@@ -213,9 +213,6 @@ static Helper * _helper_new(void)
 	/* view */
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
-#ifdef DEBUG
-	fprintf(stderr, "DEBUG: %s() \"%s\"\n", __func__, buf);
-#endif
 	gtk_box_pack_start(GTK_BOX(vbox), helper->view, TRUE, TRUE, 0);
 	gtk_container_add(GTK_CONTAINER(helper->window), vbox);
 	gtk_widget_grab_focus(helper->view);
