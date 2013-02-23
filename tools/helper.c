@@ -1,6 +1,6 @@
 /* $Id$ */
 static char const _copyright[] =
-"Copyright (c) 2012 Pierre Pronchery <khorben@defora.org>";
+"Copyright (c) 2012-2013 Pierre Pronchery <khorben@defora.org>";
 /* This file is part of DeforaOS Desktop Surfer */
 static char const _license[] =
 "This program is free software: you can redistribute it and/or modify\n"
@@ -72,6 +72,7 @@ static int _helper_open_dialog(Helper * helper);
 static int _helper_open_man(Helper * helper, int section, char const * page);
 static int _helper_open_devel(Helper * helper, char const * package);
 
+static int _error(char const * message, int ret);
 static int _usage(void);
 
 /* callbacks */
@@ -483,6 +484,15 @@ static void _helper_on_view_fullscreen(gpointer data)
 #endif
 
 
+/* error */
+static int _error(char const * message, int ret)
+{
+	fputs("helper: ", stderr);
+	perror(message);
+	return ret;
+}
+
+
 /* usage */
 static int _usage(void)
 {
@@ -759,7 +769,8 @@ int main(int argc, char * argv[])
 	char * p;
 	Helper * helper;
 
-	setlocale(LC_ALL, "");
+	if(setlocale(LC_ALL, "") == NULL)
+		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 	gtk_init(&argc, &argv);
