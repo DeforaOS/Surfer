@@ -110,6 +110,7 @@ static char const * _authors[] =
 static const DesktopAccel _helper_accel[] =
 {
 	{ G_CALLBACK(_helper_on_close), GDK_CONTROL_MASK, GDK_KEY_W },
+	{ G_CALLBACK(_helper_on_fullscreen), 0, GDK_KEY_F11 },
 	{ G_CALLBACK(_helper_on_open), GDK_CONTROL_MASK, GDK_KEY_O },
 	{ NULL, 0, 0 }
 };
