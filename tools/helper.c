@@ -54,7 +54,9 @@ struct _Surfer
 {
 	/* widgets */
 	GtkWidget * window;
+#ifndef EMBEDDED
 	GtkWidget * menubar;
+#endif
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
 	GtkWidget * ab_window;
@@ -538,12 +540,16 @@ void surfer_set_fullscreen(Surfer * surfer, gboolean fullscreen)
 				helper->tb_fullscreen), fullscreen);
 	if(fullscreen)
 	{
+#ifndef EMBEDDED
 		gtk_widget_hide(helper->menubar);
+#endif
 		gtk_window_fullscreen(GTK_WINDOW(helper->window));
 	}
 	else
 	{
+#ifndef EMBEDDED
 		gtk_widget_show(helper->menubar);
+#endif
 		gtk_window_unfullscreen(GTK_WINDOW(helper->window));
 	}
 }
