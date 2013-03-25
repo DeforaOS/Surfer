@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Web surfer
 Comment=Navigator to surf web pages
-Exec=surfer
+Exec=surfer -- %U
 Icon=web-browser
 Type=Application
 Categories=Network;WebBrowser;GTK;
