@@ -20,9 +20,9 @@ distclean:
 install:
 	@for i in $(SUBDIRS); do (cd "$$i" && $(MAKE) install) || exit; done
 	$(MKDIR) $(DESTDIR)$(PREFIX)/share/applications
-	$(INSTALL) -m 0644 -- helper.desktop $(DESTDIR)$(PREFIX)/share/applications/helper.desktop
+	$(INSTALL) -m 0644 helper.desktop $(DESTDIR)$(PREFIX)/share/applications/helper.desktop
 	$(MKDIR) $(DESTDIR)$(PREFIX)/share/applications
-	$(INSTALL) -m 0644 -- surfer.desktop $(DESTDIR)$(PREFIX)/share/applications/surfer.desktop
+	$(INSTALL) -m 0644 surfer.desktop $(DESTDIR)$(PREFIX)/share/applications/surfer.desktop
 
 uninstall:
 	@for i in $(SUBDIRS); do (cd "$$i" && $(MAKE) uninstall) || exit; done

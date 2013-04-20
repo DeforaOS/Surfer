@@ -62,9 +62,9 @@ distclean:
 install: $(TARGETS)
 	@for i in $(SUBDIRS); do (cd "$$i" && $(MAKE) install) || exit; done
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 0755 -- download $(DESTDIR)$(BINDIR)/download
+	$(INSTALL) -m 0755 download $(DESTDIR)$(BINDIR)/download
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 0755 -- surfer $(DESTDIR)$(BINDIR)/surfer
+	$(INSTALL) -m 0755 surfer $(DESTDIR)$(BINDIR)/surfer
 
 uninstall:
 	@for i in $(SUBDIRS); do (cd "$$i" && $(MAKE) uninstall) || exit; done
