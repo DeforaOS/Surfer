@@ -2064,6 +2064,7 @@ void surfer_view_source(Surfer * surfer)
 	gtk_accel_group_connect(group, GDK_KEY_W, GDK_CONTROL_MASK,
 			GTK_ACCEL_VISIBLE, cc);
 	gtk_window_add_accel_group(GTK_WINDOW(window), group);
+	g_object_unref(group);
 	gtk_window_set_default_size(GTK_WINDOW(window), 640, 480);
 	snprintf(buf, sizeof(buf), "%s%s", _("Web surfer - Source of "), url);
 	gtk_window_set_title(GTK_WINDOW(window), buf);
