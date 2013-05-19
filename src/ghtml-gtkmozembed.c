@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2010 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2008-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Surfer */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -323,6 +323,14 @@ gboolean ghtml_can_go_back(GtkWidget * ghtml)
 gboolean ghtml_can_go_forward(GtkWidget * ghtml)
 {
 	return gtk_moz_embed_can_go_forward(GTK_MOZ_EMBED(ghtml));
+}
+
+
+/* ghtml_get_favicon */
+GdkPixbuf * ghtml_get_favicon(GtkWidget * widget)
+{
+	/* FIXME implement */
+	return NULL;
 }
 
 
