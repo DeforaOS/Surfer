@@ -1,6 +1,6 @@
 /* $Id$ */
 static char const _copyright[] =
-"Copyright (c) 2006-2012 Pierre Pronchery <khorben@defora.org>";
+"Copyright (c) 2006-2013 Pierre Pronchery <khorben@defora.org>";
 /* This file is part of DeforaOS Desktop Surfer */
 static char const _license[] =
 "This program is free software: you can redistribute it and/or modify\n"
@@ -15,7 +15,6 @@ static char const _license[] =
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
 /* TODO:
- * - implement the favicon
  * - support multiple profiles
  * - implement "always ask" for the default download directory
  * - provide access to SSL information in embedded mode
@@ -320,6 +319,7 @@ Surfer * _new_do(char const * url)
 	group = gtk_accel_group_new();
 	surfer->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_add_accel_group(GTK_WINDOW(surfer->window), group);
+	g_object_unref(group);
 	gtk_window_set_default_size(GTK_WINDOW(surfer->window), 1024, 768);
 #if GTK_CHECK_VERSION(2, 6, 0)
 	gtk_window_set_icon_name(GTK_WINDOW(surfer->window), "web-browser");
@@ -529,6 +529,27 @@ void surfer_set_enable_javascript(Surfer * surfer, gboolean enable)
 				i);
 		ghtml_set_enable_javascript(view, enable);
 	}
+}
+
+
+/* surfer_set_favicon */
+void surfer_set_favicon(Surfer * surfer, GdkPixbuf * pixbuf)
+{
+	GtkWidget * view;
+#if GTK_CHECK_VERSION(2, 16, 0)
+	GtkWidget * widget;
+#endif
+
+	if((view = surfer_get_view(surfer)) == NULL)
+		return; /* consider the current tab only */
+#if GTK_CHECK_VERSION(2, 16, 0)
+	widget = gtk_bin_get_child(GTK_BIN(surfer->lb_path));
+	pixbuf = ghtml_get_favicon(view);
+	gtk_entry_set_icon_from_pixbuf(GTK_ENTRY(widget),
+			GTK_ENTRY_ICON_PRIMARY, pixbuf);
+#else
+	/* FIXME implement */
+#endif
 }
 
 

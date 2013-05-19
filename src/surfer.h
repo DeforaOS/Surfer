@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2006-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2006-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Surfer */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ void surfer_delete(Surfer * surfer);
 GtkWidget * surfer_get_view(Surfer * surfer);
 
 void surfer_set_enable_javascript(Surfer * surfer, gboolean enable);
+void surfer_set_favicon(Surfer * surfer, GdkPixbuf * pixbuf);
 void surfer_set_fullscreen(Surfer * surfer, gboolean fullscreen);
 void surfer_set_homepage(Surfer * surfer, char const * homepage);
 void surfer_set_location(Surfer * surfer, char const * url);

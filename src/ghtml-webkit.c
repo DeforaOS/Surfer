@@ -47,6 +47,10 @@ typedef struct _GHtml
 
 /* prototypes */
 /* functions */
+/* accessors */
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+static void _ghtml_set_favicon(GtkWidget * widget, char const * icon);
+#endif
 static void _ghtml_set_status(GtkWidget * widget, char const * status);
 
 /* callbacks */
@@ -60,6 +64,9 @@ static gboolean _on_download_requested(WebKitWebView * view,
 #endif
 static void _on_hovering_over_link(WebKitWebView * view, const gchar * title,
 		const gchar * url, gpointer data);
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+static void _on_icon_load(WebKitWebView * view, gchar * icon, gpointer data);
+#endif
 static void _on_load_committed(WebKitWebView * view, WebKitWebFrame * frame,
 		gpointer data);
 static gboolean _on_load_error(WebKitWebView * view, WebKitWebFrame * frame,
@@ -118,6 +125,10 @@ GtkWidget * ghtml_new(Surfer * surfer)
 #endif
 	g_signal_connect(G_OBJECT(ghtml->view), "hovering-over-link",
 			G_CALLBACK(_on_hovering_over_link), widget);
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+	g_signal_connect(G_OBJECT(ghtml->view), "icon-loaded", G_CALLBACK(
+				_on_icon_load), widget);
+#endif
 	g_signal_connect(G_OBJECT(ghtml->view), "load-committed", G_CALLBACK(
 				_on_load_committed), widget);
 	g_signal_connect(G_OBJECT(ghtml->view), "load-error", G_CALLBACK(
@@ -209,6 +220,26 @@ gboolean ghtml_can_go_back(GtkWidget * widget)
 
 	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
 	return webkit_web_view_can_go_back(WEBKIT_WEB_VIEW(ghtml->view));
+}
+
+
+/* ghtml_get_favicon */
+GdkPixbuf * ghtml_get_favicon(GtkWidget * widget)
+{
+	GHtml * ghtml;
+	WebKitWebFrame * frame;
+
+	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
+#if WEBKIT_CHECK_VERSION(1, 8, 0)
+	if((frame = webkit_web_view_get_main_frame(
+					WEBKIT_WEB_VIEW(ghtml->view))) != NULL
+			&& webkit_web_frame_get_uri(frame) != NULL)
+		return webkit_web_view_try_get_favicon_pixbuf(
+				WEBKIT_WEB_VIEW(ghtml->view), 16, 16);
+#else
+	/* FIXME implement */
+#endif
+	return NULL;
 }
 
 
@@ -731,6 +762,32 @@ void ghtml_zoom_reset(GtkWidget * widget)
 
 /* private */
 /* functions */
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+/* ghtml_set_favicon */
+static void _ghtml_set_favicon(GtkWidget * widget, char const * icon)
+{
+	GHtml * ghtml;
+	GdkPixbuf * pixbuf = NULL;
+# if WEBKIT_CHECK_VERSION(1, 8, 0)
+	WebKitWebFrame * frame;
+# endif
+
+	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
+# if WEBKIT_CHECK_VERSION(1, 8, 0)
+	if((frame = webkit_web_view_get_main_frame(
+					WEBKIT_WEB_VIEW(ghtml->view))) != NULL
+			&& webkit_web_frame_get_uri(frame) != NULL)
+		pixbuf = webkit_web_view_try_get_favicon_pixbuf(
+				WEBKIT_WEB_VIEW(ghtml->view), 16, 16);
+# else
+	/* FIXME implement */
+# endif
+	surfer_set_favicon(ghtml->surfer, pixbuf);
+}
+#endif
+
+
+/* ghtml_set_status */
 static void _ghtml_set_status(GtkWidget * widget, char const * status)
 {
 	GHtml * ghtml;
@@ -814,6 +871,16 @@ static void _on_hovering_over_link(WebKitWebView * view, const gchar * title,
 
 	_ghtml_set_status(widget, url);
 }
+
+
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+static void _on_icon_load(WebKitWebView * view, gchar * icon, gpointer data)
+{
+	GtkWidget * widget = data;
+
+	_ghtml_set_favicon(widget, icon);
+}
+#endif
 
 
 /* on_load_committed */

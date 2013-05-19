@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2008-2012 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2008-2013 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Surfer */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ void ghtml_delete(GtkWidget * ghtml);
 gboolean ghtml_can_go_back(GtkWidget * ghtml);
 gboolean ghtml_can_go_forward(GtkWidget * ghtml);
 
+GdkPixbuf * ghtml_get_favicon(GtkWidget * ghtml);
 char const * ghtml_get_link_message(GtkWidget * ghtml);
 char const * ghtml_get_location(GtkWidget * ghtml);
 gdouble ghtml_get_progress(GtkWidget * ghtml);

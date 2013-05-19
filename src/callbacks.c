@@ -496,6 +496,7 @@ static gboolean _switch_page_idle(gpointer data)
 	 * - change the title (tab)
 	 * - update toolbar buttons */
 	/* XXX the Surfer fetches the right values by himself => API change? */
+	surfer_set_favicon(surfer, NULL);
 	surfer_set_location(surfer, NULL);
 	surfer_set_progress(surfer, 0.0);
 	surfer_set_security(surfer, SS_NONE);
