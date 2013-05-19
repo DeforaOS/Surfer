@@ -69,8 +69,10 @@ static void _on_icon_load(WebKitWebView * view, gchar * icon, gpointer data);
 #endif
 static void _on_load_committed(WebKitWebView * view, WebKitWebFrame * frame,
 		gpointer data);
+#if WEBKIT_CHECK_VERSION(1, 1, 6)
 static gboolean _on_load_error(WebKitWebView * view, WebKitWebFrame * frame,
 		const gchar * uri, GError * error, gpointer data);
+#endif
 static void _on_load_finished(WebKitWebView * view, WebKitWebFrame * frame,
 		gpointer data);
 static void _on_load_progress_changed(WebKitWebView * view, gint progress,
@@ -131,8 +133,10 @@ GtkWidget * ghtml_new(Surfer * surfer)
 #endif
 	g_signal_connect(G_OBJECT(ghtml->view), "load-committed", G_CALLBACK(
 				_on_load_committed), widget);
+#if WEBKIT_CHECK_VERSION(1, 1, 6)
 	g_signal_connect(G_OBJECT(ghtml->view), "load-error", G_CALLBACK(
 				_on_load_error), widget);
+#endif
 	g_signal_connect(G_OBJECT(ghtml->view), "load-finished", G_CALLBACK(
 				_on_load_finished), widget);
 	g_signal_connect(G_OBJECT(ghtml->view), "load-progress-changed",
@@ -899,23 +903,24 @@ static void _on_load_committed(WebKitWebView * view, WebKitWebFrame * frame,
 
 
 /* on_load_error */
+#if WEBKIT_CHECK_VERSION(1, 1, 6)
 static gboolean _on_load_error(WebKitWebView * view, WebKitWebFrame * frame,
 		const gchar * uri, GError * error, gpointer data)
 {
 	GHtml * ghtml;
-#ifdef WEBKIT_POLICY_ERROR
+# ifdef WEBKIT_POLICY_ERROR
 	char const * suggested;
-#endif
+# endif
 
 	ghtml = g_object_get_data(G_OBJECT(data), "ghtml");
 	if(error == NULL)
 		return surfer_error(ghtml->surfer, _("Unknown error"), TRUE);
-#ifdef WEBKIT_NETWORK_ERROR
+# ifdef WEBKIT_NETWORK_ERROR
 	if(error->domain == WEBKIT_NETWORK_ERROR
 			&& error->code == WEBKIT_NETWORK_ERROR_CANCELLED)
 		return TRUE; /* ignored if the user cancelled it */
-#endif
-#ifdef WEBKIT_POLICY_ERROR
+# endif
+# ifdef WEBKIT_POLICY_ERROR
 	if(error->domain == WEBKIT_POLICY_ERROR
 			&& error->code == WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE)
 	{
@@ -925,9 +930,10 @@ static gboolean _on_load_error(WebKitWebView * view, WebKitWebFrame * frame,
 		surfer_download(ghtml->surfer, uri, suggested);
 		return TRUE;
 	}
-#endif
+# endif
 	return surfer_error(ghtml->surfer, error->message, TRUE);
 }
+#endif
 
 
 /* on_load_finished */
