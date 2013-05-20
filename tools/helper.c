@@ -650,6 +650,14 @@ void surfer_console_message(Surfer * surfer, char const * message,
 }
 
 
+/* surfer_copy */
+void surfer_copy(Surfer * surfer)
+{
+	/* FIXME really implement */
+	ghtml_copy(surfer->view);
+}
+
+
 /* surfer_download */
 int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 {
@@ -734,12 +742,39 @@ int surfer_prompt(Surfer * surfer, char const * message,
 }
 
 
+/* surfer_print */
+void surfer_print(Surfer * surfer)
+{
+	ghtml_print(surfer->view);
+}
+
+
+/* surfer_refresh */
+void surfer_refresh(Surfer * surfer)
+{
+	ghtml_refresh(surfer->view);
+}
+
+
 /* surfer_resize */
 void surfer_resize(Surfer * surfer, gint width, gint height)
 {
 	Helper * helper = surfer;
 
 	gtk_window_resize(GTK_WINDOW(helper->window), width, height);
+}
+
+
+/* surfer_save_dialog */
+void surfer_save_dialog(Surfer * surfer)
+{
+}
+
+
+/* surfer_select_all */
+void surfer_select_all(Surfer * surfer)
+{
+	ghtml_select_all(surfer->view);
 }
 
 
