@@ -56,6 +56,10 @@ static void _ghtml_set_status(GtkWidget * widget, char const * status);
 /* callbacks */
 static gboolean _on_console_message(WebKitWebView * view, const gchar * message,
 		guint line, const gchar * source, gpointer data);
+#if WEBKIT_CHECK_VERSION(1, 10, 0)
+static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
+		WebKitHitTestResult * result, gboolean keyboard, gpointer data);
+#endif
 static WebKitWebView * _on_create_web_view(WebKitWebView * view,
 		WebKitWebFrame * frame, gpointer data);
 #ifdef WEBKIT_TYPE_DOWNLOAD
@@ -119,6 +123,10 @@ GtkWidget * ghtml_new(Surfer * surfer)
 	/* view */
 	g_signal_connect(G_OBJECT(ghtml->view), "console-message", G_CALLBACK(
 				_on_console_message), widget);
+#if WEBKIT_CHECK_VERSION(1, 10, 0)
+	g_signal_connect(G_OBJECT(ghtml->view), "context-menu", G_CALLBACK(
+				_on_context_menu), widget);
+#endif
 	g_signal_connect(G_OBJECT(ghtml->view), "create-web-view", G_CALLBACK(
 				_on_create_web_view), widget);
 #ifdef WEBKIT_TYPE_DOWNLOAD
@@ -823,6 +831,175 @@ static gboolean _on_console_message(WebKitWebView * view, const gchar * message,
 	surfer_console_message(ghtml->surfer, message, source, line);
 	return TRUE;
 }
+
+
+#if WEBKIT_CHECK_VERSION(1, 10, 0)
+/* on_context_menu */
+static void _context_menu_document(GHtml * ghtml, GtkWidget * menu);
+static void _context_menu_editable(GHtml * ghtml);
+static void _context_menu_image(GHtml * ghtml, GtkWidget * menu);
+static void _context_menu_link(GHtml * ghtml, GtkWidget * menu);
+static void _context_menu_media(GHtml * ghtml);
+static void _context_menu_separator(GtkWidget * menu, gboolean * separator);
+
+static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
+		WebKitHitTestResult * result, gboolean keyboard, gpointer data)
+{
+	GHtml * ghtml = data;
+	WebKitHitTestResultContext context;
+	gboolean separator = FALSE;
+
+	/* FIXME implement the callbacks */
+	menu = gtk_menu_new();
+	g_object_get(result, "context", &context, NULL);
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_EDITABLE)
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_editable(ghtml);
+	}
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_LINK)
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_link(ghtml, menu);
+	}
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_DOCUMENT
+			&& !(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_LINK))
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_document(ghtml, menu);
+	}
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_IMAGE)
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_image(ghtml, menu);
+	}
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_MEDIA)
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_media(ghtml);
+	}
+	gtk_widget_show_all(menu);
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
+			gtk_get_current_event_time());
+	return TRUE;
+}
+
+static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
+{
+	GtkWidget * menuitem;
+	GtkWidget * image;
+
+	/* back */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_BACK, NULL);
+	if(!ghtml_can_go_back(ghtml))
+		gtk_widget_set_sensitive(menuitem, FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* forward */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_FORWARD,
+			NULL);
+	if(!ghtml_can_go_forward(ghtml))
+		gtk_widget_set_sensitive(menuitem, FALSE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* separator */
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* save page */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(
+			_("_Save page as..."));
+	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* separator */
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* print */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, NULL);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* separator */
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* select all */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL,
+			NULL);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* separator */
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	menuitem = gtk_image_menu_item_new_with_mnemonic(_("View so_urce"));
+	image = gtk_image_new_from_icon_name("surfer-view-html-source",
+			GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+}
+
+static void _context_menu_editable(GHtml * ghtml)
+{
+	/* FIXME implement */
+}
+
+static void _context_menu_image(GHtml * ghtml, GtkWidget * menu)
+{
+	GtkWidget * menuitem;
+	GtkWidget * image;
+
+	/* view image */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(_("_View image"));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* save image as */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(
+			_("_Save image as..."));
+	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+}
+
+static void _context_menu_link(GHtml * ghtml, GtkWidget * menu)
+{
+	GtkWidget * menuitem;
+	GtkWidget * image;
+
+	/* open in new tab */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(_("Open in new _tab"));
+	image = gtk_image_new_from_icon_name("tab-new", GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* open in new window */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(
+			_("Open in new _window"));
+	image = gtk_image_new_from_icon_name("window-new", GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* separator */
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* save link as */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(_("_Save link as..."));
+	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+}
+
+static void _context_menu_media(GHtml * ghtml)
+{
+	/* FIXME implement */
+}
+
+static void _context_menu_separator(GtkWidget * menu, gboolean * separator)
+{
+	GtkWidget * menuitem;
+
+	if(*separator == FALSE)
+	{
+		*separator = TRUE;
+		return;
+	}
+	menuitem = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	*separator = TRUE;
+}
+#endif
 
 
 /* on_create_web_view */
