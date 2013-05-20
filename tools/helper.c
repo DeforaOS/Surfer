@@ -532,6 +532,13 @@ GtkWidget * surfer_get_view(Surfer * surfer)
 }
 
 
+/* surfer_set_favicon */
+void surfer_set_favicon(Surfer * surfer, GdkPixbuf * pixbuf)
+{
+	/* FIXME implement */
+}
+
+
 /* surfer_set_fullscreen */
 void surfer_set_fullscreen(Surfer * surfer, gboolean fullscreen)
 {
