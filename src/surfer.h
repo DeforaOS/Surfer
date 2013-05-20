@@ -102,6 +102,7 @@ void surfer_close_tab(Surfer * surfer, GtkWidget * widget);
 void surfer_print(Surfer * surfer);
 
 void surfer_save(Surfer * surfer, char const * filename);
+void surfer_save_dialog(Surfer * surfer);
 
 void surfer_find(Surfer * surfer, char const * text);
 

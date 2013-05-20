@@ -1498,7 +1498,6 @@ void surfer_save(Surfer * surfer, char const * filename)
 {
 	GtkWidget * view;
 	char const * source;
-	GtkWidget * dialog;
 	size_t len;
 	FILE * fp;
 	char buf[256];
@@ -1509,17 +1508,8 @@ void surfer_save(Surfer * surfer, char const * filename)
 		return; /* XXX report error */
 	if(filename == NULL)
 	{
-		dialog = gtk_file_chooser_dialog_new(_("Save file as..."),
-				GTK_WINDOW(surfer->window),
-				GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
-				GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE,
-				GTK_RESPONSE_ACCEPT, NULL);
-		if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
-			filename = gtk_file_chooser_get_filename(
-					GTK_FILE_CHOOSER(dialog));
-		gtk_widget_destroy(dialog);
-		if(filename == NULL)
-			return;
+		surfer_save_dialog(surfer);
+		return;
 	}
 	if(_surfer_filename_confirm(surfer, filename) != TRUE)
 		return;
@@ -1536,6 +1526,28 @@ void surfer_save(Surfer * surfer, char const * filename)
 		surfer_error(surfer, buf, 0);
 	}
 	fclose(fp);
+}
+
+
+/* surfer_save_dialog */
+void surfer_save_dialog(Surfer * surfer)
+{
+	GtkWidget * dialog;
+	gchar * filename = NULL;
+
+	dialog = gtk_file_chooser_dialog_new(_("Save file as..."),
+			GTK_WINDOW(surfer->window),
+			GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
+			GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE,
+			GTK_RESPONSE_ACCEPT, NULL);
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+		filename = gtk_file_chooser_get_filename(
+				GTK_FILE_CHOOSER(dialog));
+	gtk_widget_destroy(dialog);
+	if(filename == NULL)
+		return;
+	surfer_save(surfer, filename);
+	g_free(filename);
 }
 
 

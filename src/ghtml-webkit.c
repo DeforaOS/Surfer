@@ -916,6 +916,7 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 		g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
 					surfer_go_forward), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* refresh */
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
 	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
 				surfer_refresh), ghtml->surfer);
@@ -928,6 +929,8 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 			_("_Save page as..."));
 	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				surfer_save_dialog), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* separator */
 	menuitem = gtk_separator_menu_item_new();
