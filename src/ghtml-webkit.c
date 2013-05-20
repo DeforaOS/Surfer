@@ -23,6 +23,7 @@
 #include <arpa/inet.h>
 #include <libintl.h>
 #include <webkit/webkit.h>
+#include "callbacks.h"
 #include "ghtml.h"
 #include "common/url.c"
 #include "../config.h"
@@ -845,11 +846,13 @@ static void _context_menu_separator(GtkWidget * menu, gboolean * separator);
 static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
 		WebKitHitTestResult * result, gboolean keyboard, gpointer data)
 {
-	GHtml * ghtml = data;
+	GtkWidget * widget = data;
+	GHtml * ghtml;
 	WebKitHitTestResultContext context;
 	gboolean separator = FALSE;
 
-	/* FIXME implement the callbacks */
+	/* FIXME implement every callback */
+	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
 	menu = gtk_menu_new();
 	g_object_get(result, "context", &context, NULL);
 	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_EDITABLE)
@@ -891,14 +894,20 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 
 	/* back */
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_BACK, NULL);
-	if(!ghtml_can_go_back(ghtml))
+	if(!ghtml_can_go_back(ghtml->widget))
 		gtk_widget_set_sensitive(menuitem, FALSE);
+	else
+		g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+					on_back), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* forward */
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_FORWARD,
 			NULL);
-	if(!ghtml_can_go_forward(ghtml))
+	if(!ghtml_can_go_forward(ghtml->widget))
 		gtk_widget_set_sensitive(menuitem, FALSE);
+	else
+		g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+					on_forward), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -930,6 +939,8 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 	menuitem = gtk_image_menu_item_new_with_mnemonic(_("View so_urce"));
 	image = gtk_image_new_from_icon_name("surfer-view-html-source",
 			GTK_ICON_SIZE_MENU);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				on_view_source), ghtml->surfer);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 }
