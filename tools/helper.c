@@ -680,6 +680,20 @@ int surfer_error(Surfer * surfer, char const * message, int ret)
 }
 
 
+/* surfer_go_back */
+gboolean surfer_go_back(Surfer * surfer)
+{
+	return ghtml_go_back(surfer->view);
+}
+
+
+/* surfer_go_forward */
+gboolean surfer_go_forward(Surfer * surfer)
+{
+	return ghtml_go_forward(surfer->view);
+}
+
+
 /* surfer_prompt */
 int surfer_prompt(Surfer * surfer, char const * message,
 		char const * default_value, char ** value)
@@ -761,6 +775,12 @@ void surfer_show_toolbar(Surfer * surfer, gboolean show)
 
 /* surfer_show_window */
 void surfer_show_window(Surfer * surfer, gboolean show)
+{
+}
+
+
+/* surfer_view_source */
+void surfer_view_source(Surfer * surfer)
 {
 }
 
