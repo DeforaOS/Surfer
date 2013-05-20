@@ -841,6 +841,7 @@ static void _context_menu_editable(GHtml * ghtml);
 static void _context_menu_image(GHtml * ghtml, GtkWidget * menu);
 static void _context_menu_link(GHtml * ghtml, GtkWidget * menu);
 static void _context_menu_media(GHtml * ghtml);
+static void _context_menu_selection(GHtml * ghtml, GtkWidget * menu);
 static void _context_menu_separator(GtkWidget * menu, gboolean * separator);
 
 static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
@@ -866,10 +867,16 @@ static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
 		_context_menu_link(ghtml, menu);
 	}
 	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_DOCUMENT
+			&& !(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_SELECTION)
 			&& !(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_LINK))
 	{
 		_context_menu_separator(menu, &separator);
 		_context_menu_document(ghtml, menu);
+	}
+	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_SELECTION)
+	{
+		_context_menu_separator(menu, &separator);
+		_context_menu_selection(ghtml, menu);
 	}
 	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_IMAGE)
 	{
@@ -910,6 +917,8 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 					surfer_go_forward), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				surfer_refresh), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* separator */
 	menuitem = gtk_separator_menu_item_new();
@@ -925,6 +934,8 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* print */
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, NULL);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(surfer_print),
+			ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* separator */
 	menuitem = gtk_separator_menu_item_new();
@@ -932,6 +943,8 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 	/* select all */
 	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL,
 			NULL);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				surfer_select_all), ghtml->surfer);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* separator */
 	menuitem = gtk_separator_menu_item_new();
@@ -995,6 +1008,23 @@ static void _context_menu_link(GHtml * ghtml, GtkWidget * menu)
 static void _context_menu_media(GHtml * ghtml)
 {
 	/* FIXME implement */
+}
+
+static void _context_menu_selection(GHtml * ghtml, GtkWidget * menu)
+{
+	GtkWidget * menuitem;
+
+	/* copy */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(surfer_copy),
+			ghtml->surfer);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* select all */
+	menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL,
+			NULL);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				surfer_select_all), ghtml->surfer);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 }
 
 static void _context_menu_separator(GtkWidget * menu, gboolean * separator)
