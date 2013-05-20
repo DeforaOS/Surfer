@@ -24,7 +24,7 @@ helper_LDFLAGS = $(LDFLAGSF) $(LDFLAGS) `pkg-config --libs libDesktop webkit-1.0
 helper: $(helper_OBJS)
 	$(CC) -o helper $(helper_OBJS) $(helper_LDFLAGS)
 
-helper.o: helper.c ../src/ghtml.c
+helper.o: helper.c ../src/ghtml.c ../src/surfer.h
 	$(CC) $(helper_CFLAGS) -c helper.c
 
 clean:
