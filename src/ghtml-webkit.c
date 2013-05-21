@@ -1099,7 +1099,7 @@ static void _context_menu_separator(GtkWidget * menu, gboolean * separator)
 static void _on_copy_link_location(gpointer data)
 {
 	GHtml * ghtml = data;
-	GdkAtom * atom;
+	GdkAtom atom;
 	GtkClipboard * clipboard;
 
 	/* we can ignore errors */
