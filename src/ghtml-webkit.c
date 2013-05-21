@@ -560,8 +560,9 @@ void ghtml_load_url(GtkWidget * widget, char const * url)
 	GHtml * ghtml;
 	char * p;
 	char * q = NULL;
-	const char about[] = "<html>\n<head><title>About " PACKAGE "</title>"
-		"</head>\n<body>\n<center>\n<h1>" PACKAGE " " VERSION "</h1>\n"
+	const char about[] = "<!DOCTYPE html>\n<html>\n"
+		"<head><title>About " PACKAGE "</title></head>\n"
+		"<body>\n<center>\n<h1>" PACKAGE " " VERSION "</h1>\n"
 		"<p>Copyright &copy; 2009-2013 Pierre Pronchery &lt;khorben@"
 		"defora.org&gt;</p>\n</center>\n</body>\n</html>";
 #if WITH_INSPECTOR
