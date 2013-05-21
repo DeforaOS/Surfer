@@ -1309,7 +1309,11 @@ static void _on_save_image_as(gpointer data)
 /* on_save_link_as */
 static void _on_save_link_as(gpointer data)
 {
-	/* FIXME implement */
+	GHtml * ghtml = data;
+
+	surfer_download(ghtml->surfer, ghtml->popup_link, NULL);
+	free(ghtml->popup_link);
+	ghtml->popup_link = NULL;
 }
 #endif
 
