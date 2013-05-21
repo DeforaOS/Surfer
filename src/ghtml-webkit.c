@@ -28,7 +28,7 @@
 #include "common/url.c"
 #include "../config.h"
 #define _(string) gettext(string)
-#define WITH_INSPECTOR (defined(DEBUG) && WEBKIT_CHECK_VERSION(1, 0, 3))
+#define WITH_INSPECTOR WEBKIT_CHECK_VERSION(1, 0, 3)
 
 
 /* private */
@@ -58,6 +58,11 @@ static void _ghtml_set_favicon(GtkWidget * widget, char const * icon);
 #endif
 static void _ghtml_set_status(GtkWidget * widget, char const * status);
 
+/* useful */
+#ifdef WITH_INSPECTOR
+static void _ghtml_inspect_url(GtkWidget * widget, char const * url);
+#endif
+
 /* callbacks */
 static gboolean _on_console_message(WebKitWebView * view, const gchar * message,
 		guint line, const gchar * source, gpointer data);
@@ -78,6 +83,9 @@ static void _on_hovering_over_link(WebKitWebView * view, const gchar * title,
 		const gchar * url, gpointer data);
 #if WEBKIT_CHECK_VERSION(1, 1, 18)
 static void _on_icon_load(WebKitWebView * view, gchar * icon, gpointer data);
+#endif
+#if WEBKIT_CHECK_VERSION(1, 10, 0) && defined(WITH_INSPECTOR)
+static void _on_inspect_page(gpointer data);
 #endif
 static void _on_load_committed(WebKitWebView * view, WebKitWebFrame * frame,
 		gpointer data);
@@ -544,17 +552,6 @@ gboolean ghtml_go_forward(GtkWidget * widget)
 
 
 /* ghtml_load_url */
-#if WITH_INSPECTOR
-static WebKitWebView * _load_inspector_inspect(WebKitWebInspector * inspector,
-		WebKitWebView * view, gpointer data);
-static gboolean _load_inspector_inspected_uri(WebKitWebInspector * inspector,
-		gpointer data);
-static gboolean _load_inspector_show(WebKitWebInspector * inspector,
-		gpointer data);
-/* callbacks */
-static gboolean _load_inspector_on_closex(gpointer data);
-#endif
-
 void ghtml_load_url(GtkWidget * widget, char const * url)
 {
 	GHtml * ghtml;
@@ -565,10 +562,6 @@ void ghtml_load_url(GtkWidget * widget, char const * url)
 		"<body>\n<center>\n<h1>" PACKAGE " " VERSION "</h1>\n"
 		"<p>Copyright &copy; 2009-2013 Pierre Pronchery &lt;khorben@"
 		"defora.org&gt;</p>\n</center>\n</body>\n</html>";
-#if WITH_INSPECTOR
-	WebKitWebSettings * settings;
-	WebKitWebInspector * inspector;
-#endif
 
 	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
 	if((p = _ghtml_make_url(NULL, url)) != NULL)
@@ -587,83 +580,12 @@ void ghtml_load_url(GtkWidget * widget, char const * url)
 		webkit_web_view_open(WEBKIT_WEB_VIEW(ghtml->view), url);
 #endif
 	}
-#if WITH_INSPECTOR
-	if(ghtml->inspector == NULL)
-	{
-		settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(
-					ghtml->view));
-		g_object_set(settings, "enable-developer-extras", TRUE, NULL);
-		inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(
-					ghtml->view));
-		g_signal_connect(G_OBJECT(inspector), "inspect-web-view",
-				G_CALLBACK(_load_inspector_inspect), ghtml);
-		g_signal_connect(G_OBJECT(inspector), "show-window", G_CALLBACK(
-					_load_inspector_show), ghtml);
-		g_signal_connect(G_OBJECT(inspector), "notify::inspected-uri",
-				G_CALLBACK(_load_inspector_inspected_uri),
-				ghtml);
-	}
-#endif
 	g_free(p);
 	g_free(q);
 	surfer_set_progress(ghtml->surfer, 0.0);
 	surfer_set_security(ghtml->surfer, SS_NONE);
 	_ghtml_set_status(widget, _("Connecting..."));
 }
-
-#if WITH_INSPECTOR
-static WebKitWebView * _load_inspector_inspect(WebKitWebInspector * inspector,
-		WebKitWebView * view, gpointer data)
-{
-	GHtml * ghtml = data;
-
-	ghtml->inspector = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_default_size(GTK_WINDOW(ghtml->inspector), 800, 600);
-	gtk_window_set_title(GTK_WINDOW(ghtml->inspector),
-			_("WebKit Web Inspector"));
-	g_signal_connect_swapped(ghtml->inspector, "delete-event", G_CALLBACK(
-				_load_inspector_on_closex), ghtml);
-	view = webkit_web_view_new();
-	/* FIXME implement more signals and really implement "web-view-ready" */
-	g_signal_connect(view, "console-message", G_CALLBACK(
-				_on_console_message), ghtml->widget);
-	g_signal_connect_swapped(view, "web-view-ready", G_CALLBACK(
-				gtk_widget_show_all), ghtml->inspector);
-	gtk_container_add(GTK_CONTAINER(ghtml->inspector), GTK_WIDGET(view));
-	return view;
-}
-
-static gboolean _load_inspector_show(WebKitWebInspector * inspector,
-		gpointer data)
-{
-	GHtml * ghtml = data;
-
-	gtk_window_present(GTK_WINDOW(ghtml->inspector));
-	return TRUE;
-}
-
-static gboolean _load_inspector_inspected_uri(WebKitWebInspector * inspector,
-		gpointer data)
-{
-	GHtml * ghtml = data;
-	char buf[256];
-	char const * url;
-
-	url = webkit_web_inspector_get_inspected_uri(inspector);
-	snprintf(buf, sizeof(buf), "%s%s%s", _("WebKit Web Inspector"),
-			(url != NULL) ? " - " : "", (url != NULL) ? url : "");
-	return FALSE;
-}
-
-/* callbacks */
-static gboolean _load_inspector_on_closex(gpointer data)
-{
-	GHtml * ghtml = data;
-
-	gtk_widget_hide(ghtml->inspector);
-	return TRUE;
-}
-#endif
 
 
 /* ghtml_paste */
@@ -839,6 +761,102 @@ static void _ghtml_set_status(GtkWidget * widget, char const * status)
 }
 
 
+/* useful */
+#ifdef WITH_INSPECTOR
+static WebKitWebView * _inspect_inspect(WebKitWebInspector * inspector,
+		WebKitWebView * view, gpointer data);
+static gboolean _inspect_inspected_uri(WebKitWebInspector * inspector,
+		gpointer data);
+static gboolean _inspect_show(WebKitWebInspector * inspector,
+		gpointer data);
+/* callbacks */
+static gboolean _inspect_on_closex(gpointer data);
+
+static void _ghtml_inspect_url(GtkWidget * widget, char const * url)
+{
+	GHtml * ghtml;
+	WebKitWebSettings * settings;
+	WebKitWebInspector * inspector;
+
+	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
+	if(ghtml->inspector == NULL)
+	{
+		settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(
+					ghtml->view));
+		g_object_set(settings, "enable-developer-extras", TRUE, NULL);
+		surfer_open(ghtml->surfer, url);
+		inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(
+					ghtml->view));
+		g_signal_connect(G_OBJECT(inspector), "inspect-web-view",
+				G_CALLBACK(_inspect_inspect), ghtml);
+		g_signal_connect(G_OBJECT(inspector), "show-window", G_CALLBACK(
+					_inspect_show), ghtml);
+		g_signal_connect(G_OBJECT(inspector), "notify::inspected-uri",
+				G_CALLBACK(_inspect_inspected_uri), ghtml);
+	}
+	else
+	{
+		surfer_open(ghtml->surfer, url);
+		inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(
+					ghtml->view));
+	}
+	/* FIXME crashes (tested on NetBSD/amd64) */
+	webkit_web_inspector_show(inspector);
+}
+
+static WebKitWebView * _inspect_inspect(WebKitWebInspector * inspector,
+		WebKitWebView * view, gpointer data)
+{
+	GHtml * ghtml = data;
+
+	ghtml->inspector = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_default_size(GTK_WINDOW(ghtml->inspector), 800, 600);
+	gtk_window_set_title(GTK_WINDOW(ghtml->inspector),
+			_("WebKit Web Inspector"));
+	g_signal_connect_swapped(ghtml->inspector, "delete-event", G_CALLBACK(
+				_inspect_on_closex), ghtml);
+	view = webkit_web_view_new();
+	/* FIXME implement more signals and really implement "web-view-ready" */
+	g_signal_connect(view, "console-message", G_CALLBACK(
+				_on_console_message), ghtml->widget);
+	g_signal_connect_swapped(view, "web-view-ready", G_CALLBACK(
+				gtk_widget_show_all), ghtml->inspector);
+	gtk_container_add(GTK_CONTAINER(ghtml->inspector), GTK_WIDGET(view));
+	return view;
+}
+
+static gboolean _inspect_show(WebKitWebInspector * inspector, gpointer data)
+{
+	GHtml * ghtml = data;
+
+	gtk_window_present(GTK_WINDOW(ghtml->inspector));
+	return TRUE;
+}
+
+static gboolean _inspect_inspected_uri(WebKitWebInspector * inspector,
+		gpointer data)
+{
+	GHtml * ghtml = data;
+	char buf[256];
+	char const * url;
+
+	url = webkit_web_inspector_get_inspected_uri(inspector);
+	snprintf(buf, sizeof(buf), "%s%s%s", _("WebKit Web Inspector"),
+			(url != NULL) ? " - " : "", (url != NULL) ? url : "");
+	return FALSE;
+}
+
+/* callbacks */
+static gboolean _inspect_on_closex(gpointer data)
+{
+	GHtml * ghtml = data;
+
+	gtk_widget_hide(ghtml->inspector);
+	return TRUE;
+}
+#endif
+
+
 /* callbacks */
 /* on_console_message */
 static gboolean _on_console_message(WebKitWebView * view, const gchar * message,
@@ -987,6 +1005,14 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 				surfer_view_source), ghtml->surfer);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+#ifdef WITH_INSPECTOR
+	/* inspect */
+	menuitem = gtk_image_menu_item_new_with_mnemonic(
+			_("_Inspect this page"));
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				_on_inspect_page), ghtml);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+#endif
 }
 
 static void _context_menu_editable(GHtml * ghtml)
@@ -1187,6 +1213,18 @@ static void _on_icon_load(WebKitWebView * view, gchar * icon, gpointer data)
 #endif
 
 
+#if WEBKIT_CHECK_VERSION(1, 10, 0) && defined(WITH_INSPECTOR)
+static void _on_inspect_page(gpointer data)
+{
+	GHtml * ghtml = data;
+
+	_ghtml_inspect_url(ghtml->widget, ghtml->popup_link);
+	free(ghtml->popup_link);
+	ghtml->popup_link = NULL;
+}
+#endif
+
+
 /* on_load_committed */
 static void _on_load_committed(WebKitWebView * view, WebKitWebFrame * frame,
 		gpointer data)
@@ -1301,6 +1339,7 @@ static void _on_save_image_as(gpointer data)
 {
 	GHtml * ghtml = data;
 
+	/* XXX suggest a filename if possible */
 	surfer_download(ghtml->surfer, ghtml->popup_image, NULL);
 	free(ghtml->popup_image);
 	ghtml->popup_image = NULL;
@@ -1312,6 +1351,7 @@ static void _on_save_link_as(gpointer data)
 {
 	GHtml * ghtml = data;
 
+	/* XXX suggest a filename if possible */
 	surfer_download(ghtml->surfer, ghtml->popup_link, NULL);
 	free(ghtml->popup_link);
 	ghtml->popup_link = NULL;
