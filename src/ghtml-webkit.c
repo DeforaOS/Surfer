@@ -1034,16 +1034,16 @@ static void _context_menu_link(GHtml * ghtml, WebKitHitTestResult * result,
 	menuitem = gtk_image_menu_item_new_with_mnemonic(_("_Save link as..."));
 	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
-	g_signal_connect_swapped(menuitem, "activate",
-			G_CALLBACK(_on_save_link_as), ghtml);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				_on_save_link_as), ghtml);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 	/* copy link location */
 	menuitem = gtk_image_menu_item_new_with_mnemonic(
 			_("_Copy link location"));
 	image = gtk_image_new_from_stock(GTK_STOCK_COPY, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
-	g_signal_connect_swapped(menuitem, "activate",
-			G_CALLBACK(_on_copy_link_location), ghtml);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				_on_copy_link_location), ghtml);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 }
 
