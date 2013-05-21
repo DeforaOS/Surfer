@@ -702,6 +702,12 @@ gboolean surfer_go_forward(Surfer * surfer)
 }
 
 
+/* surfer_open_tab */
+void surfer_open_tab(Surfer * surfer, char const * url)
+{
+}
+
+
 /* surfer_prompt */
 int surfer_prompt(Surfer * surfer, char const * message,
 		char const * default_value, char ** value)
