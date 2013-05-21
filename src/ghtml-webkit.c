@@ -1098,7 +1098,16 @@ static void _context_menu_separator(GtkWidget * menu, gboolean * separator)
 /* on_copy_link_location */
 static void _on_copy_link_location(gpointer data)
 {
-	/* FIXME implement */
+	GHtml * ghtml = data;
+	GdkAtom * atom;
+	GtkClipboard * clipboard;
+
+	/* we can ignore errors */
+	atom = gdk_atom_intern ("CLIPBOARD", FALSE);
+	clipboard = gtk_clipboard_get(atom);
+	gtk_clipboard_set_text(clipboard, ghtml->popup_uri, -1);
+	free(ghtml->popup_uri);
+	ghtml->popup_uri = NULL;
 }
 #endif
 
