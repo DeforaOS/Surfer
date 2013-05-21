@@ -45,7 +45,8 @@ typedef struct _GHtml
 	gboolean ssl;
 
 	/* for popup menus */
-	char * popup_uri;
+	char * popup_image;
+	char * popup_link;
 } GHtml;
 
 
@@ -93,6 +94,7 @@ static void _on_load_started(WebKitWebView * view, WebKitWebFrame * frame,
 #if WEBKIT_CHECK_VERSION(1, 10, 0)
 static void _on_open_new_tab(gpointer data);
 static void _on_open_new_window(gpointer data);
+static void _on_save_image_as(gpointer data);
 static void _on_save_link_as(gpointer data);
 #endif
 static gboolean _on_script_alert(WebKitWebView * view, WebKitWebFrame * frame,
@@ -124,7 +126,8 @@ GtkWidget * ghtml_new(Surfer * surfer)
 	ghtml->surfer = surfer;
 	ghtml->status = NULL;
 	ghtml->ssl = FALSE;
-	ghtml->popup_uri = NULL;
+	ghtml->popup_image = NULL;
+	ghtml->popup_link = NULL;
 	/* widgets */
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	ghtml->widget = widget;
@@ -232,7 +235,8 @@ void ghtml_delete(GtkWidget * widget)
 	GHtml * ghtml;
 
 	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
-	free(ghtml->popup_uri);
+	free(ghtml->popup_image);
+	free(ghtml->popup_link);
 	free(ghtml->status);
 	object_delete(ghtml);
 }
@@ -851,7 +855,8 @@ static gboolean _on_console_message(WebKitWebView * view, const gchar * message,
 /* on_context_menu */
 static void _context_menu_document(GHtml * ghtml, GtkWidget * menu);
 static void _context_menu_editable(GHtml * ghtml);
-static void _context_menu_image(GHtml * ghtml, GtkWidget * menu);
+static void _context_menu_image(GHtml * ghtml, WebKitHitTestResult * result,
+		GtkWidget * menu);
 static void _context_menu_link(GHtml * ghtml, WebKitHitTestResult * result,
 		GtkWidget * menu);
 static void _context_menu_media(GHtml * ghtml);
@@ -897,7 +902,7 @@ static gboolean _on_context_menu(WebKitWebView * view, GtkWidget * menu,
 	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_IMAGE)
 	{
 		_context_menu_separator(menu, &separator);
-		_context_menu_image(ghtml, menu);
+		_context_menu_image(ghtml, result, menu);
 	}
 	if(context & WEBKIT_HIT_TEST_RESULT_CONTEXT_MEDIA)
 	{
@@ -973,6 +978,7 @@ static void _context_menu_document(GHtml * ghtml, GtkWidget * menu)
 	/* separator */
 	menuitem = gtk_separator_menu_item_new();
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+	/* view source */
 	menuitem = gtk_image_menu_item_new_with_mnemonic(_("View so_urce"));
 	image = gtk_image_new_from_icon_name("surfer-view-html-source",
 			GTK_ICON_SIZE_MENU);
@@ -987,11 +993,15 @@ static void _context_menu_editable(GHtml * ghtml)
 	/* FIXME implement */
 }
 
-static void _context_menu_image(GHtml * ghtml, GtkWidget * menu)
+static void _context_menu_image(GHtml * ghtml, WebKitHitTestResult * result,
+		GtkWidget * menu)
 {
 	GtkWidget * menuitem;
 	GtkWidget * image;
 
+	free(ghtml->popup_image);
+	ghtml->popup_image;
+	g_object_get(G_OBJECT(result), "image-uri", &ghtml->popup_image, NULL);
 	/* view image */
 	menuitem = gtk_image_menu_item_new_with_mnemonic(_("_View image"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -1000,6 +1010,8 @@ static void _context_menu_image(GHtml * ghtml, GtkWidget * menu)
 			_("_Save image as..."));
 	image = gtk_image_new_from_stock(GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+	g_signal_connect_swapped(menuitem, "activate", G_CALLBACK(
+				_on_save_image_as), ghtml);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 }
 
@@ -1009,9 +1021,9 @@ static void _context_menu_link(GHtml * ghtml, WebKitHitTestResult * result,
 	GtkWidget * menuitem;
 	GtkWidget * image;
 
-	free(ghtml->popup_uri);
-	ghtml->popup_uri;
-	g_object_get(G_OBJECT(result), "link-uri", &ghtml->popup_uri, NULL);
+	free(ghtml->popup_link);
+	ghtml->popup_link;
+	g_object_get(G_OBJECT(result), "link-uri", &ghtml->popup_link, NULL);
 	/* open in new tab */
 	menuitem = gtk_image_menu_item_new_with_mnemonic(_("Open in new _tab"));
 	image = gtk_image_new_from_icon_name("tab-new", GTK_ICON_SIZE_MENU);
@@ -1105,9 +1117,9 @@ static void _on_copy_link_location(gpointer data)
 	/* we can ignore errors */
 	atom = gdk_atom_intern ("CLIPBOARD", FALSE);
 	clipboard = gtk_clipboard_get(atom);
-	gtk_clipboard_set_text(clipboard, ghtml->popup_uri, -1);
-	free(ghtml->popup_uri);
-	ghtml->popup_uri = NULL;
+	gtk_clipboard_set_text(clipboard, ghtml->popup_link, -1);
+	free(ghtml->popup_link);
+	ghtml->popup_link = NULL;
 }
 #endif
 
@@ -1266,9 +1278,9 @@ static void _on_open_new_tab(gpointer data)
 {
 	GHtml * ghtml = data;
 
-	surfer_open_tab(ghtml->surfer, ghtml->popup_uri);
-	free(ghtml->popup_uri);
-	ghtml->popup_uri = NULL;
+	surfer_open_tab(ghtml->surfer, ghtml->popup_link);
+	free(ghtml->popup_link);
+	ghtml->popup_link = NULL;
 }
 
 
@@ -1277,9 +1289,20 @@ static void _on_open_new_window(gpointer data)
 {
 	GHtml * ghtml = data;
 
-	surfer_new(ghtml->popup_uri);
-	free(ghtml->popup_uri);
-	ghtml->popup_uri = NULL;
+	surfer_new(ghtml->popup_link);
+	free(ghtml->popup_link);
+	ghtml->popup_link = NULL;
+}
+
+
+/* on_save_image_as */
+static void _on_save_image_as(gpointer data)
+{
+	GHtml * ghtml = data;
+
+	surfer_download(ghtml->surfer, ghtml->popup_image, NULL);
+	free(ghtml->popup_image);
+	ghtml->popup_image = NULL;
 }
 
 
