@@ -702,9 +702,16 @@ gboolean surfer_go_forward(Surfer * surfer)
 }
 
 
+/* surfer_open */
+void surfer_open(Surfer * surfer, char const * url)
+{
+}
+
+
 /* surfer_open_tab */
 void surfer_open_tab(Surfer * surfer, char const * url)
 {
+	surfer_open(surfer, url);
 }
 
 
