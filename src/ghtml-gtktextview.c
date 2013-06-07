@@ -312,7 +312,7 @@ GtkWidget * ghtml_new(Surfer * surfer)
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	ghtml->view = gtk_text_view_new();
-	g_signal_connect(G_OBJECT(ghtml->view), "event-after", G_CALLBACK(
+	g_signal_connect(ghtml->view, "event-after", G_CALLBACK(
 				_on_view_event_after), ghtml);
 	ghtml->tbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(ghtml->view));
 	ghtml->zoom = gtk_text_buffer_create_tag(ghtml->tbuffer, NULL,
