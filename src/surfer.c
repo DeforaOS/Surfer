@@ -1825,6 +1825,11 @@ static GtkWidget * _preferences_general(Surfer * surfer)
 	surfer->pr_download_dir = gtk_file_chooser_button_new(
 			_("Choose the default download directory"),
 			GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+#if GTK_CHECK_VERSION(2, 6, 0)
+	gtk_file_chooser_button_set_title(
+			GTK_FILE_CHOOSER_BUTTON(surfer->pr_download_dir),
+			_("Default download directory"));
+#endif
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->pr_download_dir, TRUE, TRUE,
 			0);
 	surfer->pr_download_close = gtk_check_button_new_with_mnemonic(
@@ -1910,16 +1915,21 @@ static void _preferences_set(Surfer * surfer)
 	else
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
 					surfer->pr_focus_tabs), FALSE);
+	/* download directory */
 	if(surfer->download_dir == NULL)
 		surfer->download_dir = _config_get_filename("Downloads");
+	gtk_file_chooser_select_filename(GTK_FILE_CHOOSER(
+				surfer->pr_download_dir),
+			(surfer->download_dir != NULL)
+			? surfer->download_dir : g_get_home_dir());
 	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(surfer->pr_download_dir),
-			(surfer->download_dir != NULL) ? surfer->download_dir
-			: g_get_home_dir());
+			(surfer->download_dir != NULL)
+			? surfer->download_dir : g_get_home_dir());
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
 				surfer->pr_download_close),
 			surfer->download_close);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
-					surfer->pr_proxy_radio_http),
+				surfer->pr_proxy_radio_http),
 			surfer->proxy_type == SPT_HTTP);
 	_preferences_on_proxy_http_toggled(surfer);
 	if(surfer->proxy_http != NULL)
@@ -1928,10 +1938,10 @@ static void _preferences_set(Surfer * surfer)
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(surfer->pr_proxy_http_port),
 			surfer->proxy_http_port);
 	p = config_get(surfer->config, NULL, "user_agent");
-	gtk_entry_set_text(GTK_ENTRY(surfer->pr_user_agent), (p != NULL) ? p
-			: "");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
-				surfer->pr_javascript), surfer->javascript);
+	gtk_entry_set_text(GTK_ENTRY(surfer->pr_user_agent), (p != NULL)
+			? p : "");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(surfer->pr_javascript),
+			surfer->javascript);
 }
 
 static gboolean _preferences_on_closex(gpointer data)
