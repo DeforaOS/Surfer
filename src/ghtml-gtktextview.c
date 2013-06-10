@@ -761,9 +761,14 @@ void ghtml_zoom_reset(GtkWidget * widget)
 
 
 /* functions */
-static ssize_t _document_load_write(Conn * conn, char const * buf, size_t size,
-		gpointer data);
-static gboolean _document_load_idle(gpointer data);
+static int _document_load_file(GHtml * ghtml, char const * filename);
+static int _document_load_url(GHtml * ghtml, char const * url,
+		char const * post);
+static gboolean _document_load_url_idle(gpointer data);
+static ssize_t _document_load_url_write(Conn * conn, char const * buf,
+		size_t size, gpointer data);
+static int _document_load_write(GHtml * ghtml, char const * buf, size_t size);
+static int _document_load_write_close(GHtml * ghtml);
 static void _document_load_write_node(GHtml * ghtml, XMLNode * node);
 static void _document_load_write_node_entity(GHtml * ghtml,
 		XMLNodeEntity * node);
@@ -797,40 +802,77 @@ static int _ghtml_document_load(GHtml * ghtml, char const * url,
 	free(ghtml->base);
 	ghtml->base = NULL;
 	surfer_set_title(ghtml->surfer, NULL);
+	if(strncmp(url, "file:", 5) == 0 || strncmp(url, "/", 1) == 0)
+		return _document_load_file(ghtml, &url[5]);
+	return _document_load_url(ghtml, url, post);
+}
+
+static int _document_load_file(GHtml * ghtml, char const * filename)
+{
+	FILE * fp;
+	char buf[BUFSIZ];
+	size_t size;
+
+	if((fp = fopen(filename, "r")) == NULL)
+		return -error_set_code(1, "%s: %s", filename, strerror(errno));
+	while((size = fread(buf, sizeof(*buf), sizeof(buf), fp)) > 0)
+		if(_document_load_write(ghtml, buf, size) != 0)
+			return -error_set_code(1, "%s: %s", filename,
+					strerror(errno));
+	fclose(fp);
+	return _document_load_write_close(ghtml);
+}
+
+static int _document_load_url(GHtml * ghtml, char const * url,
+		char const * post)
+{
 	if((ghtml->conn = _conn_new(ghtml->surfer, url, post)) == NULL)
 		return 1;
-	_conn_set_callback_write(ghtml->conn, _document_load_write, ghtml);
-	g_idle_add(_document_load_idle, ghtml);
+	_conn_set_callback_write(ghtml->conn, _document_load_url_write, ghtml);
+	g_idle_add(_document_load_url_idle, ghtml);
 	return 0;
 }
 
-static ssize_t _document_load_write(Conn * conn, char const * buf, size_t size,
-		gpointer data)
+static ssize_t _document_load_url_write(Conn * conn, char const * buf,
+		size_t size, gpointer data)
 {
 	GHtml * ghtml = data;
-	XMLPrefs prefs;
-	XML * xml;
-	XMLDocument * doc;
+
+	if(size == 0)
+		return _document_load_write_close(ghtml);
+	if(_document_load_write(ghtml, buf, size) != 0)
+		return -1;
+	return size;
+}
+
+static int _document_load_write(GHtml * ghtml, char const * buf, size_t size)
+{
 	char * p;
 
-	memset(&prefs, 0, sizeof(prefs));
-	prefs.filters |= XML_FILTER_WHITESPACE;
-	if(size == 0)
-	{
-		if((xml = xml_new_string(&prefs, ghtml->buffer,
-						ghtml->buffer_cnt)) == NULL)
-			return 0;
-		ghtml->position = GHTML_POSITION_BEFORE;
-		if((doc = xml_get_document(xml)) != NULL)
-			_document_load_write_node(ghtml, doc->root);
-		xml_delete(xml);
-	}
 	if((p = realloc(ghtml->buffer, ghtml->buffer_cnt + size)) == NULL)
 		return -error_set_code(1, "%s", strerror(errno));
 	ghtml->buffer = p;
 	memcpy(&ghtml->buffer[ghtml->buffer_cnt], buf, size);
 	ghtml->buffer_cnt += size;
-	return size;
+	return 0;
+}
+
+static int _document_load_write_close(GHtml * ghtml)
+{
+	XMLPrefs prefs;
+	XML * xml;
+	XMLDocument * doc;
+
+	memset(&prefs, 0, sizeof(prefs));
+	prefs.filters |= XML_FILTER_WHITESPACE;
+	if((xml = xml_new_string(&prefs, ghtml->buffer,
+					ghtml->buffer_cnt)) == NULL)
+		return 0;
+	ghtml->position = GHTML_POSITION_BEFORE;
+	if((doc = xml_get_document(xml)) != NULL)
+		_document_load_write_node(ghtml, doc->root);
+	xml_delete(xml);
+	return 0;
 }
 
 static void _document_load_write_node(GHtml * ghtml, XMLNode * node)
@@ -974,7 +1016,7 @@ static void _document_load_write_node_tag_link(GHtml * ghtml, XMLNodeTag * node)
 					node->attributes[i]->value));
 }
 
-static gboolean _document_load_idle(gpointer data)
+static gboolean _document_load_url_idle(gpointer data)
 {
 	GHtml * ghtml = data;
 
