@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Help browser
 Comment=Help for applications, manual pages and programming interfaces
+TryExec=helper
 Exec=helper
 Icon=help-browser
 Type=Application

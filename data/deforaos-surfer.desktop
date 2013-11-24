@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Web surfer
 Comment=Navigator to surf web pages
+TryExec=surfer
 Exec=surfer -- %U
 Icon=web-browser
 Type=Application
