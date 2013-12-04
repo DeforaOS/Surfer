@@ -323,7 +323,7 @@ static int _helper_open_dialog(Helper * helper)
 	gtk_box_set_spacing(GTK_BOX(vbox), 4);
 	/* package */
 	hbox = gtk_hbox_new(FALSE, 4);
-	label = gtk_label_new("Package: ");
+	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	entry1 = gtk_entry_new();
 	gtk_entry_set_activates_default(GTK_ENTRY(entry1), TRUE);
@@ -331,7 +331,7 @@ static int _helper_open_dialog(Helper * helper)
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	/* command */
 	hbox = gtk_hbox_new(FALSE, 4);
-	label = gtk_label_new("Command: ");
+	label = gtk_label_new(_("Command: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	entry2 = gtk_entry_new();
 	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
