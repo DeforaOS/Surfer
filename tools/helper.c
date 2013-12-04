@@ -84,6 +84,8 @@ static int _usage(void);
 static void _helper_on_close(gpointer data);
 static gboolean _helper_on_closex(gpointer data);
 #ifndef EMBEDDED
+static void _helper_on_edit_copy(gpointer data);
+static void _helper_on_edit_select_all(gpointer data);
 static void _helper_on_file_close(gpointer data);
 static void _helper_on_file_open(gpointer data);
 #endif
@@ -130,6 +132,21 @@ static const DesktopMenu _menu_file[] =
 	{ NULL, NULL, NULL, 0, 0 }
 };
 
+static const DesktopMenu _menu_edit[] =
+{
+	{ N_("Cop_y"), G_CALLBACK(_helper_on_edit_copy), GTK_STOCK_COPY,
+		GDK_CONTROL_MASK, GDK_KEY_C },
+	{ "", NULL, NULL, 0, 0 },
+	{ N_("Select _all"), G_CALLBACK(_helper_on_edit_select_all),
+# if GTK_CHECK_VERSION(2, 10, 0)
+		GTK_STOCK_SELECT_ALL,
+# else
+		NULL,
+# endif
+		GDK_CONTROL_MASK, GDK_KEY_A },
+	{ NULL, NULL, NULL, 0, 0 }
+};
+
 static const DesktopMenu _menu_view[] =
 {
 	{ N_("_Fullscreen"), G_CALLBACK(_helper_on_view_fullscreen),
@@ -157,6 +174,7 @@ static const DesktopMenu _menu_help[] =
 static const DesktopMenubar _helper_menubar[] =
 {
 	{ N_("_File"), _menu_file },
+	{ N_("_Edit"), _menu_edit },
 	{ N_("_View"), _menu_view },
 	{ N_("_Help"), _menu_help },
 	{ NULL, NULL }
@@ -165,7 +183,8 @@ static const DesktopMenubar _helper_menubar[] =
 
 
 /* functions */
-/* helper */
+/* Helper */
+/* helper_new */
 static Helper * _helper_new(void)
 {
 	Helper * helper;
@@ -387,6 +406,24 @@ static gboolean _helper_on_closex(gpointer data)
 
 
 #ifndef EMBEDDED
+/* helper_on_edit_copy */
+static void _helper_on_edit_copy(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_copy(helper);
+}
+
+
+/* helper_on_edit_select_all */
+static void _helper_on_edit_select_all(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_select_all(helper);
+}
+
+
 /* helper_on_file_close */
 static void _helper_on_file_close(gpointer data)
 {
