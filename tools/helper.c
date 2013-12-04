@@ -278,8 +278,6 @@ static int _helper_open_devel(Helper * helper, char const * package)
 
 
 /* helper_open_dialog */
-static void _open_dialog_activated(gpointer data);
-
 static int _helper_open_dialog(Helper * helper)
 {
 	int ret;
@@ -287,8 +285,10 @@ static int _helper_open_dialog(Helper * helper)
 	GtkWidget * vbox;
 	GtkWidget * hbox;
 	GtkWidget * label;
-	GtkWidget * entry;
-	char * page = NULL;
+	GtkWidget * entry1;
+	GtkWidget * entry2;
+	char const * package = NULL;
+	char const * command;
 
 	dialog = gtk_dialog_new_with_buttons(_("Open page..."),
 			GTK_WINDOW(helper->window),
@@ -300,31 +300,36 @@ static int _helper_open_dialog(Helper * helper)
 #else
 	vbox = GTK_DIALOG(dialog)->vbox;
 #endif
+	gtk_box_set_spacing(GTK_BOX(vbox), 4);
+	/* package */
 	hbox = gtk_hbox_new(FALSE, 4);
 	label = gtk_label_new("Package: ");
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	entry = gtk_entry_new();
-	g_signal_connect_swapped(entry, "activate", G_CALLBACK(
-				_open_dialog_activated), dialog);
-	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+	entry1 = gtk_entry_new();
+	gtk_entry_set_activates_default(GTK_ENTRY(entry1), TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox), entry1, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	/* command */
+	hbox = gtk_hbox_new(FALSE, 4);
+	label = gtk_label_new("Command: ");
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
+	entry2 = gtk_entry_new();
+	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox), entry2, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	gtk_widget_show_all(vbox);
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
-		page = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-	gtk_widget_destroy(dialog);
-	if(page == NULL || strlen(page) == 0)
+	{
+		package = gtk_entry_get_text(GTK_ENTRY(entry1));
+		command = gtk_entry_get_text(GTK_ENTRY(entry2));
+	}
+	gtk_widget_hide(dialog);
+	if(package == NULL || strlen(package) == 0)
 		ret = -1;
 	else
-		ret = _helper_open_contents(helper, page, NULL);
-	free(page);
+		ret = _helper_open_contents(helper, package, command);
+	gtk_widget_destroy(dialog);
 	return ret;
-}
-
-static void _open_dialog_activated(gpointer data)
-{
-	GtkWidget * dialog = data;
-
-	gtk_dialog_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 }
 
 
