@@ -191,7 +191,7 @@ static const DesktopMenubar _helper_menubar[] =
 /* helper_new */
 static void _new_manual(Helper * helper);
 static void _new_manual_package(Helper * helper, GtkTreeStore * store,
-		GtkTreeIter * parent, char const * package);
+		char const * package);
 
 static Helper * _helper_new(void)
 {
@@ -267,7 +267,6 @@ static void _new_manual(Helper * helper)
 {
 	GtkWidget * widget;
 	GtkTreeStore * store;
-	GtkTreeIter iter;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
 	DIR * dir;
@@ -290,31 +289,24 @@ static void _new_manual(Helper * helper)
 	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual pages")));
+	/* FIXME perform this while idle */
 	if((dir = opendir(DATADIR "/doc/html")) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
-	{
-		if(de->d_name[0] == '.')
-			continue;
-#ifdef DT_DIR
-		if((de->d_type & DT_DIR) == 0)
-			continue;
-#endif
-		gtk_tree_store_append(store, &iter, NULL);
-		gtk_tree_store_set(store, &iter, 1, de->d_name, -1);
-		_new_manual_package(helper, store, &iter, de->d_name);
-	}
+		if(de->d_name[0] != '.')
+			_new_manual_package(helper, store, de->d_name);
 	closedir(dir);
 }
 
 static void _new_manual_package(Helper * helper, GtkTreeStore * store,
-		GtkTreeIter * parent, char const * package)
+		char const * package)
 {
 	const char ext[] = ".html";
 	gchar * p;
 	DIR * dir;
 	struct dirent * de;
 	size_t len;
+	GtkTreeIter parent;
 	GtkTreeIter iter;
 	GdkPixbuf * pixbuf = NULL;
 
@@ -324,6 +316,9 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 	g_free(p);
 	if(dir == NULL)
 		return;
+	/* FIXME sort (or use a sorted view) */
+	gtk_tree_store_append(store, &parent, NULL);
+	gtk_tree_store_set(store, &parent, 1, package, -1);
 	while((de = readdir(dir)) != NULL)
 	{
 		if(de->d_name[0] == '.'
@@ -335,7 +330,7 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 		if(pixbuf == NULL)
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"gnome-mime-text-html", 16, 0, NULL);
-		gtk_tree_store_append(store, &iter, parent);
+		gtk_tree_store_append(store, &iter, &parent);
 		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
 	}
 	closedir(dir);
