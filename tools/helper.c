@@ -44,6 +44,9 @@ static char const _license[] =
 #ifndef DATADIR
 # define DATADIR	PREFIX "/share"
 #endif
+#ifndef MANHTMLDIR
+# define MANHTMLDIR	DATADIR "/doc/html"
+#endif
 #ifndef LOCALEDIR
 # define LOCALEDIR	DATADIR "/locale"
 #endif
@@ -98,6 +101,8 @@ static void _helper_on_fullscreen(gpointer data);
 static void _helper_on_help_about(gpointer data);
 static void _helper_on_help_contents(gpointer data);
 #endif
+static void _helper_on_manual_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 #ifdef EMBEDDED
 static void _helper_on_open(gpointer data);
 #endif
@@ -286,11 +291,13 @@ static void _new_manual(Helper * helper)
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
 			renderer, "text", 1, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
+	g_signal_connect(helper->manual, "row-activated", G_CALLBACK(
+				_helper_on_manual_row_activated), helper);
 	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual pages")));
 	/* FIXME perform this while idle */
-	if((dir = opendir(DATADIR "/doc/html")) == NULL)
+	if((dir = opendir(MANHTMLDIR)) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
 		if(de->d_name[0] != '.')
@@ -310,7 +317,7 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 	GtkTreeIter iter;
 	GdkPixbuf * pixbuf = NULL;
 
-	if((p = g_strdup_printf("%s/%s", DATADIR "/doc/html", package)) == NULL)
+	if((p = g_strdup_printf("%s/%s", MANHTMLDIR, package)) == NULL)
 		return;
 	dir = opendir(p);
 	g_free(p);
@@ -369,7 +376,7 @@ static int _helper_open_contents(Helper * helper, char const * package,
 	if(command == NULL)
 		command = "index";
 	/* read a package documentation */
-	snprintf(buf, sizeof(buf), "%s%s%s%s%s", "file://" DATADIR "/doc/html/",
+	snprintf(buf, sizeof(buf), "%s%s%s%s%s", "file://" MANHTMLDIR "/",
 			package, "/", command, ".html");
 	return _helper_open(helper, buf);
 }
@@ -600,6 +607,36 @@ static void _helper_on_help_contents(gpointer data)
 	desktop_help_contents(PACKAGE, PROGNAME);
 }
 #endif
+
+
+/* helper_on_manual_row_activated */
+static void _helper_on_manual_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	GtkTreeIter iter;
+	GtkTreeIter parent;
+	gchar * package;
+	gchar * command;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
+	gtk_tree_model_get_iter(model, &iter, path);
+	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
+	{
+		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
+			gtk_tree_view_collapse_row(GTK_TREE_VIEW(widget), path);
+		else
+			gtk_tree_view_expand_row(GTK_TREE_VIEW(widget), path,
+					FALSE);
+		return;
+	}
+	gtk_tree_model_get(model, &parent, 1, &package, -1);
+	gtk_tree_model_get(model, &iter, 1, &command, -1);
+	_helper_open_contents(helper, package, command);
+	g_free(package);
+	g_free(command);
+}
 
 
 #ifdef EMBEDDED
