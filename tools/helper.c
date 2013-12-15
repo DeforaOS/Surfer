@@ -57,6 +57,7 @@ typedef struct _Surfer Helper;
 struct _Surfer
 {
 	/* widgets */
+	GtkIconTheme * icontheme;
 	GtkWidget * window;
 #ifndef EMBEDDED
 	GtkWidget * menubar;
@@ -204,6 +205,8 @@ static Helper * _helper_new(void)
 
 	if((helper = object_new(sizeof(*helper))) == NULL)
 		return NULL;
+	/* widgets */
+	helper->icontheme = gtk_icon_theme_get_default();
 	/* window */
 	group = gtk_accel_group_new();
 	helper->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -276,6 +279,10 @@ static void _new_manual(Helper * helper)
 	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
+	renderer = gtk_cell_renderer_pixbuf_new();
+	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+			"pixbuf", 0, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
 			renderer, "text", 1, NULL);
@@ -309,6 +316,7 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 	struct dirent * de;
 	size_t len;
 	GtkTreeIter iter;
+	GdkPixbuf * pixbuf = NULL;
 
 	if((p = g_strdup_printf("%s/%s", DATADIR "/doc/html", package)) == NULL)
 		return;
@@ -324,10 +332,15 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 					ext) != 0)
 			continue;
 		de->d_name[len - sizeof(ext) + 1] = '\0';
+		if(pixbuf == NULL)
+			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
+					"gnome-mime-text-html", 16, 0, NULL);
 		gtk_tree_store_append(store, &iter, parent);
-		gtk_tree_store_set(store, &iter, 1, de->d_name, -1);
+		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
 	}
 	closedir(dir);
+	if(pixbuf != NULL)
+		g_object_unref(pixbuf);
 }
 
 
