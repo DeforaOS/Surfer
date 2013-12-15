@@ -316,7 +316,8 @@ static void _new_manual_package(Helper * helper, char const * manhtmldir,
 	size_t len;
 	GtkTreeIter parent;
 	GtkTreeIter iter;
-	GdkPixbuf * pixbuf = NULL;
+	gint size = 16;
+	GdkPixbuf * pixbuf;
 
 	if((p = g_strdup_printf("%s/%s", manhtmldir, package)) == NULL)
 		return;
@@ -324,7 +325,8 @@ static void _new_manual_package(Helper * helper, char const * manhtmldir,
 	g_free(p);
 	if(dir == NULL)
 		return;
-	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", 16, 0,
+	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
+	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
 	/* FIXME sort (or use a sorted view) */
 	gtk_tree_store_append(store, &parent, NULL);
@@ -344,7 +346,7 @@ static void _new_manual_package(Helper * helper, char const * manhtmldir,
 		de->d_name[len - sizeof(ext) + 1] = '\0';
 		if(pixbuf == NULL)
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
-					"help-contents", 16, 0, NULL);
+					"help-contents", size, 0, NULL);
 		gtk_tree_store_append(store, &iter, &parent);
 		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
 	}
