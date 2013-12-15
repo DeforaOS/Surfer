@@ -408,6 +408,8 @@ static int _helper_open_devel(Helper * helper, char const * package)
 
 
 /* helper_open_dialog */
+static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data);
+
 static int _helper_open_dialog(Helper * helper)
 {
 	int ret;
@@ -417,6 +419,8 @@ static int _helper_open_dialog(Helper * helper)
 	GtkWidget * label;
 	GtkWidget * entry1;
 	GtkWidget * entry2;
+	GtkTreeModel * model;
+	GtkCellRenderer * renderer;
 	char const * package = NULL;
 	char const * command;
 
@@ -426,6 +430,7 @@ static int _helper_open_dialog(Helper * helper)
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
 #if GTK_CHECK_VERSION(2, 14, 0)
 	vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 #else
@@ -436,15 +441,24 @@ static int _helper_open_dialog(Helper * helper)
 	hbox = gtk_hbox_new(FALSE, 4);
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	entry1 = gtk_entry_new();
-	gtk_entry_set_activates_default(GTK_ENTRY(entry1), TRUE);
+	model = gtk_tree_view_get_model(helper->manual);
+	/* FIXME something is wrong with this code (triggers errors) */
+	entry1 = gtk_combo_box_new_with_model_and_entry(model);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(entry1), renderer, TRUE);
+	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(entry1), renderer,
+			"text", 1, NULL);
+	entry2 = gtk_entry_new();
+	g_signal_connect(entry1, "changed", G_CALLBACK(
+				_open_dialog_on_entry1_changed), entry2);
 	gtk_box_pack_start(GTK_BOX(hbox), entry1, TRUE, TRUE, 0);
+	entry1 = gtk_bin_get_child(GTK_BIN(entry1));
+	gtk_entry_set_activates_default(GTK_ENTRY(entry1), TRUE);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	/* command */
 	hbox = gtk_hbox_new(FALSE, 4);
 	label = gtk_label_new(_("Command: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	entry2 = gtk_entry_new();
 	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
 	gtk_box_pack_start(GTK_BOX(hbox), entry2, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
@@ -461,6 +475,31 @@ static int _helper_open_dialog(Helper * helper)
 		ret = _helper_open_contents(helper, package, command);
 	gtk_widget_destroy(dialog);
 	return ret;
+}
+
+static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data)
+{
+	GtkTreeModel * model;
+	GtkTreeIter parent;
+	GtkTreeIter iter;
+	GtkWidget * entry2 = data;
+	gchar * command;
+
+	model = gtk_combo_box_get_model(GTK_COMBO_BOX(widget));
+	if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(widget), &iter) != TRUE)
+		return;
+	gtk_tree_model_get(model, &iter, 1, &command, -1);
+	if(gtk_tree_model_iter_parent(model, &parent, &iter) == TRUE)
+	{
+		gtk_entry_set_text(GTK_ENTRY(entry2), command);
+		g_free(command);
+		gtk_tree_model_get(model, &parent, 1, &command, -1);
+	}
+	else
+		gtk_entry_set_text(GTK_ENTRY(entry2), "");
+	gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(
+					GTK_BIN(widget))), command);
+	g_free(command);
 }
 
 
