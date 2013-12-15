@@ -441,7 +441,7 @@ static int _helper_open_dialog(Helper * helper)
 	hbox = gtk_hbox_new(FALSE, 4);
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	model = gtk_tree_view_get_model(helper->manual);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
 	/* FIXME something is wrong with this code (triggers errors) */
 	entry1 = gtk_combo_box_new_with_model_and_entry(model);
 	renderer = gtk_cell_renderer_text_new();
