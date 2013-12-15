@@ -194,9 +194,9 @@ static const DesktopMenubar _helper_menubar[] =
 /* functions */
 /* Helper */
 /* helper_new */
-static void _new_manual(Helper * helper);
-static void _new_manual_package(Helper * helper, GtkTreeStore * store,
-		char const * package);
+static void _new_manual(Helper * helper, char const * manhtmldir);
+static void _new_manual_package(Helper * helper, char const * manhtmldir,
+		GtkTreeStore * store, char const * package);
 
 static Helper * _helper_new(void)
 {
@@ -255,7 +255,7 @@ static Helper * _helper_new(void)
 	widget = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
-	_new_manual(helper);
+	_new_manual(helper, MANHTMLDIR);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
@@ -268,7 +268,7 @@ static Helper * _helper_new(void)
 	return helper;
 }
 
-static void _new_manual(Helper * helper)
+static void _new_manual(Helper * helper, char const * manhtmldir)
 {
 	GtkWidget * widget;
 	GtkTreeStore * store;
@@ -297,16 +297,17 @@ static void _new_manual(Helper * helper)
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual pages")));
 	/* FIXME perform this while idle */
-	if((dir = opendir(MANHTMLDIR)) == NULL)
+	if((dir = opendir(manhtmldir)) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
 		if(de->d_name[0] != '.')
-			_new_manual_package(helper, store, de->d_name);
+			_new_manual_package(helper, manhtmldir, store,
+					de->d_name);
 	closedir(dir);
 }
 
-static void _new_manual_package(Helper * helper, GtkTreeStore * store,
-		char const * package)
+static void _new_manual_package(Helper * helper, char const * manhtmldir,
+		GtkTreeStore * store, char const * package)
 {
 	const char ext[] = ".html";
 	gchar * p;
@@ -317,7 +318,7 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 	GtkTreeIter iter;
 	GdkPixbuf * pixbuf = NULL;
 
-	if((p = g_strdup_printf("%s/%s", MANHTMLDIR, package)) == NULL)
+	if((p = g_strdup_printf("%s/%s", manhtmldir, package)) == NULL)
 		return;
 	dir = opendir(p);
 	g_free(p);
