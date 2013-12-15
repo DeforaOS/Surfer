@@ -69,6 +69,15 @@ struct _Surfer
 	GtkWidget * manual;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
+
+	/* find */
+	GtkWidget * fi_dialog;
+	GtkWidget * fi_text;
+	GtkWidget * fi_case;
+	GtkWidget * fi_back;
+	GtkWidget * fi_wrap;
+
+	/* about */
 	GtkWidget * ab_window;
 };
 
@@ -89,9 +98,13 @@ static int _usage(void);
 
 /* callbacks */
 static void _helper_on_close(gpointer data);
+#ifdef EMBEDDED
+static void _helper_on_find(gpointer data);
+#endif
 static gboolean _helper_on_closex(gpointer data);
 #ifndef EMBEDDED
 static void _helper_on_edit_copy(gpointer data);
+static void _helper_on_edit_find(gpointer data);
 static void _helper_on_edit_select_all(gpointer data);
 static void _helper_on_file_close(gpointer data);
 static void _helper_on_file_open(gpointer data);
@@ -124,6 +137,7 @@ static char const * _authors[] =
 static const DesktopAccel _helper_accel[] =
 {
 	{ G_CALLBACK(_helper_on_close), GDK_CONTROL_MASK, GDK_KEY_W },
+	{ G_CALLBACK(_helper_on_find), GDK_CONTROL_MASK, GDK_KEY_F },
 	{ G_CALLBACK(_helper_on_fullscreen), 0, GDK_KEY_F11 },
 	{ G_CALLBACK(_helper_on_open), GDK_CONTROL_MASK, GDK_KEY_O },
 	{ NULL, 0, 0 }
@@ -153,6 +167,9 @@ static const DesktopMenu _menu_edit[] =
 		NULL,
 # endif
 		GDK_CONTROL_MASK, GDK_KEY_A },
+	{ "", NULL, NULL, 0, 0 },
+	{ N_("_Find"), G_CALLBACK(_helper_on_edit_find), GTK_STOCK_FIND,
+		GDK_CONTROL_MASK, GDK_KEY_F },
 	{ NULL, NULL, NULL, 0, 0 }
 };
 
@@ -264,6 +281,7 @@ static Helper * _helper_new(void)
 	gtk_container_add(GTK_CONTAINER(helper->window), vbox);
 	gtk_widget_grab_focus(helper->view);
 	gtk_widget_show_all(helper->window);
+	helper->fi_dialog = NULL;
 	helper->ab_window = NULL;
 	return helper;
 }
@@ -362,6 +380,10 @@ static void _new_manual_package(Helper * helper, char const * manhtmldir,
 /* helper_delete */
 void _helper_delete(Helper * helper)
 {
+	if(helper->ab_window != NULL)
+		gtk_widget_destroy(helper->ab_window);
+	if(helper->fi_dialog != NULL)
+		gtk_widget_destroy(helper->fi_dialog);
 	gtk_widget_destroy(helper->window);
 	object_delete(helper);
 }
@@ -566,6 +588,15 @@ static void _helper_on_edit_copy(gpointer data)
 }
 
 
+/* helper_on_edit_find */
+static void _helper_on_edit_find(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_find(helper, NULL);
+}
+
+
 /* helper_on_edit_select_all */
 static void _helper_on_edit_select_all(gpointer data)
 {
@@ -591,6 +622,17 @@ static void _helper_on_file_open(gpointer data)
 	Helper * helper = data;
 
 	_helper_open_dialog(helper);
+}
+#endif
+
+
+#ifdef EMBEDDED
+/* helper_on_find */
+static void _helper_on_find(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_find(helper, NULL);
 }
 #endif
 
@@ -754,7 +796,7 @@ void surfer_delete(Surfer * surfer)
 GtkWidget * surfer_get_view(Surfer * surfer)
 {
 	/* FIXME remove from the API? */
-	return NULL;
+	return surfer->view;
 }
 
 
@@ -912,6 +954,10 @@ int surfer_error(Surfer * surfer, char const * message, int ret)
 	gtk_widget_destroy(dialog);
 	return ret;
 }
+
+
+/* surfer_find */
+#include "../src/common/find.c"
 
 
 /* surfer_go_back */

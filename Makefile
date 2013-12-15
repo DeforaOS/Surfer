@@ -63,6 +63,7 @@ dist:
 		$(PACKAGE)-$(VERSION)/src/project.conf \
 		$(PACKAGE)-$(VERSION)/src/common/Makefile \
 		$(PACKAGE)-$(VERSION)/src/common/conn.c \
+		$(PACKAGE)-$(VERSION)/src/common/find.c \
 		$(PACKAGE)-$(VERSION)/src/common/history.c \
 		$(PACKAGE)-$(VERSION)/src/common/url.c \
 		$(PACKAGE)-$(VERSION)/src/common/project.conf \

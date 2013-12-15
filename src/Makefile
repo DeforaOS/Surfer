@@ -38,7 +38,7 @@ surfer: $(surfer_OBJS)
 download.o: download.c download.h ../config.h
 	$(CC) -D WITH_MAIN $(download_CFLAGS) -c download.c
 
-surfer.o: surfer.c callbacks.h download.c download.h surfer.h ../config.h
+surfer.o: surfer.c callbacks.h common/find.c download.c download.h surfer.h ../config.h
 	$(CC) $(surfer_CFLAGS) -c surfer.c
 
 ghtml.o: ghtml.c ghtml.h ghtml-gtkhtml.c ghtml-gtkmozembed.c ghtml-gtktextview.c ghtml-webkit.c common/conn.c common/history.c common/url.c ../config.h
