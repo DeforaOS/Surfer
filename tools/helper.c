@@ -323,9 +323,16 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 	g_free(p);
 	if(dir == NULL)
 		return;
+	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", 16, 0,
+			NULL);
 	/* FIXME sort (or use a sorted view) */
 	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, 1, package, -1);
+	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, package, -1);
+	if(pixbuf != NULL)
+	{
+		g_object_unref(pixbuf);
+		pixbuf = NULL;
+	}
 	while((de = readdir(dir)) != NULL)
 	{
 		if(de->d_name[0] == '.'
@@ -336,7 +343,7 @@ static void _new_manual_package(Helper * helper, GtkTreeStore * store,
 		de->d_name[len - sizeof(ext) + 1] = '\0';
 		if(pixbuf == NULL)
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
-					"gnome-mime-text-html", 16, 0, NULL);
+					"help-contents", 16, 0, NULL);
 		gtk_tree_store_append(store, &iter, &parent);
 		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
 	}
