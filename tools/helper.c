@@ -283,6 +283,7 @@ static void _new_manual(Helper * helper, char const * manhtmldir)
 	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 1);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
 			"pixbuf", 0, NULL);
