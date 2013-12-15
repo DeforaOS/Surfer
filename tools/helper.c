@@ -17,6 +17,7 @@ static char const _license[] =
 
 
 
+#include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -60,6 +61,8 @@ struct _Surfer
 #ifndef EMBEDDED
 	GtkWidget * menubar;
 #endif
+	GtkWidget * notebook;
+	GtkWidget * manual;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
 	GtkWidget * ab_window;
@@ -185,6 +188,10 @@ static const DesktopMenubar _helper_menubar[] =
 /* functions */
 /* Helper */
 /* helper_new */
+static void _new_manual(Helper * helper);
+static void _new_manual_package(Helper * helper, GtkTreeStore * store,
+		GtkTreeIter * parent, char const * package);
+
 static Helper * _helper_new(void)
 {
 	Helper * helper;
@@ -237,14 +244,90 @@ static Helper * _helper_new(void)
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), helper->tb_fullscreen, -1);
 	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, TRUE, 0);
 	/* view */
+	widget = gtk_hpaned_new();
+	gtk_paned_set_position(GTK_PANED(widget), 150);
+	helper->notebook = gtk_notebook_new();
+	_new_manual(helper);
+	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
-	gtk_box_pack_start(GTK_BOX(vbox), helper->view, TRUE, TRUE, 0);
+	gtk_paned_add2(GTK_PANED(widget), helper->view);
+	gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 	gtk_container_add(GTK_CONTAINER(helper->window), vbox);
 	gtk_widget_grab_focus(helper->view);
 	gtk_widget_show_all(helper->window);
 	helper->ab_window = NULL;
 	return helper;
+}
+
+static void _new_manual(Helper * helper)
+{
+	GtkWidget * widget;
+	GtkTreeStore * store;
+	GtkTreeIter iter;
+	GtkCellRenderer * renderer;
+	GtkTreeViewColumn * column;
+	DIR * dir;
+	struct dirent * de;
+
+	widget = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(_("Package"),
+			renderer, "text", 1, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
+	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
+	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
+			gtk_label_new(_("Manual pages")));
+	if((dir = opendir(DATADIR "/doc/html")) == NULL)
+		return;
+	while((de = readdir(dir)) != NULL)
+	{
+		if(de->d_name[0] == '.')
+			continue;
+#ifdef DT_DIR
+		if((de->d_type & DT_DIR) == 0)
+			continue;
+#endif
+		gtk_tree_store_append(store, &iter, NULL);
+		gtk_tree_store_set(store, &iter, 1, de->d_name, -1);
+		_new_manual_package(helper, store, &iter, de->d_name);
+	}
+	closedir(dir);
+}
+
+static void _new_manual_package(Helper * helper, GtkTreeStore * store,
+		GtkTreeIter * parent, char const * package)
+{
+	const char ext[] = ".html";
+	gchar * p;
+	DIR * dir;
+	struct dirent * de;
+	size_t len;
+	GtkTreeIter iter;
+
+	if((p = g_strdup_printf("%s/%s", DATADIR "/doc/html", package)) == NULL)
+		return;
+	dir = opendir(p);
+	g_free(p);
+	if(dir == NULL)
+		return;
+	while((de = readdir(dir)) != NULL)
+	{
+		if(de->d_name[0] == '.'
+				|| (len = strlen(de->d_name)) < sizeof(ext)
+				|| strcmp(&de->d_name[len - sizeof(ext) + 1],
+					ext) != 0)
+			continue;
+		de->d_name[len - sizeof(ext) + 1] = '\0';
+		gtk_tree_store_append(store, &iter, parent);
+		gtk_tree_store_set(store, &iter, 1, de->d_name, -1);
+	}
+	closedir(dir);
 }
 
 
