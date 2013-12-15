@@ -1558,6 +1558,16 @@ void surfer_show_console(Surfer * surfer, gboolean show)
 }
 
 
+/* surfer_show_location */
+void surfer_show_location(Surfer * surfer, gboolean show)
+{
+	if(show == TRUE)
+		gtk_widget_show(surfer->locationbar);
+	else
+		gtk_widget_hide(surfer->locationbar);
+}
+
+
 /* surfer_show_menubar */
 void surfer_show_menubar(Surfer * surfer, gboolean show)
 {

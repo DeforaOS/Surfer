@@ -120,6 +120,7 @@ void surfer_undo(Surfer * surfer);
 void surfer_about(Surfer * surfer);
 void surfer_resize(Surfer * surfer, gint width, gint height);
 void surfer_show_console(Surfer * surfer, gboolean show);
+void surfer_show_location(Surfer * surfer, gboolean show);
 void surfer_show_menubar(Surfer * surfer, gboolean show);
 void surfer_show_statusbar(Surfer * surfer, gboolean show);
 void surfer_show_toolbar(Surfer * surfer, gboolean show);
