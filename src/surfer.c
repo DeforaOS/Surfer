@@ -1594,15 +1594,10 @@ void surfer_show_statusbar(Surfer * surfer, gboolean show)
 void surfer_show_toolbar(Surfer * surfer, gboolean show)
 {
 	if(show == TRUE)
-	{
 		gtk_widget_show(surfer->toolbar);
-		gtk_widget_show(surfer->locationbar);
-	}
 	else
-	{
 		gtk_widget_hide(surfer->toolbar);
-		gtk_widget_hide(surfer->locationbar);
-	}
+	surfer_show_location(surfer, show);
 }
 
 
