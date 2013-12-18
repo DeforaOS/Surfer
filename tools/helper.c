@@ -442,7 +442,6 @@ static int _helper_open_dialog(Helper * helper)
 	GtkWidget * entry1;
 	GtkWidget * entry2;
 	GtkTreeModel * model;
-	GtkCellRenderer * renderer;
 	char const * package = NULL;
 	char const * command;
 
@@ -464,12 +463,13 @@ static int _helper_open_dialog(Helper * helper)
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
-	/* FIXME something is wrong with this code (triggers errors) */
+#if GTK_CHECK_VERSION(2, 24, 0)
 	entry1 = gtk_combo_box_new_with_model_and_entry(model);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(entry1), renderer, TRUE);
-	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(entry1), renderer,
-			"text", 1, NULL);
+	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(entry1), 1);
+#else
+	entry1 = gtk_combo_box_entry_new_with_model(model, 1);
+	gtk_combo_box_entry_set_text_column(GTK_COMBO_BOX_ENTRY(entry1), 1);
+#endif
 	entry2 = gtk_entry_new();
 	g_signal_connect(entry1, "changed", G_CALLBACK(
 				_open_dialog_on_entry1_changed), entry2);
