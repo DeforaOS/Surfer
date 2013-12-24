@@ -349,7 +349,6 @@ static void _new_manual_package(Helper * helper, char const * manhtmldir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
-	/* FIXME sort (or use a sorted view) */
 	gtk_tree_store_append(store, &parent, NULL);
 	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, package, -1);
 	if(pixbuf != NULL)
