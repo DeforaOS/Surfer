@@ -44,6 +44,9 @@ static char const _license[] =
 #ifndef DATADIR
 # define DATADIR	PREFIX "/share"
 #endif
+#ifndef GTKDOCDIR
+# define GTKDOCDIR	DATADIR "/gtk-doc/html"
+#endif
 #ifndef MANHTMLDIR
 # define MANHTMLDIR	DATADIR "/doc/html"
 #endif
@@ -67,6 +70,7 @@ struct _Surfer
 #endif
 	GtkWidget * notebook;
 	GtkWidget * manual;
+	GtkWidget * gtkdoc;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
 
@@ -90,8 +94,8 @@ static int _helper_open(Helper * helper, char const * url);
 static int _helper_open_contents(Helper * helper, char const * package,
 		char const * command);
 static int _helper_open_dialog(Helper * helper);
+static int _helper_open_gtkdoc(Helper * helper, char const * package);
 static int _helper_open_man(Helper * helper, int section, char const * page);
-static int _helper_open_devel(Helper * helper, char const * package);
 
 static int _error(char const * message, int ret);
 static int _usage(void);
@@ -114,6 +118,8 @@ static void _helper_on_fullscreen(gpointer data);
 static void _helper_on_help_about(gpointer data);
 static void _helper_on_help_contents(gpointer data);
 #endif
+static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 static void _helper_on_manual_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 #ifdef EMBEDDED
@@ -211,6 +217,9 @@ static const DesktopMenubar _helper_menubar[] =
 /* functions */
 /* Helper */
 /* helper_new */
+static void _new_gtkdoc(Helper * helper, char const * gtkdocdir);
+static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
+		GtkTreeStore * store, char const * package);
 static void _new_manual(Helper * helper, char const * manhtmldir);
 static void _new_manual_package(Helper * helper, char const * manhtmldir,
 		GtkTreeStore * store, char const * package);
@@ -272,6 +281,7 @@ static Helper * _helper_new(void)
 	widget = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
+	_new_gtkdoc(helper, GTKDOCDIR);
 	_new_manual(helper, MANHTMLDIR);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
@@ -284,6 +294,95 @@ static Helper * _helper_new(void)
 	helper->fi_dialog = NULL;
 	helper->ab_window = NULL;
 	return helper;
+}
+
+static void _new_gtkdoc(Helper * helper, char const * gtkdocdir)
+{
+	GtkWidget * widget;
+	GtkTreeStore * store;
+	GtkCellRenderer * renderer;
+	GtkTreeViewColumn * column;
+	DIR * dir;
+	struct dirent * de;
+
+	widget = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	helper->gtkdoc = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->gtkdoc), FALSE);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->gtkdoc), 1);
+	renderer = gtk_cell_renderer_pixbuf_new();
+	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+			"pixbuf", 0, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(_("Package"),
+			renderer, "text", 1, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, 1);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
+	gtk_tree_view_column_clicked(column);
+	g_signal_connect(helper->gtkdoc, "row-activated", G_CALLBACK(
+				_helper_on_gtkdoc_row_activated), helper);
+	gtk_container_add(GTK_CONTAINER(widget), helper->gtkdoc);
+	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
+			gtk_label_new(_("API reference")));
+	/* FIXME perform this while idle */
+	if((dir = opendir(gtkdocdir)) == NULL)
+		return;
+	while((de = readdir(dir)) != NULL)
+		if(de->d_name[0] != '.')
+			_new_gtkdoc_package(helper, gtkdocdir, store,
+					de->d_name);
+	closedir(dir);
+}
+
+static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
+		GtkTreeStore * store, char const * package)
+{
+	const char ext[] = ".devhelp2";
+	gchar * p;
+	DIR * dir;
+	struct dirent * de;
+	size_t len;
+	GtkTreeIter parent;
+	GtkTreeIter iter;
+	gint size = 16;
+	GdkPixbuf * pixbuf;
+
+	if((p = g_strdup_printf("%s/%s", gtkdocdir, package)) == NULL)
+		return;
+	dir = opendir(p);
+	g_free(p);
+	if(dir == NULL)
+		return;
+	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
+	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
+			NULL);
+	gtk_tree_store_append(store, &parent, NULL);
+	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, package, -1);
+	if(pixbuf != NULL)
+	{
+		g_object_unref(pixbuf);
+		pixbuf = NULL;
+	}
+	while((de = readdir(dir)) != NULL)
+	{
+		if(de->d_name[0] == '.'
+				|| (len = strlen(de->d_name)) < sizeof(ext)
+				|| strcmp(&de->d_name[len - sizeof(ext) + 1],
+					ext) != 0)
+			continue;
+		de->d_name[len - sizeof(ext) + 1] = '\0';
+		if(pixbuf == NULL)
+			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
+					"help-contents", size, 0, NULL);
+		gtk_tree_store_append(store, &iter, &parent);
+		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
+	}
+	closedir(dir);
+	if(pixbuf != NULL)
+		g_object_unref(pixbuf);
 }
 
 static void _new_manual(Helper * helper, char const * manhtmldir)
@@ -416,18 +515,6 @@ static int _helper_open_contents(Helper * helper, char const * package,
 }
 
 
-/* helper_open_devel */
-static int _helper_open_devel(Helper * helper, char const * package)
-{
-	char buf[256];
-
-	/* read a package API documentation */
-	snprintf(buf, sizeof(buf), "%s%s%s", "file://" DATADIR "/gtk-doc/html/",
-			package, "/index.html");
-	return _helper_open(helper, buf);
-}
-
-
 /* helper_open_dialog */
 static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data);
 
@@ -521,6 +608,18 @@ static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data)
 	gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(
 					GTK_BIN(widget))), command);
 	g_free(command);
+}
+
+
+/* helper_open_gtkdoc */
+static int _helper_open_gtkdoc(Helper * helper, char const * package)
+{
+	char buf[256];
+
+	/* read a package API documentation */
+	snprintf(buf, sizeof(buf), "%s%s%s", "file://" DATADIR "/gtk-doc/html/",
+			package, "/index.html");
+	return _helper_open(helper, buf);
 }
 
 
@@ -702,6 +801,33 @@ static void _helper_on_help_contents(gpointer data)
 #endif
 
 
+/* helper_on_gtkdoc_row_activated */
+static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	GtkTreeIter iter;
+	GtkTreeIter parent;
+	gchar * package;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
+	gtk_tree_model_get_iter(model, &iter, path);
+	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
+	{
+		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
+			gtk_tree_view_collapse_row(GTK_TREE_VIEW(widget), path);
+		else
+			gtk_tree_view_expand_row(GTK_TREE_VIEW(widget), path,
+					FALSE);
+		return;
+	}
+	gtk_tree_model_get(model, &iter, 1, &package, -1);
+	_helper_open_gtkdoc(helper, package);
+	g_free(package);
+}
+
+
 /* helper_on_manual_row_activated */
 static void _helper_on_manual_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data)
@@ -769,6 +895,7 @@ static int _usage(void)
 	fprintf(stderr, _("Usage: %s [-c][-p package] command\n"
 "       helper -d package\n"
 "       helper -s section page\n"
+"  -d	Open an API reference\n"
 "  -s	Section of the manual page to read from\n"), PROGNAME);
 	return 1;
 }
@@ -1158,7 +1285,7 @@ int main(int argc, char * argv[])
 		/* XXX check for errors */
 		_helper_open_man(helper, section, argv[optind]);
 	else if(argv[optind] != NULL && devel != 0)
-		_helper_open_devel(helper, argv[optind]);
+		_helper_open_gtkdoc(helper, argv[optind]);
 	else if(argv[optind] != NULL)
 		_helper_open_contents(helper, (package != NULL) ? package
 				: argv[optind], argv[optind]);
