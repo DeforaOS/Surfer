@@ -24,6 +24,9 @@
 #define _(string) gettext(string)
 
 /* constants */
+#ifndef PROGNAME
+# define PROGNAME	"surfer"
+#endif
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
 #endif
@@ -36,11 +39,25 @@
 
 
 /* private */
+/* prototypes */
+static int _error(char const * message, int ret);
+static int _usage(void);
+
+
 /* functions */
+/* error */
+static int _error(char const * message, int ret)
+{
+	fputs(PROGNAME ": ", stderr);
+	perror(message);
+	return ret;
+}
+
+
 /* usage */
 static int _usage(void)
 {
-	fputs(_("Usage: surfer [URL...]\n"), stderr);
+	fprintf(stderr, _("Usage: %s [URL...]\n"), PROGNAME);
 	return 1;
 }
 
@@ -53,13 +70,14 @@ int main(int argc, char * argv[])
 	int o;
 	Surfer * surfer;
 
-	setlocale(LC_ALL, "");
+	if(setlocale(LC_ALL, "") == NULL)
+		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 #if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) || defined(WITH_WEBKIT)
 	if(g_thread_supported() == FALSE)
 		g_thread_init(NULL);
-#endif /* WITH_GTKHTML */
+#endif
 	gtk_init(&argc, &argv);
 	while((o = getopt(argc, argv, "")) != -1)
 		switch(o)
@@ -72,7 +90,7 @@ int main(int argc, char * argv[])
 	else
 		for(; optind != argc; optind++)
 			if((surfer = surfer_new(argv[optind])) == NULL)
-				break; /* ignore potential memory leak */
+				break; /* memory leak */
 	if(surfer == NULL)
 		return 2;
 	gtk_main();
