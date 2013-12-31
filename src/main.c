@@ -90,9 +90,10 @@ int main(int argc, char * argv[])
 	else
 		for(; optind != argc; optind++)
 			if((surfer = surfer_new(argv[optind])) == NULL)
-				break; /* memory leak */
+				break; /* potential memory leak */
 	if(surfer == NULL)
 		return 2;
 	gtk_main();
+	surfer_delete(surfer);
 	return 0;
 }
