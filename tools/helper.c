@@ -354,21 +354,20 @@ static void _new_gtkdoc(Helper * helper, char const * gtkdocdir)
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		GtkTreeStore * store, char const * package)
 {
-	const char ext[] = ".devhelp2";
 	gchar * p;
-	DIR * dir;
-	struct dirent * de;
-	size_t len;
+	FILE * fp;
 	GtkTreeIter parent;
 	GtkTreeIter iter;
 	gint size = 16;
 	GdkPixbuf * pixbuf;
 
-	if((p = g_strdup_printf("%s/%s", gtkdocdir, package)) == NULL)
+	if((p = g_strdup_printf("%s/%s/%s.devhelp2", gtkdocdir, package,
+					package)) == NULL)
 		return;
-	dir = opendir(p);
+	if((fp = fopen(p, "r")) == NULL)
+		surfer_error(helper, p, 1);
 	g_free(p);
-	if(dir == NULL)
+	if(fp == NULL)
 		return;
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
@@ -380,23 +379,15 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		g_object_unref(pixbuf);
 		pixbuf = NULL;
 	}
-	while((de = readdir(dir)) != NULL)
-	{
-		if(de->d_name[0] == '.'
-				|| (len = strlen(de->d_name)) < sizeof(ext)
-				|| strcmp(&de->d_name[len - sizeof(ext) + 1],
-					ext) != 0)
-			continue;
-		de->d_name[len - sizeof(ext) + 1] = '\0';
-		if(pixbuf == NULL)
-			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
-					"help-contents", size, 0, NULL);
-		gtk_tree_store_append(store, &iter, &parent);
-		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
-	}
-	closedir(dir);
+	if(pixbuf == NULL)
+		pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
+				"help-contents", size, 0, NULL);
+	/* FIXME parse the contents of the devhelp file */
+	gtk_tree_store_append(store, &iter, &parent);
+	gtk_tree_store_set(store, &iter, 0, pixbuf, 1, package, -1);
 	if(pixbuf != NULL)
 		g_object_unref(pixbuf);
+	fclose(fp);
 }
 
 static void _new_manual(Helper * helper, char const * manhtmldir)
