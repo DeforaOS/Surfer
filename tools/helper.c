@@ -101,10 +101,12 @@ static int _error(char const * message, int ret);
 static int _usage(void);
 
 /* callbacks */
+static void _helper_on_back(gpointer data);
 static void _helper_on_close(gpointer data);
 #ifdef EMBEDDED
 static void _helper_on_find(gpointer data);
 #endif
+static void _helper_on_forward(gpointer data);
 static gboolean _helper_on_closex(gpointer data);
 #ifndef EMBEDDED
 static void _helper_on_edit_copy(gpointer data);
@@ -149,6 +151,16 @@ static const DesktopAccel _helper_accel[] =
 	{ NULL, 0, 0 }
 };
 #endif
+
+static DesktopToolbar _helper_toolbar[] =
+{
+	{ N_("Back"), G_CALLBACK(_helper_on_back), GTK_STOCK_GO_BACK,
+		GDK_MOD1_MASK, GDK_KEY_Left, NULL },
+	{ N_("Forward"), G_CALLBACK(_helper_on_forward), GTK_STOCK_GO_FORWARD,
+		GDK_MOD1_MASK, GDK_KEY_Right, NULL },
+	{ "", NULL, NULL, 0, 0, NULL },
+	{ NULL, NULL, NULL, 0, 0, NULL }
+};
 
 #ifndef EMBEDDED
 static const DesktopMenu _menu_file[] =
@@ -259,11 +271,13 @@ static Helper * _helper_new(void)
 	desktop_accel_create(_helper_accel, helper, group);
 #endif
 	/* toolbar */
-	widget = gtk_toolbar_new();
+	widget = desktop_toolbar_create(_helper_toolbar, helper, group);
 #ifdef EMBEDDED
 	toolitem = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 	g_signal_connect_swapped(toolitem, "clicked", G_CALLBACK(
 				_helper_on_open), helper);
+	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
+	toolitem = gtk_separator_tool_item_new();
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), toolitem, -1);
 #endif
 #if GTK_CHECK_VERSION(2, 8, 0)
@@ -656,6 +670,15 @@ static int _helper_open_man(Helper * helper, int section, char const * page)
 
 
 /* callbacks */
+/* helper_on_back */
+static void _helper_on_back(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_go_back(helper);
+}
+
+
 /* helper_on_close */
 static void _helper_on_close(gpointer data)
 {
@@ -733,6 +756,15 @@ static void _helper_on_find(gpointer data)
 	surfer_find(helper, NULL);
 }
 #endif
+
+
+/* helper_on_forward */
+static void _helper_on_forward(gpointer data)
+{
+	Helper * helper = data;
+
+	surfer_go_forward(helper);
+}
 
 
 /* helper_on_fullscreen */
