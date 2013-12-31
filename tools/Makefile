@@ -25,7 +25,7 @@ helper: $(helper_OBJS) ../src/ghtml.o
 	$(CC) -o helper $(helper_OBJS) $(helper_LDFLAGS)
 
 helper.o: helper.c ../src/common/find.c ../src/ghtml.c ../src/surfer.h ../config.h
-	$(CC) $(helper_CFLAGS) -c helper.c
+	$(CC) -D WITH_WEBKIT $(helper_CFLAGS) -c helper.c
 
 clean:
 	$(RM) -- $(helper_OBJS)

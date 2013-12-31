@@ -1276,6 +1276,10 @@ int main(int argc, char * argv[])
 		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
+#if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) || defined(WITH_WEBKIT)
+	if(g_thread_supported() == FALSE)
+		g_thread_init(NULL);
+#endif
 	gtk_init(&argc, &argv);
 	while((o = getopt(argc, argv, "cdp:s:")) != -1)
 		switch(o)
