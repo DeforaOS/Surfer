@@ -622,7 +622,10 @@ static int _helper_open_gtkdoc(Helper * helper, char const * package)
 	int ret;
 	char const * prefix[] =
 	{
-		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books", NULL
+		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
+		"/usr/local/share/gtk-doc/html",
+		"/usr/local/share/devhelp/books",
+		"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
 	};
 	char const ** p;
 	String * s;
