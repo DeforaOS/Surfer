@@ -139,16 +139,18 @@ static char const * _authors[] =
 };
 #endif
 
-#ifdef EMBEDDED
 static const DesktopAccel _helper_accel[] =
 {
+#ifdef EMBEDDED
 	{ G_CALLBACK(_helper_on_close), GDK_CONTROL_MASK, GDK_KEY_W },
 	{ G_CALLBACK(_helper_on_find), GDK_CONTROL_MASK, GDK_KEY_F },
+#endif
 	{ G_CALLBACK(_helper_on_fullscreen), 0, GDK_KEY_F11 },
+#ifdef EMBEDDED
 	{ G_CALLBACK(_helper_on_open), GDK_CONTROL_MASK, GDK_KEY_O },
+#endif
 	{ NULL, 0, 0 }
 };
-#endif
 
 static DesktopToolbar _helper_toolbar[] =
 {
@@ -193,9 +195,9 @@ static const DesktopMenu _menu_view[] =
 {
 	{ N_("_Fullscreen"), G_CALLBACK(_helper_on_view_fullscreen),
 # if GTK_CHECK_VERSION(2, 8, 0)
-		GTK_STOCK_FULLSCREEN, 0, GDK_KEY_F11 },
+		GTK_STOCK_FULLSCREEN, 0, 0 },
 # else
-		NULL, 0, GDK_KEY_F11 },
+		NULL, 0, 0 },
 # endif
 	{ NULL, NULL, NULL, 0, 0 }
 };
@@ -265,9 +267,8 @@ static Helper * _helper_new(void)
 	helper->menubar = desktop_menubar_create(_helper_menubar, helper,
 			group);
 	gtk_box_pack_start(GTK_BOX(vbox), helper->menubar, FALSE, TRUE, 0);
-#else
-	desktop_accel_create(_helper_accel, helper, group);
 #endif
+	desktop_accel_create(_helper_accel, helper, group);
 	/* toolbar */
 	widget = desktop_toolbar_create(_helper_toolbar, helper, group);
 #ifdef EMBEDDED
