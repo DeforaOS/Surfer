@@ -635,13 +635,17 @@ static int _helper_open_gtkdoc(Helper * helper, char const * package)
 		if((s = string_new_append(*p, "/", package, "/index.html",
 						NULL)) == NULL)
 			return -1;
-		if(access(s, R_OK) == 0)
-			break;
+		ret = access(s, R_OK);
 		string_delete(s);
+		if(ret == 0)
+			break;
 	}
 	if(*p == NULL)
 		return -1;
 	/* read a package API documentation */
+	if((s = string_new_append("file://", *p, "/", package, "/index.html",
+					NULL)) == NULL)
+		return -1;
 	ret = _helper_open(helper, s);
 	string_delete(s);
 	return ret;
