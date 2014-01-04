@@ -619,11 +619,24 @@ static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data)
 /* helper_open_gtkdoc */
 static int _helper_open_gtkdoc(Helper * helper, char const * package)
 {
+	char const * prefix[] =
+	{
+		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books", NULL
+	};
+	char const ** p;
 	char buf[256];
 
+	for(p = prefix; *p != NULL; p++)
+	{
+		snprintf(buf, sizeof(buf), "%s%s%s%s", *p, "/", package,
+				"/index.html");
+		fprintf(stderr, "DEBUG: %s\n", buf);
+		if(access(buf, R_OK) == 0)
+			break;
+	}
+	if(*p == NULL)
+		return -1;
 	/* read a package API documentation */
-	snprintf(buf, sizeof(buf), "%s%s%s", "file://" DATADIR "/gtk-doc/html/",
-			package, "/index.html");
 	return _helper_open(helper, buf);
 }
 
