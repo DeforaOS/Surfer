@@ -630,7 +630,6 @@ static int _helper_open_gtkdoc(Helper * helper, char const * package)
 	{
 		snprintf(buf, sizeof(buf), "%s%s%s%s", *p, "/", package,
 				"/index.html");
-		fprintf(stderr, "DEBUG: %s\n", buf);
 		if(access(buf, R_OK) == 0)
 			break;
 	}
