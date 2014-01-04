@@ -353,6 +353,7 @@ static void _new_gtkdoc(Helper * helper)
 	/* FIXME perform this while idle */
 	for(p = prefix; *p != NULL; p++)
 	{
+		/* XXX avoid duplicates */
 		if((p != &prefix[0] && strcmp(*p, prefix[0]) == 0)
 				|| (p != &prefix[1] && strcmp(*p, prefix[1])
 					== 0))
@@ -1072,12 +1073,13 @@ void surfer_set_status(Surfer * surfer, char const * status)
 void surfer_set_title(Surfer * surfer, char const * title)
 {
 	Helper * helper = surfer;
-	char buf[256];
+	gchar * t;
 
-	snprintf(buf, sizeof(buf), "%s%s%s", _("Help browser"),
+	t = g_strdup_printf("%s%s%s", _("Help browser"),
 			(title != NULL) ? " - " : "",
 			(title != NULL) ? title : "");
-	gtk_window_set_title(GTK_WINDOW(helper->window), buf);
+	gtk_window_set_title(GTK_WINDOW(helper->window), t);
+	g_free(t);
 }
 
 
