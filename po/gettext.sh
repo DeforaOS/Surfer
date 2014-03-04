@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2010-2013 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2010-2014 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@
 
 #variables
 PREFIX="/usr/local"
-. "../config.sh"
+[ -f "../config.sh" ] && . "../config.sh"
 LOCALEDIR="$PREFIX/share/locale"
 POTFILES="POTFILES"
 #executables
@@ -46,6 +46,14 @@ _debug()
 {
 	echo "$@" 1>&2
 	"$@"
+}
+
+
+#error
+_error()
+{
+	echo "gettext.sh: $@" 1>&2
+	return 2
 }
 
 
@@ -111,7 +119,7 @@ while getopts "ciuP:" name; do
 			uninstall=1
 			;;
 		P)
-			PREFIX="$2"
+			PREFIX="$OPTARG"
 			;;
 		?)
 			_usage
@@ -122,6 +130,12 @@ done
 shift $(($OPTIND - 1))
 if [ $# -eq 0 ]; then
 	_usage
+	exit $?
+fi
+
+#check the variables
+if [ -z "$PACKAGE" ]; then
+	_error "The PACKAGE variable needs to be set"
 	exit $?
 fi
 
