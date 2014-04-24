@@ -47,8 +47,8 @@ static char const _license[] =
 #ifndef CONTENTSDIR
 # define CONTENTSDIR	DATADIR "/doc/html"
 #endif
-#ifndef MANHTMLDIR
-# define MANHTMLDIR	DATADIR "/man"
+#ifndef MANDIR
+# define MANDIR		DATADIR "/man"
 #endif
 #ifndef LOCALEDIR
 # define LOCALEDIR	DATADIR "/locale"
@@ -543,11 +543,11 @@ static void _new_manual(Helper * helper)
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual")));
 	/* FIXME perform this while idle */
-	if((dir = opendir(MANHTMLDIR)) == NULL)
+	if((dir = opendir(MANDIR)) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
 		if(strncmp(de->d_name, "html", 4) == 0)
-			_new_manual_section(helper, MANHTMLDIR, store,
+			_new_manual_section(helper, MANDIR, store,
 					&de->d_name[4]);
 	closedir(dir);
 }
