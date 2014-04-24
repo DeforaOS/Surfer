@@ -44,8 +44,8 @@ static char const _license[] =
 #ifndef DATADIR
 # define DATADIR	PREFIX "/share"
 #endif
-#ifndef MANHTMLDIR
-# define MANHTMLDIR	DATADIR "/doc/html"
+#ifndef CONTENTSDIR
+# define CONTENTSDIR	DATADIR "/doc/html"
 #endif
 #ifndef LOCALEDIR
 # define LOCALEDIR	DATADIR "/locale"
@@ -229,8 +229,8 @@ static const DesktopMenubar _helper_menubar[] =
 /* functions */
 /* Helper */
 /* helper_new */
-static void _new_contents(Helper * helper, char const * manhtmldir);
-static void _new_contents_package(Helper * helper, char const * manhtmldir,
+static void _new_contents(Helper * helper, char const * contentsdir);
+static void _new_contents_package(Helper * helper, char const * contentsdir,
 		GtkTreeStore * store, char const * package);
 static void _new_gtkdoc(Helper * helper);
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
@@ -295,7 +295,7 @@ static Helper * _helper_new(void)
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
 	_new_gtkdoc(helper);
-	_new_contents(helper, MANHTMLDIR);
+	_new_contents(helper, CONTENTSDIR);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
@@ -309,7 +309,7 @@ static Helper * _helper_new(void)
 	return helper;
 }
 
-static void _new_contents(Helper * helper, char const * manhtmldir)
+static void _new_contents(Helper * helper, char const * contentsdir)
 {
 	GtkWidget * widget;
 	GtkTreeStore * store;
@@ -341,16 +341,16 @@ static void _new_contents(Helper * helper, char const * manhtmldir)
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Contents")));
 	/* FIXME perform this while idle */
-	if((dir = opendir(manhtmldir)) == NULL)
+	if((dir = opendir(contentsdir)) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
 		if(de->d_name[0] != '.')
-			_new_contents_package(helper, manhtmldir, store,
+			_new_contents_package(helper, contentsdir, store,
 					de->d_name);
 	closedir(dir);
 }
 
-static void _new_contents_package(Helper * helper, char const * manhtmldir,
+static void _new_contents_package(Helper * helper, char const * contentsdir,
 		GtkTreeStore * store, char const * package)
 {
 	const char ext[] = ".html";
@@ -363,7 +363,7 @@ static void _new_contents_package(Helper * helper, char const * manhtmldir,
 	gint size = 16;
 	GdkPixbuf * pixbuf;
 
-	if((p = g_strdup_printf("%s/%s", manhtmldir, package)) == NULL)
+	if((p = g_strdup_printf("%s/%s", contentsdir, package)) == NULL)
 		return;
 	dir = opendir(p);
 	g_free(p);
@@ -540,7 +540,7 @@ static int _helper_open_contents(Helper * helper, char const * package,
 	if(command == NULL)
 		command = "index";
 	/* read a package documentation */
-	snprintf(buf, sizeof(buf), "%s%s%s%s%s", "file://" MANHTMLDIR "/",
+	snprintf(buf, sizeof(buf), "%s%s%s%s%s", "file://" CONTENTSDIR "/",
 			package, "/", command, ".html");
 	return _helper_open(helper, buf);
 }
