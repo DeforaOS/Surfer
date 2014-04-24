@@ -69,7 +69,7 @@ struct _Surfer
 	GtkWidget * menubar;
 #endif
 	GtkWidget * notebook;
-	GtkWidget * manual;
+	GtkWidget * contents;
 	GtkWidget * gtkdoc;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
@@ -329,22 +329,23 @@ static void _new_contents(Helper * helper, char const * contentsdir)
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
-	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 1);
+	helper->contents = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->contents),
+			FALSE);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->contents), 1);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
 			"pixbuf", 0, NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
 			renderer, "text", 1, NULL);
 	gtk_tree_view_column_set_sort_column_id(column, 1);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	gtk_tree_view_column_clicked(column);
-	g_signal_connect(helper->manual, "row-activated", G_CALLBACK(
+	g_signal_connect(helper->contents, "row-activated", G_CALLBACK(
 				_helper_on_manual_row_activated), helper);
-	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
+	gtk_container_add(GTK_CONTAINER(widget), helper->contents);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Contents")));
 	/* FIXME perform this while idle */
@@ -674,7 +675,7 @@ static int _helper_open_dialog(Helper * helper)
 	hbox = gtk_hbox_new(FALSE, 4);
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
 #if GTK_CHECK_VERSION(2, 24, 0)
 	entry1 = gtk_combo_box_new_with_model_and_entry(model);
 	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(entry1), 1);
