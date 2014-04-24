@@ -1041,7 +1041,27 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 static void _helper_on_manual_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data)
 {
-	/* FIXME implement */
+	Helper * helper = data;
+	GtkTreeModel * model;
+	GtkTreeIter iter;
+	GtkTreeIter parent;
+	gchar * command;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
+	gtk_tree_model_get_iter(model, &iter, path);
+	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
+	{
+		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
+			gtk_tree_view_collapse_row(GTK_TREE_VIEW(widget), path);
+		else
+			gtk_tree_view_expand_row(GTK_TREE_VIEW(widget), path,
+					FALSE);
+		return;
+	}
+	gtk_tree_model_get(model, &iter, 1, &command, -1);
+	/* FIXME the section is hard-coded */
+	_helper_open_man(helper, 1, command);
+	g_free(command);
 }
 
 
