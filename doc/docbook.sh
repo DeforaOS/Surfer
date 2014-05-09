@@ -151,11 +151,13 @@ while [ $# -gt 0 ]; do
 	ext="${ext##.}"
 	case "$ext" in
 		html)
+			instdir="$DATADIR/doc/$ext/$PACKAGE"
 			source="${target%.*}.xml"
 			xpath="string(/refentry/refmeta/manvolnum)"
 			section=$($XMLLINT --xpath "$xpath" "$source")
-			[ $? -eq 0 -a -n "$section" ]		|| exit 2
-			instdir="$DATADIR/man/html$section"
+			if [ $? -eq 0 -a -n "$section" ]; then
+				instdir="$DATADIR/man/html$section"
+			fi
 			;;
 		pdf)
 			instdir="$DATADIR/doc/$ext/$PACKAGE"
