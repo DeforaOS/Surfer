@@ -544,7 +544,7 @@ static void _new_manual(Helper * helper)
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
 			renderer, "text", 3, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, 2);
+	gtk_tree_view_column_set_sort_column_id(column, 3);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(view, "row-activated", G_CALLBACK(
