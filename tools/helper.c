@@ -96,7 +96,8 @@ static int _helper_open_contents(Helper * helper, char const * package,
 static int _helper_open_dialog(Helper * helper);
 static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 		char const * package);
-static int _helper_open_man(Helper * helper, int section, char const * page);
+static int _helper_open_man(Helper * helper, int section, char const * page,
+		char const * manhtmldir);
 
 static int _error(char const * message, int ret);
 static int _usage(void);
@@ -798,12 +799,13 @@ static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 
 
 /* helper_open_man */
-static int _helper_open_man(Helper * helper, int section, char const * page)
+static int _helper_open_man(Helper * helper, int section, char const * page,
+		char const * manhtmldir)
 {
 	char const * prefix[] =
 	{
-		DATADIR, PREFIX, "/usr/local/share", "/usr/local", "/usr/share",
-		NULL
+		DATADIR "/man", PREFIX "/man", "/usr/local/share/man",
+		"/usr/local/man", "/usr/share/man", "/usr/man", NULL
 	};
 	char const ** p;
 	char buf[256];
@@ -813,17 +815,21 @@ static int _helper_open_man(Helper * helper, int section, char const * page)
 #endif
 	if(section <= 0 || section >= 10)
 		return -1;
-	for(p = prefix; *p != NULL; p++)
-	{
-		snprintf(buf, sizeof(buf), "%s%s%d%s%s%s", *p, "/man/html",
-				section, "/", page, ".html");
-		if(access(buf, R_OK) == 0)
-			break;
-	}
+	if(manhtmldir != NULL)
+		p = &manhtmldir;
+	else
+		for(p = prefix; *p != NULL; p++)
+		{
+			snprintf(buf, sizeof(buf), "%s%s%d%s%s%s", *p,
+					"/man/html", section, "/", page,
+					".html");
+			if(access(buf, R_OK) == 0)
+				break;
+		}
 	if(*p == NULL)
 		return -1;
 	/* read a manual page */
-	snprintf(buf, sizeof(buf), "%s%s%s%d%s%s%s", "file://", *p, "/man/html",
+	snprintf(buf, sizeof(buf), "%s%s%s%d%s%s%s", "file://", *p, "/html",
 			section, "/", page, ".html");
 	return _helper_open(helper, buf);
 }
@@ -1060,6 +1066,7 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	GtkTreeModel * model;
 	GtkTreeIter iter;
 	GtkTreeIter parent;
+	gchar * manhtmldir;
 	guint section;
 	gchar * command;
 
@@ -1074,8 +1081,10 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 					FALSE);
 		return;
 	}
-	gtk_tree_model_get(model, &iter, 2, &section, 3, &command, -1);
-	_helper_open_man(helper, section, command);
+	gtk_tree_model_get(model, &iter, 1, &manhtmldir, 2, &section,
+			3, &command, -1);
+	_helper_open_man(helper, section, command, manhtmldir);
+	g_free(manhtmldir);
 	g_free(command);
 }
 
@@ -1510,7 +1519,7 @@ int main(int argc, char * argv[])
 		return 2;
 	if(section > 0)
 		/* XXX check for errors */
-		_helper_open_man(helper, section, argv[optind]);
+		_helper_open_man(helper, section, argv[optind], NULL);
 	else if(argv[optind] != NULL && devel != 0)
 		_helper_open_gtkdoc(helper, NULL, argv[optind]);
 	else if(argv[optind] != NULL)
