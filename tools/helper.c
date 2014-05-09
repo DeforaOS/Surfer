@@ -242,7 +242,7 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		GtkTreeStore * store, char const * package);
 static void _new_manual(Helper * helper);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
-		GtkTreeStore * store, char const * section);
+		char const * name, GtkTreeStore * store, unsigned int section);
 
 static Helper * _helper_new(void)
 {
@@ -524,12 +524,14 @@ static void _new_manual(Helper * helper)
 	GtkWidget * view;
 	DIR * dir;
 	struct dirent * de;
+	unsigned int section;
 
 	/* FIXME fully implement, de-duplicate code if possible */
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	store = gtk_tree_store_new(4, GDK_TYPE_PIXBUF, G_TYPE_STRING,
+			G_TYPE_UINT, G_TYPE_STRING);
 	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(view), 1);
@@ -539,7 +541,7 @@ static void _new_manual(Helper * helper)
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
-			renderer, "text", 1, NULL);
+			renderer, "text", 3, NULL);
 	gtk_tree_view_column_set_sort_column_id(column, 1);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 	gtk_tree_view_column_clicked(column);
@@ -552,14 +554,14 @@ static void _new_manual(Helper * helper)
 	if((dir = opendir(MANDIR)) == NULL)
 		return;
 	while((de = readdir(dir)) != NULL)
-		if(strncmp(de->d_name, "html", 4) == 0)
-			_new_manual_section(helper, MANDIR, store,
-					&de->d_name[4]);
+		if(sscanf(de->d_name, "html%u", &section) == 1)
+			_new_manual_section(helper, MANDIR, de->d_name, store,
+					section);
 	closedir(dir);
 }
 
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
-		GtkTreeStore * store, char const * section)
+		char const * name, GtkTreeStore * store, unsigned int section)
 {
 	const char ext[] = ".html";
 	gchar * p;
@@ -571,7 +573,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	gint size = 16;
 	GdkPixbuf * pixbuf;
 
-	if((p = g_strdup_printf("%s/html%s", manhtmldir, section)) == NULL)
+	if((p = g_strdup_printf("%s/%s", manhtmldir, name)) == NULL)
 		return;
 	dir = opendir(p);
 	g_free(p);
@@ -581,7 +583,8 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
 	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, section, -1);
+	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, manhtmldir, 2, section,
+			3, name, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -599,7 +602,8 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"help-contents", size, 0, NULL);
 		gtk_tree_store_append(store, &iter, &parent);
-		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
+		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, manhtmldir,
+				2, section, 3, de->d_name, -1);
 	}
 	closedir(dir);
 	if(pixbuf != NULL)
@@ -1045,6 +1049,7 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	GtkTreeModel * model;
 	GtkTreeIter iter;
 	GtkTreeIter parent;
+	guint section;
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
@@ -1058,9 +1063,8 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 					FALSE);
 		return;
 	}
-	gtk_tree_model_get(model, &iter, 1, &command, -1);
-	/* FIXME the section is hard-coded */
-	_helper_open_man(helper, 1, command);
+	gtk_tree_model_get(model, &iter, 2, &section, 3, &command, -1);
+	_helper_open_man(helper, section, command);
 	g_free(command);
 }
 
