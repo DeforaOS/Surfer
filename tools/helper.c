@@ -522,6 +522,8 @@ static void _new_manual(Helper * helper)
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
 	GtkWidget * view;
+	char const * prefix[] = { MANDIR, "/usr/share/man", NULL };
+	char const ** p;
 	DIR * dir;
 	struct dirent * de;
 	unsigned int section;
@@ -542,7 +544,7 @@ static void _new_manual(Helper * helper)
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
 			renderer, "text", 3, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, 1);
+	gtk_tree_view_column_set_sort_column_id(column, 2);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(view, "row-activated", G_CALLBACK(
@@ -551,13 +553,21 @@ static void _new_manual(Helper * helper)
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual")));
 	/* FIXME perform this while idle */
-	if((dir = opendir(MANDIR)) == NULL)
-		return;
-	while((de = readdir(dir)) != NULL)
-		if(sscanf(de->d_name, "html%u", &section) == 1)
-			_new_manual_section(helper, MANDIR, de->d_name, store,
-					section);
-	closedir(dir);
+	for(p = prefix; *p != NULL; p++)
+	{
+		/* XXX avoid duplicates */
+		if((p != &prefix[0] && strcmp(*p, prefix[0]) == 0)
+				|| (p != &prefix[1] && strcmp(*p, prefix[1])
+					== 0))
+			continue;
+		if((dir = opendir(*p)) == NULL)
+			continue;
+		while((de = readdir(dir)) != NULL)
+			if(sscanf(de->d_name, "html%u", &section) == 1)
+				_new_manual_section(helper, *p, de->d_name,
+						store, section);
+		closedir(dir);
+	}
 }
 
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
@@ -582,6 +592,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
+	/* FIXME check if a folder by the same name already exists */
 	gtk_tree_store_append(store, &parent, NULL);
 	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, manhtmldir, 2, section,
 			3, name, -1);
