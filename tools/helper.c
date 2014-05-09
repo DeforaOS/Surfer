@@ -548,6 +548,7 @@ static void _new_manual(Helper * helper)
 	gtk_tree_view_column_set_sort_column_id(column, 3);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 	gtk_tree_view_column_clicked(column);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(view), 3);
 	g_signal_connect(view, "row-activated", G_CALLBACK(
 				_helper_on_manual_row_activated), helper);
 	gtk_container_add(GTK_CONTAINER(widget), view);
