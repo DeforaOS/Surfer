@@ -33,6 +33,7 @@ FOP="fop"
 INSTALL="install -m 0644"
 MKDIR="mkdir -m 0755 -p"
 RM="rm -f"
+XMLLINT="xmllint"
 XSLTPROC="xsltproc --nonet --xinclude"
 
 
@@ -149,7 +150,14 @@ while [ $# -gt 0 ]; do
 	ext="${target##*.}"
 	ext="${ext##.}"
 	case "$ext" in
-		html|pdf)
+		html)
+			source="${target%.*}.xml"
+			xpath="string(/refentry/refmeta/manvolnum)"
+			section=$($XMLLINT --xpath "$xpath" "$source")
+			[ $? -eq 0 -a -n "$section" ]		|| exit 2
+			instdir="$DATADIR/man/html$section"
+			;;
+		pdf)
 			instdir="$DATADIR/doc/$ext/$PACKAGE"
 			;;
 		1|2|3|4|5|6|7|8|9)
