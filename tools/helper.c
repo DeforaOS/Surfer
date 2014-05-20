@@ -62,6 +62,8 @@ typedef struct _Surfer Helper;
 
 struct _Surfer
 {
+	guint source;
+
 	/* widgets */
 	GtkIconTheme * icontheme;
 	GtkWidget * window;
@@ -71,6 +73,7 @@ struct _Surfer
 	GtkWidget * notebook;
 	GtkWidget * contents;
 	GtkWidget * gtkdoc;
+	GtkWidget * manual;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
 
@@ -235,13 +238,16 @@ static const DesktopMenubar _helper_menubar[] =
 /* functions */
 /* Helper */
 /* helper_new */
-static void _new_contents(Helper * helper, char const * contentsdir);
+static void _new_contents(Helper * helper);
+static gboolean _new_contents_idle(gpointer data);
 static void _new_contents_package(Helper * helper, char const * contentsdir,
 		GtkTreeStore * store, char const * package);
 static void _new_gtkdoc(Helper * helper);
+static gboolean _new_gtkdoc_idle(gpointer data);
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		GtkTreeStore * store, char const * package);
 static void _new_manual(Helper * helper);
+static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, unsigned int section);
 
@@ -257,6 +263,7 @@ static Helper * _helper_new(void)
 
 	if((helper = object_new(sizeof(*helper))) == NULL)
 		return NULL;
+	helper->source = 0;
 	/* widgets */
 	helper->icontheme = gtk_icon_theme_get_default();
 	/* window */
@@ -304,7 +311,7 @@ static Helper * _helper_new(void)
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
 	_new_gtkdoc(helper);
-	_new_contents(helper, CONTENTSDIR);
+	_new_contents(helper);
 	_new_manual(helper);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
@@ -319,14 +326,12 @@ static Helper * _helper_new(void)
 	return helper;
 }
 
-static void _new_contents(Helper * helper, char const * contentsdir)
+static void _new_contents(Helper * helper)
 {
 	GtkWidget * widget;
 	GtkTreeStore * store;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
-	DIR * dir;
-	struct dirent * de;
 
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
@@ -351,14 +356,25 @@ static void _new_contents(Helper * helper, char const * contentsdir)
 	gtk_container_add(GTK_CONTAINER(widget), helper->contents);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Contents")));
-	/* FIXME perform this while idle */
-	if((dir = opendir(contentsdir)) == NULL)
-		return;
+}
+
+static gboolean _new_contents_idle(gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	DIR * dir;
+	struct dirent * de;
+
+	helper->source = g_idle_add(_new_manual_idle, helper);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
+	if((dir = opendir(CONTENTSDIR)) == NULL)
+		return FALSE;
 	while((de = readdir(dir)) != NULL)
 		if(de->d_name[0] != '.')
-			_new_contents_package(helper, contentsdir, store,
-					de->d_name);
+			_new_contents_package(helper, CONTENTSDIR,
+					GTK_TREE_STORE(model), de->d_name);
 	closedir(dir);
+	return FALSE;
 }
 
 static void _new_contents_package(Helper * helper, char const * contentsdir,
@@ -415,17 +431,6 @@ static void _new_gtkdoc(Helper * helper)
 	GtkTreeStore * store;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
-	char const * prefix[] =
-	{
-		/* FIXME look into more directories */
-		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
-		"/usr/local/share/gtk-doc/html",
-		"/usr/local/share/devhelp/books",
-		"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
-	};
-	char const ** p;
-	DIR * dir;
-	struct dirent * de;
 
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
@@ -450,7 +455,27 @@ static void _new_gtkdoc(Helper * helper)
 	gtk_container_add(GTK_CONTAINER(widget), helper->gtkdoc);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("API reference")));
-	/* FIXME perform this while idle */
+	helper->source = g_idle_add(_new_gtkdoc_idle, helper);
+}
+
+static gboolean _new_gtkdoc_idle(gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	char const * prefix[] =
+	{
+		/* FIXME look into more directories */
+		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
+		"/usr/local/share/gtk-doc/html",
+		"/usr/local/share/devhelp/books",
+		"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
+	};
+	char const ** p;
+	DIR * dir;
+	struct dirent * de;
+
+	helper->source = g_idle_add(_new_contents_idle, helper);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->gtkdoc));
 	for(p = prefix; *p != NULL; p++)
 	{
 		/* XXX avoid duplicates */
@@ -462,10 +487,12 @@ static void _new_gtkdoc(Helper * helper)
 			continue;
 		while((de = readdir(dir)) != NULL)
 			if(de->d_name[0] != '.')
-				_new_gtkdoc_package(helper, *p, store,
+				_new_gtkdoc_package(helper, *p,
+						GTK_TREE_STORE(model),
 						de->d_name);
 		closedir(dir);
 	}
+	return FALSE;
 }
 
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
@@ -522,12 +549,6 @@ static void _new_manual(Helper * helper)
 	GtkTreeStore * store;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
-	GtkWidget * view;
-	char const * prefix[] = { MANDIR, "/usr/share/man", NULL };
-	char const ** p;
-	DIR * dir;
-	struct dirent * de;
-	unsigned int section;
 
 	/* FIXME fully implement, de-duplicate code if possible */
 	widget = gtk_scrolled_window_new(NULL, NULL);
@@ -535,26 +556,39 @@ static void _new_manual(Helper * helper)
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	store = gtk_tree_store_new(4, GDK_TYPE_PIXBUF, G_TYPE_STRING,
 			G_TYPE_UINT, G_TYPE_STRING);
-	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(view), 1);
+	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 1);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
 			"pixbuf", 0, NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
 			renderer, "text", 3, NULL);
 	gtk_tree_view_column_set_sort_column_id(column, 3);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	gtk_tree_view_column_clicked(column);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(view), 3);
-	g_signal_connect(view, "row-activated", G_CALLBACK(
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 3);
+	g_signal_connect(helper->manual, "row-activated", G_CALLBACK(
 				_helper_on_manual_row_activated), helper);
-	gtk_container_add(GTK_CONTAINER(widget), view);
+	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual")));
-	/* FIXME perform this while idle */
+}
+
+static gboolean _new_manual_idle(gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	char const * prefix[] = { MANDIR, "/usr/share/man", NULL };
+	char const ** p;
+	DIR * dir;
+	struct dirent * de;
+	unsigned int section;
+
+	helper->source = 0;
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
 	for(p = prefix; *p != NULL; p++)
 	{
 		/* XXX avoid duplicates */
@@ -567,9 +601,10 @@ static void _new_manual(Helper * helper)
 		while((de = readdir(dir)) != NULL)
 			if(sscanf(de->d_name, "html%u", &section) == 1)
 				_new_manual_section(helper, *p, de->d_name,
-						store, section);
+						GTK_TREE_STORE(model), section);
 		closedir(dir);
 	}
+	return FALSE;
 }
 
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
@@ -627,6 +662,8 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 /* helper_delete */
 void _helper_delete(Helper * helper)
 {
+	if(helper->source != 0)
+		g_source_remove(helper->source);
 	if(helper->ab_window != NULL)
 		gtk_widget_destroy(helper->ab_window);
 	if(helper->fi_dialog != NULL)
