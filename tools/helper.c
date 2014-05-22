@@ -516,7 +516,7 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 						package)) == NULL)
 			return;
 	}
-	if((fp = fopen(p, "r")) == NULL)
+	if(fp == NULL && (fp = fopen(p, "r")) == NULL)
 		_error(p, 1);
 	g_free(p);
 	if(fp == NULL)
