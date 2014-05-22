@@ -649,10 +649,8 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
-	/* FIXME check if a folder by the same name already exists */
-	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, manhtmldir, 2, section,
-			3, name, -1);
+	_new_manual_section_lookup(store, &parent, pixbuf, manhtmldir, section,
+			name);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -676,6 +674,30 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	closedir(dir);
 	if(pixbuf != NULL)
 		g_object_unref(pixbuf);
+}
+
+static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
+		GdkPixbuf * pixbuf, char const * manhtmldir,
+		unsigned int section, char const * name)
+{
+	GtkTreeModel * model = GTK_TREE_MODEL(store);
+	gboolean valid;
+	gchar * n;
+	int res;
+
+	for(valid = gtk_tree_model_get_iter_first(model, iter); valid == TRUE;
+			valid = gtk_tree_model_iter_next(model, iter))
+	{
+		gtk_tree_model_get(model, iter, 3, &n, -1);
+		res = strcmp(name, n);
+		g_free(n);
+		if(res == 0)
+			break;
+	}
+	if(valid == FALSE)
+		gtk_tree_store_append(store, iter, NULL);
+	gtk_tree_store_set(store, iter, 0, pixbuf, 1, manhtmldir, 2, section,
+			3, name, -1);
 }
 
 
