@@ -677,6 +677,9 @@ void _helper_delete(Helper * helper)
 /* helper_open */
 static int _helper_open(Helper * helper, char const * url)
 {
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\")\n", __func__, url);
+#endif
 	if(url == NULL)
 		return _helper_open_dialog(helper);
 	ghtml_load_url(helper->view, url);
@@ -812,6 +815,10 @@ static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 	char const ** p;
 	String * s;
 
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\", \"%s\")\n", __func__, gtkdocdir,
+			package);
+#endif
 	for(p = prefix; gtkdocdir == NULL && *p != NULL; p++)
 	{
 		if((s = string_new_append(*p, "/", package, "/index.html",
