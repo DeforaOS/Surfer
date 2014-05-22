@@ -63,6 +63,7 @@ typedef struct _Surfer Helper;
 struct _Surfer
 {
 	guint source;
+	char const ** p;
 
 	/* widgets */
 	GtkIconTheme * icontheme;
@@ -234,6 +235,17 @@ static const DesktopMenubar _helper_menubar[] =
 };
 #endif
 
+static char const * _gtkdoc_prefix[] =
+{
+	/* FIXME look into more directories */
+	DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
+	"/usr/local/share/gtk-doc/html",
+	"/usr/local/share/devhelp/books",
+	"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
+};
+
+static char const * _manual_prefix[] = { MANDIR, "/usr/share/man", NULL };
+
 
 /* functions */
 /* Helper */
@@ -250,6 +262,9 @@ static void _new_manual(Helper * helper);
 static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, unsigned int section);
+static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
+		GdkPixbuf * pixbuf, char const * manhtmldir,
+		unsigned int section, char const * name);
 
 static Helper * _helper_new(void)
 {
@@ -264,6 +279,7 @@ static Helper * _helper_new(void)
 	if((helper = object_new(sizeof(*helper))) == NULL)
 		return NULL;
 	helper->source = 0;
+	helper->p = NULL;
 	/* widgets */
 	helper->icontheme = gtk_icon_theme_get_default();
 	/* window */
@@ -366,6 +382,7 @@ static gboolean _new_contents_idle(gpointer data)
 	struct dirent * de;
 
 	helper->source = g_idle_add(_new_manual_idle, helper);
+	helper->p = NULL;
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
 	if((dir = opendir(CONTENTSDIR)) == NULL)
 		return FALSE;
@@ -462,36 +479,34 @@ static gboolean _new_gtkdoc_idle(gpointer data)
 {
 	Helper * helper = data;
 	GtkTreeModel * model;
-	char const * prefix[] =
-	{
-		/* FIXME look into more directories */
-		DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
-		"/usr/local/share/gtk-doc/html",
-		"/usr/local/share/devhelp/books",
-		"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
-	};
-	char const ** p;
+	char const * p;
 	DIR * dir;
 	struct dirent * de;
 
-	helper->source = g_idle_add(_new_contents_idle, helper);
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->gtkdoc));
-	for(p = prefix; *p != NULL; p++)
+	if(helper->p == NULL)
+		helper->p = _gtkdoc_prefix;
+	for(p = *(helper->p); p != NULL; (helper->p)++, p = *(helper->p))
 	{
 		/* XXX avoid duplicates */
-		if((p != &prefix[0] && strcmp(*p, prefix[0]) == 0)
-				|| (p != &prefix[1] && strcmp(*p, prefix[1])
-					== 0))
+		if((helper->p != &_gtkdoc_prefix[0]
+					&& strcmp(p, _gtkdoc_prefix[0]) == 0)
+				|| (helper->p != &_gtkdoc_prefix[1]
+					&& strcmp(p, _gtkdoc_prefix[1]) == 0))
 			continue;
-		if((dir = opendir(*p)) == NULL)
+		if((dir = opendir(p)) == NULL)
 			continue;
 		while((de = readdir(dir)) != NULL)
 			if(de->d_name[0] != '.')
-				_new_gtkdoc_package(helper, *p,
+				_new_gtkdoc_package(helper, p,
 						GTK_TREE_STORE(model),
 						de->d_name);
 		closedir(dir);
+		(helper->p)++;
+		return TRUE;
 	}
+	helper->source = g_idle_add(_new_contents_idle, helper);
+	helper->p = NULL;
 	return FALSE;
 }
 
@@ -581,29 +596,34 @@ static gboolean _new_manual_idle(gpointer data)
 {
 	Helper * helper = data;
 	GtkTreeModel * model;
-	char const * prefix[] = { MANDIR, "/usr/share/man", NULL };
-	char const ** p;
+	char const * p;
 	DIR * dir;
 	struct dirent * de;
 	unsigned int section;
 
-	helper->source = 0;
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
-	for(p = prefix; *p != NULL; p++)
+	if(helper->p == NULL)
+		helper->p = _manual_prefix;
+	for(p = *(helper->p); p != NULL; (helper->p)++, p = *(helper->p))
 	{
 		/* XXX avoid duplicates */
-		if((p != &prefix[0] && strcmp(*p, prefix[0]) == 0)
-				|| (p != &prefix[1] && strcmp(*p, prefix[1])
-					== 0))
+		if((helper->p != &_manual_prefix[0]
+					&& strcmp(p, _manual_prefix[0]) == 0)
+				|| (helper->p != &_manual_prefix[1]
+					&& strcmp(p, _manual_prefix[1]) == 0))
 			continue;
-		if((dir = opendir(*p)) == NULL)
+		if((dir = opendir(p)) == NULL)
 			continue;
 		while((de = readdir(dir)) != NULL)
 			if(sscanf(de->d_name, "html%u", &section) == 1)
-				_new_manual_section(helper, *p, de->d_name,
+				_new_manual_section(helper, p, de->d_name,
 						GTK_TREE_STORE(model), section);
 		closedir(dir);
+		(helper->p)++;
+		return TRUE;
 	}
+	helper->source = 0;
+	helper->p = NULL;
 	return FALSE;
 }
 
