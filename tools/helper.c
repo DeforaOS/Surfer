@@ -875,7 +875,7 @@ static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 		p = &gtkdocdir;
 	if(*p == NULL)
 		return -1;
-	/* read a package API documentation */
+	/* read the API documentation */
 	if((s = string_new_append("file://", *p, "/", package, "/index.html",
 					NULL)) == NULL)
 		return -1;
