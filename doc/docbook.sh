@@ -58,6 +58,7 @@ _docbook()
 		html)
 			XSL="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"
 			[ -f "${target%.*}.xsl" ] && XSL="${target%.*}.xsl"
+			[ -f "${target%.*}.css.xml" ] && XSLTPROC="$XSLTPROC --param custom.css.source \"${target%.*}.css.xml\" --param generate.css.header 1"
 			$DEBUG $XSLTPROC -o "$target" "$XSL" "$source"
 			;;
 		pdf)
