@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<!DOCTYPE style [
+<!ENTITY manual "manual.css.xml">
+]>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="&manual;"/>
+<!-- vim: set noet ts=1 sw=1 sts=1 tw=80: -->

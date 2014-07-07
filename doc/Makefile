@@ -12,19 +12,19 @@ all: $(TARGETS)
 download.1: download.xml
 	./docbook.sh -P "$(PREFIX)" -- "download.1"
 
-download.html: download.xml
+download.html: download.css.xml download.xml manual.css.xml
 	./docbook.sh -P "$(PREFIX)" -- "download.html"
 
 helper.1: helper.xml
 	./docbook.sh -P "$(PREFIX)" -- "helper.1"
 
-helper.html: helper.xml
+helper.html: helper.css.xml helper.xml manual.css.xml
 	./docbook.sh -P "$(PREFIX)" -- "helper.html"
 
 surfer.1: surfer.xml
 	./docbook.sh -P "$(PREFIX)" -- "surfer.1"
 
-surfer.html: surfer.xml
+surfer.html: manual.css.xml surfer.css.xml surfer.xml
 	./docbook.sh -P "$(PREFIX)" -- "surfer.html"
 
 clean:

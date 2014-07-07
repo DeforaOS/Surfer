@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<style><![CDATA[/* $Id$ */
+
+div.refentry {
+	font-family:			monospace;
+	margin-left:			5ex;
+	min-width:			102ex;
+	width:				102ex;
+}
+
+div.refentry h1, div.refentry h2, div.refentry h3 {
+	font-size:			inherit;
+	margin-bottom:			0;
+}
+
+div.refentry h1, div.refentry h2 {
+	margin-left:			-4ex;
+	text-transform:			uppercase;
+}
+
+div.refentry h3 {
+	margin-left:			-2ex;
+}
+
+div.refentry p {
+	margin-top:			0;
+	padding-top:			0;
+}
+
+div.refentry blockquote, div.refentry pre {
+	margin-left:			5ex;
+}
+]]></style>
