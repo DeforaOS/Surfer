@@ -188,7 +188,7 @@ static const DesktopMenu _menu_edit[] =
 	{ N_("Cop_y"), G_CALLBACK(_helper_on_edit_copy), GTK_STOCK_COPY,
 		GDK_CONTROL_MASK, GDK_KEY_C },
 	{ "", NULL, NULL, 0, 0 },
-	{ N_("Select _all"), G_CALLBACK(_helper_on_edit_select_all),
+	{ N_("Select _All"), G_CALLBACK(_helper_on_edit_select_all),
 # if GTK_CHECK_VERSION(2, 10, 0)
 		GTK_STOCK_SELECT_ALL,
 # else
