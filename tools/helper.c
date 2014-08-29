@@ -87,6 +87,33 @@ typedef struct _Surfer
 	GtkWidget * ab_window;
 } Helper;
 
+typedef enum _HelperContentsColumn
+{
+	HCC_ICON = 0,
+	HCC_PACKAGE
+} HelperContentsColumn;
+#define HCC_LAST HCC_PACKAGE
+#define HCC_COUNT (HCC_LAST + 1)
+
+typedef enum _HelperGtkDocColumn
+{
+	HGC_ICON = 0,
+	HGC_PACKAGE,
+	HGC_DIRECTORY
+} HelperGtkDocColumn;
+#define HGC_LAST HGC_DIRECTORY
+#define HGC_COUNT (HGC_LAST + 1)
+
+typedef enum _HelperManualColumn
+{
+	HMC_ICON = 0,
+	HMC_DIRECTORY,
+	HMC_SECTION,
+	HMC_FILENAME
+} HelperManualColumn;
+#define HMC_LAST HMC_FILENAME
+#define HMC_COUNT (HMC_LAST + 1)
+
 
 /* prototypes */
 static Helper * _helper_new(void);
@@ -350,19 +377,22 @@ static void _new_contents(Helper * helper)
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	store = gtk_tree_store_new(HCC_COUNT,
+			GDK_TYPE_PIXBUF,	/* icon */
+			G_TYPE_STRING);		/* package */
 	helper->contents = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->contents),
 			FALSE);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->contents), 1);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->contents),
+			HCC_PACKAGE);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", 0, NULL);
+			"pixbuf", HCC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
-			renderer, "text", 1, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, 1);
+			renderer, "text", HCC_PACKAGE, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HCC_PACKAGE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(helper->contents, "row-activated", G_CALLBACK(
@@ -415,7 +445,8 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
 	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, package, -1);
+	gtk_tree_store_set(store, &parent, HCC_ICON, pixbuf,
+			HCC_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -433,7 +464,8 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"help-contents", size, 0, NULL);
 		gtk_tree_store_append(store, &iter, &parent);
-		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, de->d_name, -1);
+		gtk_tree_store_set(store, &iter,
+				HCC_ICON, pixbuf, HCC_PACKAGE, de->d_name, -1);
 	}
 	closedir(dir);
 	if(pixbuf != NULL)
@@ -450,19 +482,21 @@ static void _new_gtkdoc(Helper * helper)
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(3, GDK_TYPE_PIXBUF, G_TYPE_STRING,
-			G_TYPE_STRING);
+	store = gtk_tree_store_new(HGC_COUNT,
+			GDK_TYPE_PIXBUF,	/* icon */
+			G_TYPE_STRING,		/* package */
+			G_TYPE_STRING);		/* directory */
 	helper->gtkdoc = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->gtkdoc), FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->gtkdoc), 1);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", 0, NULL);
+			"pixbuf", HGC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
-			renderer, "text", 1, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, 1);
+			renderer, "text", HGC_PACKAGE, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HGC_PACKAGE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(helper->gtkdoc, "row-activated", G_CALLBACK(
@@ -538,7 +572,8 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
 	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, 0, pixbuf, 1, package, -1);
+	gtk_tree_store_set(store, &parent,
+			HGC_ICON, pixbuf, HGC_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -549,8 +584,9 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 				"help-contents", size, 0, NULL);
 	/* FIXME parse the contents of the devhelp(2) file */
 	gtk_tree_store_append(store, &iter, &parent);
-	gtk_tree_store_set(store, &iter, 0, pixbuf, 1, package, 2, gtkdocdir,
-			-1);
+	gtk_tree_store_set(store, &iter,
+			HGC_ICON, pixbuf, HGC_PACKAGE, package,
+			HGC_DIRECTORY, gtkdocdir, -1);
 	if(pixbuf != NULL)
 		g_object_unref(pixbuf);
 	fclose(fp);
@@ -567,22 +603,27 @@ static void _new_manual(Helper * helper)
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(4, GDK_TYPE_PIXBUF, G_TYPE_STRING,
-			G_TYPE_UINT, G_TYPE_STRING);
+	store = gtk_tree_store_new(HMC_COUNT,
+			GDK_TYPE_PIXBUF,	/* icon */
+			G_TYPE_STRING,		/* directory */
+			G_TYPE_UINT,		/* section */
+			G_TYPE_STRING);		/* filename */
 	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 1);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual),
+			HMC_DIRECTORY);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", 0, NULL);
+			"pixbuf", HMC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
-			renderer, "text", 3, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, 3);
+			renderer, "text", HMC_FILENAME, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HMC_FILENAME);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	gtk_tree_view_column_clicked(column);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual), 3);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual),
+			HMC_FILENAME);
 	g_signal_connect(helper->manual, "row-activated", G_CALLBACK(
 				_helper_on_manual_row_activated), helper);
 	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
@@ -666,8 +707,10 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"help-contents", size, 0, NULL);
 		gtk_tree_store_append(store, &iter, &parent);
-		gtk_tree_store_set(store, &iter, 0, pixbuf, 1, manhtmldir,
-				2, section, 3, de->d_name, -1);
+		gtk_tree_store_set(store, &iter,
+				HMC_ICON, pixbuf, HMC_DIRECTORY, manhtmldir,
+				HMC_SECTION, section, HMC_FILENAME, de->d_name,
+				-1);
 	}
 	closedir(dir);
 	if(pixbuf != NULL)
@@ -686,16 +729,16 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 	for(valid = gtk_tree_model_get_iter_first(model, iter); valid == TRUE;
 			valid = gtk_tree_model_iter_next(model, iter))
 	{
-		gtk_tree_model_get(model, iter, 3, &n, -1);
+		gtk_tree_model_get(model, iter, HMC_FILENAME, &n, -1);
 		res = strcmp(name, n);
 		g_free(n);
 		if(res == 0)
 			break;
 	}
 	if(valid == FALSE)
-		gtk_tree_store_append(store, iter, NULL);
-	gtk_tree_store_set(store, iter, 0, pixbuf, 1, manhtmldir, 2, section,
-			3, name, -1);
+	gtk_tree_store_set(store, iter, HMC_ICON, pixbuf,
+			HMC_DIRECTORY, manhtmldir, HMC_SECTION, section,
+			HMC_FILENAME, name, -1);
 }
 
 
