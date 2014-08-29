@@ -444,9 +444,13 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
-	gtk_tree_store_append(store, &parent, NULL);
-	gtk_tree_store_set(store, &parent, HCC_ICON, pixbuf,
-			HCC_PACKAGE, package, -1);
+#if GTK_CHECK_VERSION(2, 10, 0)
+	gtk_tree_store_insert_with_values(store, &parent, NULL, -1,
+#else
+	gtk_tree_store_insert(store, &parent, NULL, -1);
+	gtk_tree_store_set(store, &parent,
+#endif
+			HCC_ICON, pixbuf, HCC_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -463,8 +467,12 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 		if(pixbuf == NULL)
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"help-contents", size, 0, NULL);
-		gtk_tree_store_append(store, &iter, &parent);
+#if GTK_CHECK_VERSION(2, 10, 0)
+		gtk_tree_store_insert_with_values(store, &iter, &parent, -1,
+#else
+		gtk_tree_store_insert(store, &iter, &parent, -1);
 		gtk_tree_store_set(store, &iter,
+#endif
 				HCC_ICON, pixbuf, HCC_PACKAGE, de->d_name, -1);
 	}
 	closedir(dir);
@@ -571,8 +579,12 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
-	gtk_tree_store_append(store, &parent, NULL);
+#if GTK_CHECK_VERSION(2, 10, 0)
+	gtk_tree_store_insert_with_values(store, &parent, NULL, -1,
+#else
+	gtk_tree_store_insert(store, &parent, NULL, -1);
 	gtk_tree_store_set(store, &parent,
+#endif
 			HGC_ICON, pixbuf, HGC_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
@@ -583,8 +595,12 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 				"help-contents", size, 0, NULL);
 	/* FIXME parse the contents of the devhelp(2) file */
-	gtk_tree_store_append(store, &iter, &parent);
+#if GTK_CHECK_VERSION(2, 10, 0)
+	gtk_tree_store_insert_with_values(store, &iter, &parent, -1,
+#else
+	gtk_tree_store_insert(store, &iter, &parent, -1);
 	gtk_tree_store_set(store, &iter,
+#endif
 			HGC_ICON, pixbuf, HGC_PACKAGE, package,
 			HGC_DIRECTORY, gtkdocdir, -1);
 	if(pixbuf != NULL)
@@ -706,8 +722,12 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		if(pixbuf == NULL)
 			pixbuf = gtk_icon_theme_load_icon(helper->icontheme,
 					"help-contents", size, 0, NULL);
-		gtk_tree_store_append(store, &iter, &parent);
+#if GTK_CHECK_VERSION(2, 10, 0)
+		gtk_tree_store_insert_with_values(store, &iter, &parent, -1,
+#else
+		gtk_tree_store_insert(store, &iter, &parent, -1);
 		gtk_tree_store_set(store, &iter,
+#endif
 				HMC_ICON, pixbuf, HMC_DIRECTORY, manhtmldir,
 				HMC_SECTION, section, HMC_FILENAME, de->d_name,
 				-1);
