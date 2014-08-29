@@ -906,8 +906,7 @@ static int _helper_open_man(Helper * helper, int section, char const * page,
 		for(p = prefix; *p != NULL; p++)
 		{
 			snprintf(buf, sizeof(buf), "%s%s%d%s%s%s", *p,
-					"/man/html", section, "/", page,
-					".html");
+					"/html", section, "/", page, ".html");
 			if(access(buf, R_OK) == 0)
 				break;
 		}
