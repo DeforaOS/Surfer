@@ -1078,7 +1078,9 @@ static gboolean _about_on_closex(gpointer data)
 /* helper_on_help_contents */
 static void _helper_on_help_contents(gpointer data)
 {
-	desktop_help_contents(PACKAGE, PROGNAME);
+	Helper * helper = data;
+
+	_helper_open_man(helper, 1, PROGNAME, MANDIR);
 }
 #endif
 
