@@ -274,7 +274,7 @@ static Helper * _helper_new(void)
 	GtkToolItem * toolitem;
 #endif
 
-	if((helper = object_new(sizeof(*helper))) == NULL)
+	if((helper = surfer_new(NULL)) == NULL)
 		return NULL;
 	helper->source = 0;
 	helper->p = NULL;
@@ -709,7 +709,7 @@ void _helper_delete(Helper * helper)
 	if(helper->fi_dialog != NULL)
 		gtk_widget_destroy(helper->fi_dialog);
 	gtk_widget_destroy(helper->window);
-	object_delete(helper);
+	surfer_delete(helper);
 }
 
 
@@ -1221,15 +1221,20 @@ static int _usage(void)
 /* surfer */
 /* essential */
 /* surfer_new */
-Surfer * surfer_new(char const * url)
+Helper * surfer_new(char const * url)
 {
-	return NULL;
+	Helper * helper;
+
+	if((helper = object_new(sizeof(*helper))) == NULL)
+		return NULL;
+	return helper;
 }
 
 
 /* surfer_delete */
-void surfer_delete(Surfer * surfer)
+void surfer_delete(Helper * helper)
 {
+	object_delete(helper);
 }
 
 
