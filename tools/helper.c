@@ -58,9 +58,7 @@ static char const _license[] =
 /* helper */
 /* private */
 /* types */
-typedef struct _Surfer Helper;
-
-struct _Surfer
+typedef struct _Surfer
 {
 	guint source;
 	char const ** p;
@@ -87,7 +85,7 @@ struct _Surfer
 
 	/* about */
 	GtkWidget * ab_window;
-};
+} Helper;
 
 
 /* prototypes */
