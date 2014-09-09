@@ -73,6 +73,7 @@ typedef struct _Surfer
 	GtkWidget * contents;
 	GtkWidget * gtkdoc;
 	GtkWidget * manual;
+	GtkWidget * search;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
 
@@ -156,6 +157,9 @@ static void _helper_on_contents_row_activated(GtkWidget * widget,
 static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 static void _helper_on_manual_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
+static void _helper_on_search_activated(GtkWidget * widget, gpointer data);
+static void _helper_on_search_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 #ifdef EMBEDDED
 static void _helper_on_open(gpointer data);
@@ -290,6 +294,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		GdkPixbuf * pixbuf, char const * manhtmldir,
 		unsigned int section, char const * name);
+static void _new_search(Helper * helper);
 
 static Helper * _helper_new(void)
 {
@@ -354,6 +359,7 @@ static Helper * _helper_new(void)
 	_new_gtkdoc(helper);
 	_new_contents(helper);
 	_new_manual(helper);
+	_new_search(helper);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
@@ -770,6 +776,31 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		gtk_tree_store_set(store, iter, HMC_ICON, pixbuf,
 				HMC_DIRECTORY, manhtmldir, HMC_SECTION, section,
 				HMC_FILENAME, name, -1);
+}
+
+static void _new_search(Helper * helper)
+{
+	GtkWidget * vbox;
+	GtkWidget * widget;
+	GtkListStore * store;
+
+	vbox = gtk_vbox_new(FALSE, 4);
+	widget = gtk_entry_new();
+	g_signal_connect(widget, "activate", G_CALLBACK(
+				_helper_on_search_activated), helper);
+	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, TRUE, 0);
+	widget = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	/* FIXME complete the model */
+	store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	helper->search = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	g_signal_connect(helper->search, "row-activated", G_CALLBACK(
+				_helper_on_search_row_activated), helper);
+	gtk_container_add(GTK_CONTAINER(widget), helper->search);
+	gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), vbox,
+			gtk_label_new(_("Search")));
 }
 
 
@@ -1246,6 +1277,34 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	_helper_open_man(helper, section, command, manhtmldir);
 	g_free(manhtmldir);
 	g_free(command);
+}
+
+
+/* helper_on_search_activated */
+static void _helper_on_search_activated(GtkWidget * widget, gpointer data)
+{
+	Helper * helper = data;
+	GtkListStore * store;
+	char const * text;
+
+	store = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->search));
+	gtk_list_store_clear(store);
+	text = gtk_entry_get_text(GTK_ENTRY(widget));
+	/* FIXME implement */
+}
+
+
+/* helper_on_search_row_activated */
+static void _helper_on_search_row_activated(GtkWidget * widget,
+		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data)
+{
+	Helper * helper = data;
+	GtkTreeModel * model;
+	GtkTreeIter iter;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
+	gtk_tree_model_get_iter(model, &iter, path);
+	/* FIXME implement */
 }
 
 
