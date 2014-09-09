@@ -756,9 +756,20 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 			break;
 	}
 	if(valid == FALSE)
-	gtk_tree_store_set(store, iter, HMC_ICON, pixbuf,
-			HMC_DIRECTORY, manhtmldir, HMC_SECTION, section,
-			HMC_FILENAME, name, -1);
+	{
+#if GTK_CHECK_VERSION(2, 10, 0)
+		gtk_tree_store_insert_with_values(store, iter, NULL, -1,
+#else
+		gtk_tree_store_insert(store, iter, NULL, -1);
+		gtk_tree_store_set(store, iter,
+#endif
+				HMC_ICON, pixbuf, HMC_DIRECTORY, manhtmldir,
+				HMC_SECTION, section, HMC_FILENAME, name, -1);
+	}
+	else
+		gtk_tree_store_set(store, iter, HMC_ICON, pixbuf,
+				HMC_DIRECTORY, manhtmldir, HMC_SECTION, section,
+				HMC_FILENAME, name, -1);
 }
 
 
