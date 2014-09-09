@@ -117,7 +117,7 @@ static const DesktopMenu _menu_file[] =
 	{ N_("Open _URL..."),	G_CALLBACK(on_file_open_url), NULL,
 		GDK_CONTROL_MASK, GDK_KEY_L },
 	{ "", NULL, NULL, 0, 0 },
-	{ N_("Save _as..."),	G_CALLBACK(on_file_save_as), GTK_STOCK_SAVE_AS,
+	{ N_("Save _As..."),	G_CALLBACK(on_file_save_as), GTK_STOCK_SAVE_AS,
 		GDK_CONTROL_MASK, GDK_KEY_S },
 	{ "", NULL, NULL, 0, 0 },
 	{ N_("_Print..."),	G_CALLBACK(on_file_print), GTK_STOCK_PRINT, 0,
@@ -144,7 +144,7 @@ static const DesktopMenu _menu_edit[] =
 	{ N_("_Paste"),		G_CALLBACK(on_edit_paste), GTK_STOCK_PASTE,
 		GDK_CONTROL_MASK, GDK_KEY_V },
 	{ "",			NULL, NULL, 0, 0 },
-	{ N_("Select _all"),	G_CALLBACK(on_edit_select_all),
+	{ N_("Select _All"),	G_CALLBACK(on_edit_select_all),
 # if GTK_CHECK_VERSION(2, 10, 0)
 		GTK_STOCK_SELECT_ALL,
 # else
