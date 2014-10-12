@@ -29,6 +29,11 @@ surfer.html: manual.css.xml surfer.css.xml surfer.xml
 
 clean:
 	$(RM) -- $(download.1_OBJS) $(download.html_OBJS) $(helper.1_OBJS) $(helper.html_OBJS) $(surfer.1_OBJS) $(surfer.html_OBJS)
+	./docbook.sh -c -P "$(PREFIX)" -- "download.1"
+	./docbook.sh -c -P "$(PREFIX)" -- "download.html"
+	./docbook.sh -c -P "$(PREFIX)" -- "helper.1"
+	./docbook.sh -c -P "$(PREFIX)" -- "helper.html"
+	./docbook.sh -c -P "$(PREFIX)" -- "surfer.1"
 	./docbook.sh -c -P "$(PREFIX)" -- "surfer.html"
 
 distclean: clean
