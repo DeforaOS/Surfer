@@ -1,4 +1,5 @@
-TARGETS	= helper
+TARGETS	= $(OBJDIR)helper
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 BINDIR	= $(PREFIX)/bin
@@ -17,15 +18,15 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-helper_OBJS = helper.o
+helper_OBJS = $(OBJDIR)helper.o
 helper_CFLAGS = $(CPPFLAGSF) $(CPPFLAGS) $(CFLAGSF) $(CFLAGS)
 helper_LDFLAGS = $(LDFLAGSF) $(LDFLAGS) `pkg-config --libs libDesktop webkit-1.0` ../src/ghtml.o
 
-helper: $(helper_OBJS) ../src/ghtml.o
-	$(CC) -o helper $(helper_OBJS) $(helper_LDFLAGS)
+$(OBJDIR)helper: $(helper_OBJS) ../src/ghtml.o
+	$(CC) -o $(OBJDIR)helper $(helper_OBJS) $(helper_LDFLAGS)
 
-helper.o: helper.c ../src/common/find.c ../src/ghtml.c ../src/surfer.h ../config.h
-	$(CC) -D WITH_WEBKIT $(helper_CFLAGS) -c helper.c
+$(OBJDIR)helper.o: helper.c ../src/common/find.c ../src/ghtml.c ../src/surfer.h ../config.h
+	$(CC) -D WITH_WEBKIT $(helper_CFLAGS) -o $(OBJDIR)helper.o -c helper.c
 
 clean:
 	$(RM) -- $(helper_OBJS)
@@ -35,7 +36,7 @@ distclean: clean
 
 install: $(TARGETS)
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 0755 helper $(DESTDIR)$(BINDIR)/helper
+	$(INSTALL) -m 0755 $(OBJDIR)helper $(DESTDIR)$(BINDIR)/helper
 
 uninstall:
 	$(RM) -- $(DESTDIR)$(BINDIR)/helper

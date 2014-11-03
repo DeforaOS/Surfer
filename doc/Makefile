@@ -1,4 +1,5 @@
-TARGETS	= download.1 download.html helper.1 helper.html surfer.1 surfer.html
+TARGETS	= $(OBJDIR)download.1 $(OBJDIR)download.html $(OBJDIR)helper.1 $(OBJDIR)helper.html $(OBJDIR)surfer.1 $(OBJDIR)surfer.html
+OBJDIR	=
 PREFIX	= /usr/local
 DESTDIR	=
 RM	= rm -f
@@ -9,23 +10,23 @@ INSTALL	= install
 
 all: $(TARGETS)
 
-download.1: download.xml
-	./docbook.sh -P "$(PREFIX)" -- "download.1"
+$(OBJDIR)download.1: download.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)download.1"
 
-download.html: download.css.xml download.xml manual.css.xml
-	./docbook.sh -P "$(PREFIX)" -- "download.html"
+$(OBJDIR)download.html: download.css.xml download.xml manual.css.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)download.html"
 
-helper.1: helper.xml
-	./docbook.sh -P "$(PREFIX)" -- "helper.1"
+$(OBJDIR)helper.1: helper.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)helper.1"
 
-helper.html: helper.css.xml helper.xml manual.css.xml
-	./docbook.sh -P "$(PREFIX)" -- "helper.html"
+$(OBJDIR)helper.html: helper.css.xml helper.xml manual.css.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)helper.html"
 
-surfer.1: surfer.xml
-	./docbook.sh -P "$(PREFIX)" -- "surfer.1"
+$(OBJDIR)surfer.1: surfer.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)surfer.1"
 
-surfer.html: manual.css.xml surfer.css.xml surfer.xml
-	./docbook.sh -P "$(PREFIX)" -- "surfer.html"
+$(OBJDIR)surfer.html: manual.css.xml surfer.css.xml surfer.xml
+	./docbook.sh -P "$(PREFIX)" -- "$(OBJDIR)surfer.html"
 
 clean:
 	$(RM) -- $(download.1_OBJS) $(download.html_OBJS) $(helper.1_OBJS) $(helper.html_OBJS) $(surfer.1_OBJS) $(surfer.html_OBJS)
@@ -40,12 +41,12 @@ distclean: clean
 	$(RM) -- $(TARGETS)
 
 install: $(TARGETS)
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "download.1"
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "download.html"
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "helper.1"
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "helper.html"
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "surfer.1"
-	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "surfer.html"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)download.1"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)download.html"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)helper.1"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)helper.html"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)surfer.1"
+	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -i -- "$(OBJDIR)surfer.html"
 
 uninstall:
 	./docbook.sh -P "$(DESTDIR)$(PREFIX)" -u -- "download.1"

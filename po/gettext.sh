@@ -70,9 +70,12 @@ _gettext_mo()
 {
 	package="$1"
 	lang="$2"
+	potfile="$3"
+	pofile="$4"
+	mofile="$5"
 
-	_gettext_po "$package" "$lang"				|| return 1
-	$DEBUG $MSGFMT -c -v -o "$lang.mo" "$lang.po"		|| return 1
+	_gettext_po "$package" "$lang" "$potfile" "$pofile"	|| return 1
+	$DEBUG $MSGFMT -c -v -o "$mofile" "$pofile"		|| return 1
 }
 
 
@@ -81,11 +84,13 @@ _gettext_po()
 {
 	package="$1"
 	lang="$2"
+	potfile="$3"
+	pofile="$4"
 
-	if [ -f "$lang.po" ]; then
-		$DEBUG $MSGMERGE -U "$lang.po" "$package.pot"	|| return 1
+	if [ -f "$pofile" ]; then
+		$DEBUG $MSGMERGE -U "$pofile" "$potfile"	|| return 1
 	else
-		$DEBUG $MSGINIT -l "$lang" -o "$lang.po" -i "$package.pot" \
+		$DEBUG $MSGINIT -l "$lang" -o "$pofile" -i "$potfile" \
 								|| return 1
 	fi
 }
@@ -95,8 +100,9 @@ _gettext_po()
 _gettext_pot()
 {
 	package="$1"
+	potfile="$2"
 
-	$DEBUG $XGETTEXT -d "$package" -o "$package.pot" --keyword="_" \
+	$DEBUG $XGETTEXT -d "$package" -o "$potfile" --keyword="_" \
 			--keyword="N_" -f "$POTFILES"		|| return 1
 }
 
@@ -142,7 +148,8 @@ fi
 LOCALEDIR="$PREFIX/share/locale"
 while [ $# -gt 0 ]; do
 	target="$1"
-	lang="${target%%.mo}"
+	source="${target#$OBJDIR}"
+	lang="${source%%.mo}"
 	lang="${lang%%.po}"
 	shift
 
@@ -168,13 +175,32 @@ while [ $# -gt 0 ]; do
 	#create
 	case "$target" in
 		*.mo)
-			_gettext_mo "$PACKAGE" "$lang"		|| exit 2
+			#XXX may not match
+			if [ -n "$OBJDIR" ]; then
+				potfile="$OBJDIR/$PACKAGE.pot"
+			else
+				potfile="$PACKAGE.pot"
+			fi
+			mofile="$target"
+			pofile="${source%%.mo}.po"
+			_gettext_mo "$PACKAGE" "$lang" "$potfile" "$pofile" \
+				"$mofile"			|| exit 2
 			;;
 		*.po)
-			_gettext_po "$PACKAGE" "$lang"		|| exit 2
+			#XXX may not match
+			if [ -n "$OBJDIR" ]; then
+				potfile="$OBJDIR/$PACKAGE.pot"
+			else
+				potfile="$PACKAGE.pot"
+			fi
+			pofile="$target"
+			_gettext_po "$PACKAGE" "$lang" "$potfile" "$pofile" \
+								|| exit 2
 			;;
 		*.pot)
-			_gettext_pot "${target%%.pot}"		|| exit 2
+			package="${source%%.pot}"
+			potfile="$target"
+			_gettext_pot "$package" "$potfile"	|| exit 2
 			;;
 		*)
 			exit 2
