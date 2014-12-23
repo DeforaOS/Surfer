@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-04 16:24+0100\n"
+"POT-Creation-Date: 2014-12-23 15:24+0100\n"
 "PO-Revision-Date: 2010-04-01 19:40+0200\n"
 "Last-Translator: Calimero <calimeroteknik@free.fr>\n"
 "Language-Team: French\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:956
-#: ../src/surfer.c:960 ../src/surfer.c:1430 ../src/surfer.c:1434
-#: ../tools/helper.c:673 ../tools/helper.c:677 ../tools/helper.c:780
-#: ../tools/helper.c:784
+#: ../src/surfer.c:960 ../src/surfer.c:1337 ../src/surfer.c:1341
+#: ../tools/helper.c:1477 ../tools/helper.c:1481 ../tools/helper.c:1588
+#: ../tools/helper.c:1592
 msgid "Question"
 msgstr "Question"
 
@@ -31,11 +31,11 @@ msgstr ""
 "Plusieurs onglets sont ouverts.\n"
 "Voulez-vous vraiment fermer tous les onglets de cette fenêtre ?"
 
-#: ../src/common/conn.c:204 ../src/download.c:228 ../src/ghtml-gtkhtml.c:923
+#: ../src/common/conn.c:204 ../src/download.c:232 ../src/ghtml-gtkhtml.c:923
 msgid "Resolving..."
 msgstr "Résolution du domaine..."
 
-#: ../src/common/conn.c:253 ../src/download.c:655 ../src/ghtml-gtkhtml.c:973
+#: ../src/common/conn.c:253 ../src/download.c:659 ../src/ghtml-gtkhtml.c:973
 msgid "Connected"
 msgstr "Connecté"
 
@@ -57,108 +57,132 @@ msgstr "Hôte inconnu"
 msgid "Unspecified error"
 msgstr "Erreur non spécifiée"
 
-#: ../src/common/conn.c:348 ../src/download.c:734 ../src/ghtml-gtkhtml.c:1159
+#: ../src/common/conn.c:348 ../src/download.c:738 ../src/ghtml-gtkhtml.c:1159
 msgid "Timeout"
 msgstr "Délai dépassé"
 
-#: ../src/download.c:191
+#: ../src/common/find.c:39
+msgid "Find text"
+msgstr "Chercher du texte"
+
+#: ../src/common/find.c:51
+msgid "Text:"
+msgstr "Texte : "
+
+#: ../src/common/find.c:59
+msgid "Case-sensitive"
+msgstr "Sensible à la casse"
+
+#: ../src/common/find.c:63
+msgid "Search backwards"
+msgstr "Inverser le sens de la recherche"
+
+#: ../src/common/find.c:66
+msgid "Wrap"
+msgstr "Chercher en boucle"
+
+#: ../src/common/find.c:96
+msgid "Text not found"
+msgstr "Texte non trouvé"
+
+#: ../src/download.c:195
 msgid "Download"
 msgstr "Téléchargement"
 
-#: ../src/download.c:214
+#: ../src/download.c:218
 msgid "Address: "
 msgstr "Adresse: "
 
-#: ../src/download.c:225
+#: ../src/download.c:229
 msgid "File: "
 msgstr "Fichier : "
 
-#: ../src/download.c:227
+#: ../src/download.c:231
 msgid "Status: "
 msgstr "Statut : "
 
-#: ../src/download.c:229
+#: ../src/download.c:233
 msgid "Received: "
 msgstr "Reçu : "
 
-#: ../src/download.c:230
+#: ../src/download.c:234
 msgid "0.0 kB"
 msgstr "0.0 Kio"
 
-#: ../src/download.c:231
+#: ../src/download.c:235
 msgid "Remaining: "
 msgstr "Restant : "
 
-#: ../src/download.c:232
+#: ../src/download.c:236
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: ../src/download.c:238
+#: ../src/download.c:242
 msgid "Close window when the download is complete"
 msgstr "Fermer la fenêtre à la fin du téléchargement"
 
-#: ../src/download.c:358 ../src/download.c:363 ../src/download.c:812
-#: ../src/surfer.c:1115 ../src/surfer.c:1119 ../tools/helper.c:726
-#: ../tools/helper.c:730
+#: ../src/download.c:362 ../src/download.c:367 ../src/download.c:816
+#: ../src/surfer.c:1115 ../src/surfer.c:1119 ../tools/helper.c:1530
+#: ../tools/helper.c:1534
 msgid "Error"
 msgstr "Erreur"
 
-#: ../src/download.c:418 ../src/download.c:420 ../src/download.c:517
+#: ../src/download.c:422 ../src/download.c:424 ../src/download.c:521
 msgid "kB"
 msgstr "Kio"
 
-#: ../src/download.c:445
+#: ../src/download.c:449
 #, c-format
 msgid "%.1f %s (%.1f %s/s)"
 msgstr "%.1f %s (%.1f %s/s)"
 
-#: ../src/download.c:464
+#: ../src/download.c:468
 #, c-format
 msgid "%.1f of %.1f %s (%.1f %s/s)"
 msgstr "%.1f de %.1f %s (%.1f %s/s)"
 
-#: ../src/download.c:510
+#: ../src/download.c:514
 msgid "bytes"
 msgstr "octets"
 
-#: ../src/download.c:524
+#: ../src/download.c:528
 msgid "MB"
 msgstr "Mo"
 
-#: ../src/download.c:663
+#: ../src/download.c:667
 msgid "Error "
 msgstr "Erreur "
 
-#: ../src/download.c:688 ../src/download.c:817
+#: ../src/download.c:692 ../src/download.c:821
 msgid "Complete"
 msgstr "Terminé"
 
-#: ../src/download.c:698 ../src/download.c:835
+#: ../src/download.c:702 ../src/download.c:839
 msgid "Downloading"
 msgstr "Téléchargement"
 
-#: ../src/download.c:709
+#: ../src/download.c:713
 msgid "Redirected to"
 msgstr "Redirigé vers"
 
-#: ../src/download.c:712
+#: ../src/download.c:716
 msgid "Redirected"
 msgstr "Redirigé"
 
-#: ../src/download.c:719
+#: ../src/download.c:723
 msgid "Resolved"
 msgstr "Résolu"
 
-#: ../src/download.c:727
+#: ../src/download.c:731
 msgid "Code "
 msgstr "Code "
 
-#: ../src/download.c:785 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1118
-#: ../tools/helper.c:729
+#: ../src/download.c:789 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1118
+#: ../tools/helper.c:1533
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
-#: ../src/download.c:862
+#: ../src/download.c:866
 msgid ""
 "Usage: download [-x][-O output][-U user-agent] URL...\n"
 "  -x\tStart in embedded mode\n"
@@ -247,9 +271,10 @@ msgstr "Enregistrer le lien sous..."
 msgid "_Copy link location"
 msgstr ""
 
-#: ../src/main.c:43
-msgid "Usage: surfer [URL...]\n"
-msgstr "Usage: surfer [URL...]\n"
+#: ../src/main.c:60
+#, c-format
+msgid "Usage: %s [URL...]\n"
+msgstr "Usage: %s [URL...]\n"
 
 #: ../src/surfer.c:111
 msgid "_New tab"
@@ -259,7 +284,7 @@ msgstr "Nouvel ongle_t"
 msgid "_New window"
 msgstr "_Nouvelle fenêtre"
 
-#: ../src/surfer.c:115 ../tools/helper.c:127
+#: ../src/surfer.c:115 ../tools/helper.c:207
 msgid "_Open..."
 msgstr "_Ouvrir..."
 
@@ -268,7 +293,7 @@ msgid "Open _URL..."
 msgstr "Ouvrir une _adresse..."
 
 #: ../src/surfer.c:120
-msgid "Save _as..."
+msgid "Save _As..."
 msgstr "Enregistrer _sous..."
 
 #: ../src/surfer.c:123
@@ -279,7 +304,7 @@ msgstr "Imprimer..."
 msgid "Close _tab"
 msgstr "F_ermer l'onglet"
 
-#: ../src/surfer.c:128 ../tools/helper.c:130
+#: ../src/surfer.c:128 ../tools/helper.c:210
 msgid "_Close"
 msgstr "F_ermer"
 
@@ -295,7 +320,7 @@ msgstr "_Rétablir"
 msgid "_Cut"
 msgstr "Co_uper"
 
-#: ../src/surfer.c:142 ../tools/helper.c:137
+#: ../src/surfer.c:142 ../tools/helper.c:217
 msgid "Cop_y"
 msgstr "_Copier"
 
@@ -303,15 +328,15 @@ msgstr "_Copier"
 msgid "_Paste"
 msgstr "C_oller"
 
-#: ../src/surfer.c:147 ../tools/helper.c:140
-msgid "Select _all"
+#: ../src/surfer.c:147 ../tools/helper.c:220
+msgid "Select _All"
 msgstr "_Sélectionner tout"
 
 #: ../src/surfer.c:154
 msgid "_Unselect all"
 msgstr "Tout _désélectionner"
 
-#: ../src/surfer.c:156
+#: ../src/surfer.c:156 ../tools/helper.c:228
 msgid "_Find"
 msgstr "Rechercher"
 
@@ -331,7 +356,7 @@ msgstr "Zoom -"
 msgid "Normal size"
 msgstr "Taille normale"
 
-#: ../src/surfer.c:173 ../tools/helper.c:152
+#: ../src/surfer.c:173 ../tools/helper.c:235
 msgid "_Fullscreen"
 msgstr "_Plein écran"
 
@@ -355,35 +380,35 @@ msgstr "_Console Javascript"
 msgid "Page so_urce"
 msgstr "So_urce de la page"
 
-#: ../src/surfer.c:197 ../tools/helper.c:163
+#: ../src/surfer.c:197 ../tools/helper.c:246
 msgid "_Contents"
 msgstr "_Sommaire"
 
-#: ../src/surfer.c:199 ../tools/helper.c:165
+#: ../src/surfer.c:199 ../tools/helper.c:248
 msgid "_About"
 msgstr "À _propos"
 
-#: ../src/surfer.c:210 ../tools/helper.c:176
+#: ../src/surfer.c:210 ../tools/helper.c:259
 msgid "_File"
 msgstr "_Fichier"
 
-#: ../src/surfer.c:211 ../tools/helper.c:177
+#: ../src/surfer.c:211 ../tools/helper.c:260
 msgid "_Edit"
 msgstr "É_dition"
 
-#: ../src/surfer.c:212 ../tools/helper.c:178
+#: ../src/surfer.c:212 ../tools/helper.c:261
 msgid "_View"
 msgstr "_Vue"
 
-#: ../src/surfer.c:213 ../tools/helper.c:179
+#: ../src/surfer.c:213 ../tools/helper.c:262
 msgid "_Help"
 msgstr "_Aide"
 
-#: ../src/surfer.c:220
+#: ../src/surfer.c:220 ../tools/helper.c:196
 msgid "Back"
 msgstr "Précédent"
 
-#: ../src/surfer.c:222
+#: ../src/surfer.c:222 ../tools/helper.c:198
 msgid "Forward"
 msgstr "Suivant"
 
@@ -415,7 +440,7 @@ msgstr "Web surfer"
 msgid " Location: "
 msgstr " Adresse: "
 
-#: ../src/surfer.c:425 ../src/surfer.c:2038 ../src/surfer.c:2042
+#: ../src/surfer.c:425 ../src/surfer.c:1950 ../src/surfer.c:1954
 msgid "Security information"
 msgstr "Informations de sécurité"
 
@@ -423,7 +448,7 @@ msgstr "Informations de sécurité"
 msgid "Ready"
 msgstr "Prêt"
 
-#: ../src/surfer.c:748 ../src/surfer.c:1346
+#: ../src/surfer.c:748 ../src/surfer.c:1253
 msgid "Untitled"
 msgstr "Sans titre"
 
@@ -437,200 +462,202 @@ msgstr ""
 "Calimero <calimeroteknik@free.fr>\n"
 "Pierre Pronchery <khorben@defora.org>"
 
-#: ../src/surfer.c:1059 ../src/surfer.c:1538
+#: ../src/surfer.c:1059 ../src/surfer.c:1445
 msgid "Save file as..."
 msgstr "Enregistrer sous..."
 
-#: ../src/surfer.c:1147
-msgid "Find text"
-msgstr "Chercher du texte"
-
-#: ../src/surfer.c:1159
-msgid "Text:"
-msgstr "Texte : "
-
-#: ../src/surfer.c:1167
-msgid "Case-sensitive"
-msgstr "Sensible à la casse"
-
-#: ../src/surfer.c:1171
-msgid "Search backwards"
-msgstr "Inverser le sens de la recherche"
-
-#: ../src/surfer.c:1174
-msgid "Wrap"
-msgstr "Chercher en boucle"
-
-#: ../src/surfer.c:1204
-msgid "Text not found"
-msgstr "Texte non trouvé"
-
-#: ../src/surfer.c:1293
+#: ../src/surfer.c:1200
 msgid "Open file..."
 msgstr "Ouvrir un fichier..."
 
-#: ../src/surfer.c:1299
+#: ../src/surfer.c:1206
 msgid "HTML files"
 msgstr "Fichiers HTML"
 
-#: ../src/surfer.c:1304
+#: ../src/surfer.c:1211
 msgid "All files"
 msgstr "Tous les fichiers"
 
-#: ../src/surfer.c:1331
+#: ../src/surfer.c:1238
 msgid "Could not initialize HTML renderer"
 msgstr "Ne peut charger le moteur de rendu HTML"
 
-#: ../src/surfer.c:1595
+#: ../src/surfer.c:1502
 msgid "Javascript console"
 msgstr "Console Javascript"
 
-#: ../src/surfer.c:1600
+#: ../src/surfer.c:1507
 msgid "Command:"
 msgstr "Commande :"
 
-#: ../src/surfer.c:1619
+#: ../src/surfer.c:1526
 msgid "Message"
 msgstr "Message"
 
-#: ../src/surfer.c:1624
+#: ../src/surfer.c:1531
 msgid "Source"
 msgstr "Source"
 
-#: ../src/surfer.c:1629
+#: ../src/surfer.c:1536
 msgid "Line"
 msgstr "Ligne"
 
-#: ../src/surfer.c:1760
+#: ../src/surfer.c:1672
 msgid "Web surfer preferences"
 msgstr "Préférences de Web surfer"
 
-#: ../src/surfer.c:1778
+#: ../src/surfer.c:1690
 msgid "General"
 msgstr "Général"
 
-#: ../src/surfer.c:1782
+#: ../src/surfer.c:1694
 msgid "Network"
 msgstr "Réseau"
 
-#: ../src/surfer.c:1786
+#: ../src/surfer.c:1698
 msgid "Advanced"
 msgstr "Avancées"
 
-#: ../src/surfer.c:1803
+#: ../src/surfer.c:1715
 msgid "Homepage:"
 msgstr "Page d'accueil :"
 
-#: ../src/surfer.c:1809
+#: ../src/surfer.c:1721
 msgid "Tab handling"
 msgstr "Gestion des onglets"
 
-#: ../src/surfer.c:1814
+#: ../src/surfer.c:1726
 msgid "Focus new tabs"
 msgstr "Focaliser les nouveaux onglets"
 
-#: ../src/surfer.c:1819
+#: ../src/surfer.c:1731
 msgid "Downloads"
 msgstr "Téléchargements"
 
-#: ../src/surfer.c:1822
+#: ../src/surfer.c:1734
 msgid "Default download directory:"
 msgstr "Répertoire par défaut :"
 
-#: ../src/surfer.c:1826
+#: ../src/surfer.c:1738
 msgid "Choose the default download directory"
 msgstr "Choix du répertoire par défaut :"
 
-#: ../src/surfer.c:1831
+#: ../src/surfer.c:1743
 msgid "Default download directory"
 msgstr "Répertoire de téléchargement par défaut"
 
-#: ../src/surfer.c:1836
+#: ../src/surfer.c:1748
 msgid "_Close download windows when complete"
 msgstr "_Fermer les fenêtres à la fin du téléchargement"
 
-#: ../src/surfer.c:1854
+#: ../src/surfer.c:1766
 msgid "Connectivity:"
 msgstr "Connectivité :"
 
-#: ../src/surfer.c:1857
+#: ../src/surfer.c:1769
 msgid "Direct connection"
 msgstr "Connexion directe"
 
-#: ../src/surfer.c:1861
+#: ../src/surfer.c:1773
 msgid "HTTP proxy:"
 msgstr "Proxy HTTP :"
 
-#: ../src/surfer.c:1868
+#: ../src/surfer.c:1780
 msgid "Hostname:"
 msgstr "Hôte :"
 
-#: ../src/surfer.c:1872
+#: ../src/surfer.c:1784
 msgid "Port:"
 msgstr "Port :"
 
-#: ../src/surfer.c:1893
+#: ../src/surfer.c:1805
 msgid "User agent:"
 msgstr "User agent :"
 
-#: ../src/surfer.c:1899
+#: ../src/surfer.c:1811
 msgid "Enable _Javascript"
 msgstr "Activer _Javascript"
 
-#: ../src/surfer.c:2024
+#: ../src/surfer.c:1936
 msgid "This connection is encrypted and trusted."
 msgstr "Cette connexion est chiffrée et de confiance."
 
-#: ../src/surfer.c:2027
+#: ../src/surfer.c:1939
 msgid "This connection is encrypted but not trusted."
 msgstr "Cette connexion est chiffrée mais pas de confiance."
 
-#: ../src/surfer.c:2031
+#: ../src/surfer.c:1943
 msgid "This connection is not encrypted."
 msgstr "Cette connexion n'est pas chiffrée."
 
-#: ../src/surfer.c:2091
+#: ../src/surfer.c:2003
 msgid "Web surfer - Source of "
 msgstr "Web surfer - Source de "
 
-#: ../src/surfer.c:2134 ../src/surfer.c:2138 ../src/surfer.c:2196
-#: ../src/surfer.c:2200
+#: ../src/surfer.c:2046 ../src/surfer.c:2050 ../src/surfer.c:2108
+#: ../src/surfer.c:2112
 msgid "Warning"
 msgstr "Avertissement"
 
-#: ../src/surfer.c:2199
+#: ../src/surfer.c:2111
 msgid "This file already exists. Overwrite?"
 msgstr "Le fichier existe déjà. L'écraser ?"
 
-#: ../tools/helper.c:208 ../tools/helper.c:652
+#: ../tools/helper.c:323 ../tools/helper.c:1455
 msgid "Help browser"
 msgstr "Aide en ligne"
 
-#: ../tools/helper.c:312
+#: ../tools/helper.c:399 ../tools/helper.c:511
+msgid "Package"
+msgstr ""
+
+#: ../tools/helper.c:408
+msgid "Contents"
+msgstr "Sommaire"
+
+#: ../tools/helper.c:520
+msgid "API reference"
+msgstr "Bibliothèque"
+
+#: ../tools/helper.c:642
+msgid "Section"
+msgstr "Section"
+
+#: ../tools/helper.c:653
+msgid "Manual"
+msgstr "Manuel"
+
+#: ../tools/helper.c:803
+msgid "Search"
+msgstr ""
+
+#: ../tools/helper.c:868
 msgid "Open page..."
 msgstr "Ouvrir une page..."
 
-#: ../tools/helper.c:326
+#: ../tools/helper.c:883
 msgid "Package: "
 msgstr ""
 
-#: ../tools/helper.c:334
+#: ../tools/helper.c:902
 msgid "Command: "
 msgstr "Commande : "
 
-#: ../tools/helper.c:485
+#: ../tools/helper.c:1162
 msgid "Online help for the DeforaOS desktop"
 msgstr "Aide en ligne pour l'environnement DeforaOS"
 
-#: ../tools/helper.c:548
+#: ../tools/helper.c:1345
 #, c-format
 msgid ""
 "Usage: %s [-c][-p package] command\n"
 "       helper -d package\n"
 "       helper -s section page\n"
+"  -d\tOpen an API reference\n"
 "  -s\tSection of the manual page to read from\n"
 msgstr ""
 "Usage: %s [-c][-p package] commande\n"
 "       helper -d package\n"
 "       helper -s section page\n"
+"  -d\tOuvrir une référence de bibliothèque\n"
 "  -s\tSection du manuel à accéder\n"
