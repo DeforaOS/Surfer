@@ -66,6 +66,7 @@ typedef struct _Surfer
 	/* widgets */
 	GtkIconTheme * icontheme;
 	GtkWidget * window;
+	GtkWidget * vbox;
 #ifndef EMBEDDED
 	GtkWidget * menubar;
 #endif
@@ -323,7 +324,12 @@ static Helper * _helper_new(void)
 	gtk_window_set_title(GTK_WINDOW(helper->window), _("Help browser"));
 	g_signal_connect_swapped(helper->window, "delete-event", G_CALLBACK(
 				_helper_on_closex), helper);
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+#else
 	vbox = gtk_vbox_new(FALSE, 0);
+#endif
+	helper->vbox = vbox;
 #ifndef EMBEDDED
 	/* menubar */
 	helper->menubar = desktop_menubar_create(_helper_menubar, helper,

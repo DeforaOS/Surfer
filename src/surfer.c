@@ -327,7 +327,12 @@ Surfer * _new_do(char const * url)
 	gtk_window_set_title(GTK_WINDOW(surfer->window), _("Web surfer"));
 	g_signal_connect_swapped(surfer->window, "delete-event", G_CALLBACK(
 				on_closex), surfer);
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+#else
 	vbox = gtk_vbox_new(FALSE, 0);
+#endif
+	surfer->vbox = vbox;
 #ifndef EMBEDDED
 	/* menubar */
 	surfer->menubar = desktop_menubar_create(_surfer_menubar, surfer,
@@ -452,7 +457,7 @@ Surfer * _new_do(char const * url)
 	/* about */
 	surfer->ab_dialog = NULL;
 	/* hack to display the statusbar only if necessary */
-	gtk_box_pack_start(GTK_BOX(vbox), surfer->statusbox, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(vbox), surfer->statusbox, FALSE, FALSE, 0);
 	/* FIXME should be automatic and per tab */
 	surfer_set_security(surfer, SS_NONE);
 	surfer_set_status(surfer, NULL);

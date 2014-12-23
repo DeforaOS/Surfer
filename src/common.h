@@ -41,6 +41,7 @@ struct _Surfer
 	/* widgets */
 	/* main window */
 	GtkWidget * window;
+	GtkWidget * vbox;
 #ifndef EMBEDDED
 	GtkWidget * menubar;
 #endif
