@@ -17,6 +17,9 @@
 
 /* surfer_find */
 static void _find_dialog(Surfer * surfer);
+#if GTK_CHECK_VERSION(2, 16, 0)
+static void _on_find_clear(gpointer data);
+#endif
 static void _on_find_clicked(gpointer data);
 static void _on_find_hide(gpointer data);
 static void _on_find_response(GtkWidget * widget, gint response, gpointer data);
@@ -49,6 +52,12 @@ static void _find_dialog(Surfer * surfer)
 	surfer->fi_text = gtk_entry_new();
 	g_signal_connect_swapped(surfer->fi_text, "activate", G_CALLBACK(
 				_on_find_clicked), surfer);
+#if GTK_CHECK_VERSION(2, 16, 0)
+	gtk_entry_set_icon_from_stock(GTK_ENTRY(surfer->fi_text),
+			GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR);
+	g_signal_connect_swapped(surfer->fi_text, "icon-release", G_CALLBACK(
+				_on_find_clear), surfer);
+#endif
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->fi_text, FALSE, TRUE, 4);
 	/* case-sensitive */
 	surfer->fi_case = gtk_check_button_new_with_label(_("Case-sensitive"));
@@ -81,6 +90,15 @@ static void _find_dialog(Surfer * surfer)
 	gtk_widget_set_no_show_all(hbox, TRUE);
 	gtk_box_pack_end(GTK_BOX(surfer->vbox), hbox, FALSE, FALSE, 0);
 }
+
+#if GTK_CHECK_VERSION(2, 16, 0)
+static void _on_find_clear(gpointer data)
+{
+	Surfer * surfer = data;
+
+	gtk_entry_set_text(GTK_ENTRY(surfer->fi_text), "");
+}
+#endif
 
 static void _on_find_clicked(gpointer data)
 {
