@@ -61,7 +61,7 @@ static void _find_dialog(Surfer * surfer)
 	surfer->fi_wrap = gtk_check_button_new_with_label(_("Wrap"));
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->fi_wrap, FALSE, TRUE, 4);
 	gtk_widget_show_all(hbox);
-	g_signal_connect(G_OBJECT(surfer->fi_dialog), "response", G_CALLBACK(
+	g_signal_connect(surfer->fi_dialog, "response", G_CALLBACK(
 				_on_find_response), surfer);
 	/* find */
 	widget = gtk_button_new_from_stock(GTK_STOCK_FIND);

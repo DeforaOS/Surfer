@@ -1172,8 +1172,8 @@ static void _helper_on_help_about(gpointer data)
 	desktop_about_dialog_set_license(helper->ab_window, _license);
 	desktop_about_dialog_set_name(helper->ab_window, PACKAGE);
 	desktop_about_dialog_set_version(helper->ab_window, VERSION);
-	g_signal_connect_swapped(G_OBJECT(helper->ab_window), "delete-event",
-			G_CALLBACK(_about_on_closex), helper);
+	g_signal_connect_swapped(helper->ab_window, "delete-event", G_CALLBACK(
+				_about_on_closex), helper);
 	gtk_widget_show(helper->ab_window);
 }
 

@@ -244,15 +244,15 @@ Download * download_new(DownloadPrefs * prefs, char const * url)
 	/* button */
 	hbox = gtk_hbox_new(FALSE, 4);
 	download->cancel = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
-	g_signal_connect_swapped(G_OBJECT(download->cancel), "clicked",
-			G_CALLBACK(_download_on_cancel), download);
+	g_signal_connect_swapped(download->cancel, "clicked", G_CALLBACK(
+				_download_on_cancel), download);
 	gtk_box_pack_end(GTK_BOX(hbox), download->cancel, FALSE, TRUE, 0);
 	download->browse = gtk_button_new_with_mnemonic("_Open folder");
 	gtk_widget_set_no_show_all(download->browse, TRUE);
 	widget = gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_image(GTK_BUTTON(download->browse), widget);
-	g_signal_connect_swapped(G_OBJECT(download->browse), "clicked",
-			G_CALLBACK(_download_on_browse), download);
+	g_signal_connect_swapped(download->browse, "clicked", G_CALLBACK(
+				_download_on_browse), download);
 	gtk_box_pack_end(GTK_BOX(hbox), download->browse, FALSE, TRUE, 0);
 	gtk_box_pack_end(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(download->window), 4);

@@ -1291,8 +1291,8 @@ static GtkWidget * _tab_button(Surfer * surfer, GtkWidget * widget,
 	gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(
 				GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU));
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(
-				on_notebook_close_tab), surfer);
+	g_signal_connect(button, "clicked", G_CALLBACK(on_notebook_close_tab),
+			surfer);
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 	gtk_widget_show_all(hbox);
 	return hbox;
@@ -2007,8 +2007,8 @@ void surfer_view_source(Surfer * surfer)
 	gtk_window_set_default_size(GTK_WINDOW(window), 640, 480);
 	snprintf(buf, sizeof(buf), "%s%s", _("Web surfer - Source of "), url);
 	gtk_window_set_title(GTK_WINDOW(window), buf);
-	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(
-				_source_on_closex), NULL);
+	g_signal_connect(window, "delete-event", G_CALLBACK(_source_on_closex),
+			NULL);
 	scrolled = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);

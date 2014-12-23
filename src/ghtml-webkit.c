@@ -145,45 +145,45 @@ GtkWidget * ghtml_new(Surfer * surfer)
 #endif
 	g_object_set_data(G_OBJECT(widget), "ghtml", ghtml);
 	/* view */
-	g_signal_connect(G_OBJECT(ghtml->view), "console-message", G_CALLBACK(
+	g_signal_connect(ghtml->view, "console-message", G_CALLBACK(
 				_on_console_message), widget);
 #if WEBKIT_CHECK_VERSION(1, 10, 0)
-	g_signal_connect(G_OBJECT(ghtml->view), "context-menu", G_CALLBACK(
+	g_signal_connect(ghtml->view, "context-menu", G_CALLBACK(
 				_on_context_menu), widget);
 #endif
-	g_signal_connect(G_OBJECT(ghtml->view), "create-web-view", G_CALLBACK(
+	g_signal_connect(ghtml->view, "create-web-view", G_CALLBACK(
 				_on_create_web_view), widget);
 #ifdef WEBKIT_TYPE_DOWNLOAD
-	g_signal_connect(G_OBJECT(ghtml->view), "download-requested",
-			G_CALLBACK(_on_download_requested), widget);
+	g_signal_connect(ghtml->view, "download-requested", G_CALLBACK(
+				_on_download_requested), widget);
 #endif
-	g_signal_connect(G_OBJECT(ghtml->view), "hovering-over-link",
-			G_CALLBACK(_on_hovering_over_link), widget);
+	g_signal_connect(ghtml->view, "hovering-over-link", G_CALLBACK(
+				_on_hovering_over_link), widget);
 #if WEBKIT_CHECK_VERSION(1, 1, 18)
-	g_signal_connect(G_OBJECT(ghtml->view), "icon-loaded", G_CALLBACK(
+	g_signal_connect(ghtml->view, "icon-loaded", G_CALLBACK(
 				_on_icon_load), widget);
 #endif
-	g_signal_connect(G_OBJECT(ghtml->view), "load-committed", G_CALLBACK(
+	g_signal_connect(ghtml->view, "load-committed", G_CALLBACK(
 				_on_load_committed), widget);
 #if WEBKIT_CHECK_VERSION(1, 1, 6)
-	g_signal_connect(G_OBJECT(ghtml->view), "load-error", G_CALLBACK(
+	g_signal_connect(ghtml->view, "load-error", G_CALLBACK(
 				_on_load_error), widget);
 #endif
-	g_signal_connect(G_OBJECT(ghtml->view), "load-finished", G_CALLBACK(
+	g_signal_connect(ghtml->view, "load-finished", G_CALLBACK(
 				_on_load_finished), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "load-progress-changed",
-			G_CALLBACK(_on_load_progress_changed), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "load-started", G_CALLBACK(
+	g_signal_connect(ghtml->view, "load-progress-changed", G_CALLBACK(
+				_on_load_progress_changed), widget);
+	g_signal_connect(ghtml->view, "load-started", G_CALLBACK(
 				_on_load_started), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "script-alert", G_CALLBACK(
+	g_signal_connect(ghtml->view, "script-alert", G_CALLBACK(
 				_on_script_alert), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "script-confirm", G_CALLBACK(
+	g_signal_connect(ghtml->view, "script-confirm", G_CALLBACK(
 				_on_script_confirm), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "script-prompt", G_CALLBACK(
+	g_signal_connect(ghtml->view, "script-prompt", G_CALLBACK(
 				_on_script_prompt), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "status-bar-text-changed",
+	g_signal_connect(ghtml->view, "status-bar-text-changed",
 			G_CALLBACK(_on_status_bar_text_changed), widget);
-	g_signal_connect(G_OBJECT(ghtml->view), "title-changed", G_CALLBACK(
+	g_signal_connect(ghtml->view, "title-changed", G_CALLBACK(
 				_on_title_changed), widget);
 	/* scrolled window */
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
@@ -787,12 +787,12 @@ static void _ghtml_inspect_url(GtkWidget * widget, char const * url)
 		surfer_open(ghtml->surfer, url);
 		inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(
 					ghtml->view));
-		g_signal_connect(G_OBJECT(inspector), "inspect-web-view",
-				G_CALLBACK(_inspect_inspect), ghtml);
-		g_signal_connect(G_OBJECT(inspector), "show-window", G_CALLBACK(
+		g_signal_connect(inspector, "inspect-web-view", G_CALLBACK(
+					_inspect_inspect), ghtml);
+		g_signal_connect(inspector, "show-window", G_CALLBACK(
 					_inspect_show), ghtml);
-		g_signal_connect(G_OBJECT(inspector), "notify::inspected-uri",
-				G_CALLBACK(_inspect_inspected_uri), ghtml);
+		g_signal_connect(inspector, "notify::inspected-uri", G_CALLBACK(
+					_inspect_inspected_uri), ghtml);
 	}
 	else
 	{
@@ -1168,7 +1168,7 @@ static WebKitWebView * _on_create_web_view(WebKitWebView * view,
 		return NULL;
 	}
 	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
-	g_signal_connect(G_OBJECT(ghtml->view), "web-view-ready", G_CALLBACK(
+	g_signal_connect(ghtml->view, "web-view-ready", G_CALLBACK(
 				_on_web_view_ready), widget);
 	return WEBKIT_WEB_VIEW(ghtml->view);
 }
