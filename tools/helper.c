@@ -790,7 +790,11 @@ static void _new_search(Helper * helper)
 	GtkWidget * widget;
 	GtkListStore * store;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	vbox = gtk_vbox_new(FALSE, 4);
+#endif
 	widget = gtk_entry_new();
 	g_signal_connect(widget, "activate", G_CALLBACK(
 				_helper_on_search_activated), helper);
@@ -885,7 +889,11 @@ static int _helper_open_dialog(Helper * helper)
 #endif
 	gtk_box_set_spacing(GTK_BOX(vbox), 4);
 	/* package */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
@@ -904,7 +912,11 @@ static int _helper_open_dialog(Helper * helper)
 	gtk_entry_set_activates_default(GTK_ENTRY(entry1), TRUE);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	/* command */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	label = gtk_label_new(_("Command: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
