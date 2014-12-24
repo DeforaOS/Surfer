@@ -209,12 +209,20 @@ Download * download_new(DownloadPrefs * prefs, char const * url)
 		g_signal_connect_swapped(download->window, "embedded",
 				G_CALLBACK(_download_on_embedded), download);
 	}
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+#else
 	vbox = gtk_vbox_new(FALSE, 2);
+#endif
 	bold = pango_font_description_new();
 	pango_font_description_set_weight(bold, PANGO_WEIGHT_BOLD);
 	left = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 	/* address */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	widget = gtk_label_new(_("Address: "));
 	gtk_widget_modify_font(widget, bold);
 	gtk_misc_set_alignment(GTK_MISC(widget), 0.0, 0.5);
@@ -242,7 +250,11 @@ Download * download_new(DownloadPrefs * prefs, char const * url)
 			_("Close window when the download is complete"));
 	gtk_box_pack_start(GTK_BOX(vbox), download->check, FALSE, FALSE, 0);
 	/* button */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	download->cancel = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
 	g_signal_connect_swapped(download->cancel, "clicked", G_CALLBACK(
 				_download_on_cancel), download);
@@ -278,7 +290,11 @@ static void _download_label(GtkWidget * vbox, PangoFontDescription * bold,
 {
 	GtkWidget * hbox;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	*widget = gtk_label_new(label);
 	gtk_widget_modify_font(*widget, bold);
 	gtk_misc_set_alignment(GTK_MISC(*widget), 0.0, 0.5);
