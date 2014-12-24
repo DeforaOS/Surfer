@@ -1,5 +1,5 @@
 PACKAGE	= Surfer
-VERSION	= 0.2.6
+VERSION	= 0.2.7
 SUBDIRS	= data doc po src tools
 RM	= rm -f
 LN	= ln -f
