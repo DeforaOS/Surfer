@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-23 19:14+0100\n"
+"POT-Creation-Date: 2014-12-24 18:57+0100\n"
 "PO-Revision-Date: 2010-04-01 19:40+0200\n"
 "Last-Translator: Pierre Pronchery <khorben@defora.org>\n"
 "Language-Team: German\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:961
-#: ../src/surfer.c:965 ../src/surfer.c:1342 ../src/surfer.c:1346
+#: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:965
+#: ../src/surfer.c:969 ../src/surfer.c:1350 ../src/surfer.c:1354
 #: ../tools/helper.c:1483 ../tools/helper.c:1487 ../tools/helper.c:1594
 #: ../tools/helper.c:1598
 msgid "Question"
@@ -116,7 +116,7 @@ msgid "Close window when the download is complete"
 msgstr ""
 
 #: ../src/download.c:362 ../src/download.c:367 ../src/download.c:816
-#: ../src/surfer.c:1120 ../src/surfer.c:1124 ../tools/helper.c:1536
+#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1536
 #: ../tools/helper.c:1540
 msgid "Error"
 msgstr "Fehler"
@@ -171,7 +171,7 @@ msgstr ""
 msgid "Code "
 msgstr ""
 
-#: ../src/download.c:789 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1123
+#: ../src/download.c:789 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
 #: ../tools/helper.c:1539
 msgid "Unknown error"
 msgstr ""
@@ -420,7 +420,7 @@ msgstr ""
 msgid "New window"
 msgstr "Neue Fenster"
 
-#: ../src/surfer.c:327 ../src/surfer.c:740
+#: ../src/surfer.c:327 ../src/surfer.c:744
 msgid "Web surfer"
 msgstr "Web surfer"
 
@@ -428,164 +428,164 @@ msgstr "Web surfer"
 msgid " Location: "
 msgstr ""
 
-#: ../src/surfer.c:430 ../src/surfer.c:1955 ../src/surfer.c:1959
+#: ../src/surfer.c:434 ../src/surfer.c:2002 ../src/surfer.c:2006
 msgid "Security information"
 msgstr ""
 
-#: ../src/surfer.c:712
+#: ../src/surfer.c:716
 msgid "Ready"
 msgstr "Bereit"
 
-#: ../src/surfer.c:753 ../src/surfer.c:1258
+#: ../src/surfer.c:757 ../src/surfer.c:1262
 msgid "Untitled"
 msgstr ""
 
-#: ../src/surfer.c:819
+#: ../src/surfer.c:823
 msgid "Web browser for the DeforaOS desktop"
 msgstr ""
 
-#: ../src/surfer.c:826
+#: ../src/surfer.c:830
 msgid "translator-credits"
 msgstr "Pierre Pronchery <khorben@defora.org>"
 
-#: ../src/surfer.c:1064 ../src/surfer.c:1450
+#: ../src/surfer.c:1068 ../src/surfer.c:1458
 msgid "Save file as..."
 msgstr ""
 
-#: ../src/surfer.c:1205
+#: ../src/surfer.c:1209
 msgid "Open file..."
 msgstr ""
 
-#: ../src/surfer.c:1211
+#: ../src/surfer.c:1215
 msgid "HTML files"
 msgstr "HTML Dateien"
 
-#: ../src/surfer.c:1216
+#: ../src/surfer.c:1220
 msgid "All files"
 msgstr "Alle Dateien"
 
-#: ../src/surfer.c:1243
+#: ../src/surfer.c:1247
 msgid "Could not initialize HTML renderer"
 msgstr ""
 
-#: ../src/surfer.c:1507
+#: ../src/surfer.c:1515
 msgid "Javascript console"
 msgstr ""
 
-#: ../src/surfer.c:1512
+#: ../src/surfer.c:1525
 msgid "Command:"
 msgstr ""
 
-#: ../src/surfer.c:1531
+#: ../src/surfer.c:1544
 msgid "Message"
 msgstr "Nachricht"
 
-#: ../src/surfer.c:1536
+#: ../src/surfer.c:1549
 msgid "Source"
 msgstr "Quelle"
 
-#: ../src/surfer.c:1541
+#: ../src/surfer.c:1554
 msgid "Line"
 msgstr "Linie"
 
-#: ../src/surfer.c:1677
+#: ../src/surfer.c:1690
 msgid "Web surfer preferences"
 msgstr "Web surfer Einstellungen"
 
-#: ../src/surfer.c:1695
+#: ../src/surfer.c:1708
 msgid "General"
 msgstr "Allgemein"
 
-#: ../src/surfer.c:1699
+#: ../src/surfer.c:1712
 msgid "Network"
 msgstr "Netzwerk"
 
-#: ../src/surfer.c:1703
+#: ../src/surfer.c:1716
 msgid "Advanced"
 msgstr ""
 
-#: ../src/surfer.c:1720
+#: ../src/surfer.c:1741
 msgid "Homepage:"
 msgstr "Hauptseite:"
 
-#: ../src/surfer.c:1726
+#: ../src/surfer.c:1747
 msgid "Tab handling"
 msgstr ""
 
-#: ../src/surfer.c:1731
+#: ../src/surfer.c:1756
 msgid "Focus new tabs"
 msgstr ""
 
-#: ../src/surfer.c:1736
+#: ../src/surfer.c:1761
 msgid "Downloads"
 msgstr ""
 
-#: ../src/surfer.c:1739
+#: ../src/surfer.c:1768
 msgid "Default download directory:"
 msgstr ""
 
-#: ../src/surfer.c:1743
+#: ../src/surfer.c:1772
 msgid "Choose the default download directory"
 msgstr ""
 
-#: ../src/surfer.c:1748
+#: ../src/surfer.c:1777
 msgid "Default download directory"
 msgstr ""
 
-#: ../src/surfer.c:1753
+#: ../src/surfer.c:1782
 msgid "_Close download windows when complete"
 msgstr ""
 
-#: ../src/surfer.c:1771
+#: ../src/surfer.c:1804
 msgid "Connectivity:"
 msgstr "Verbindung:"
 
-#: ../src/surfer.c:1774
+#: ../src/surfer.c:1811
 msgid "Direct connection"
 msgstr "Direkt Verbindung"
 
-#: ../src/surfer.c:1778
+#: ../src/surfer.c:1815
 msgid "HTTP proxy:"
 msgstr "HTTP proxy:"
 
-#: ../src/surfer.c:1785
+#: ../src/surfer.c:1826
 msgid "Hostname:"
 msgstr ""
 
-#: ../src/surfer.c:1789
+#: ../src/surfer.c:1830
 msgid "Port:"
 msgstr "Port:"
 
-#: ../src/surfer.c:1810
+#: ../src/surfer.c:1857
 msgid "User agent:"
 msgstr ""
 
-#: ../src/surfer.c:1816
+#: ../src/surfer.c:1863
 msgid "Enable _Javascript"
 msgstr ""
 
-#: ../src/surfer.c:1941
+#: ../src/surfer.c:1988
 msgid "This connection is encrypted and trusted."
 msgstr ""
 
-#: ../src/surfer.c:1944
+#: ../src/surfer.c:1991
 msgid "This connection is encrypted but not trusted."
 msgstr ""
 
-#: ../src/surfer.c:1948
+#: ../src/surfer.c:1995
 msgid "This connection is not encrypted."
 msgstr ""
 
-#: ../src/surfer.c:2008
+#: ../src/surfer.c:2055
 msgid "Web surfer - Source of "
 msgstr "Web surfer - Quellcode von "
 
-#: ../src/surfer.c:2051 ../src/surfer.c:2055 ../src/surfer.c:2113
-#: ../src/surfer.c:2117
+#: ../src/surfer.c:2098 ../src/surfer.c:2102 ../src/surfer.c:2160
+#: ../src/surfer.c:2164
 msgid "Warning"
 msgstr "Achtung"
 
-#: ../src/surfer.c:2116
+#: ../src/surfer.c:2163
 msgid "This file already exists. Overwrite?"
 msgstr ""
 
