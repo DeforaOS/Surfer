@@ -422,7 +422,11 @@ Surfer * _new_do(char const * url)
 				on_notebook_switch_page), surfer);
 	gtk_box_pack_start(GTK_BOX(vbox), surfer->notebook, TRUE, TRUE, 0);
 	/* statusbar */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	surfer->statusbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+#else
 	surfer->statusbox = gtk_hbox_new(FALSE, 0);
+#endif
 	widget = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 	surfer->security = gtk_image_new();
@@ -1280,7 +1284,11 @@ static GtkWidget * _tab_button(Surfer * surfer, GtkWidget * widget,
 	GtkWidget * label;
 	GtkWidget * button;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+#else
 	hbox = gtk_hbox_new(FALSE, 0);
+#endif
 	label = gtk_label_new(text);
 	gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
 	gtk_label_set_width_chars(GTK_LABEL(label), 10);
@@ -1507,8 +1515,13 @@ void surfer_show_console(Surfer * surfer, gboolean show)
 			_("Javascript console"));
 	g_signal_connect_swapped(surfer->co_window, "delete-event", G_CALLBACK(
 				on_console_closex), surfer);
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+#else
 	vbox = gtk_vbox_new(FALSE, 0);
 	hbox = gtk_hbox_new(FALSE, 0);
+#endif
 	widget = gtk_label_new(_("Command:"));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 4);
 	surfer->co_entry = gtk_entry_new();
@@ -1713,10 +1726,18 @@ static GtkWidget * _preferences_general(Surfer * surfer)
 	GtkWidget * frame;
 	GtkWidget * widget;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	page = gtk_vbox_new(FALSE, 4);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(page), 4);
 	/* homepage */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	widget = gtk_label_new(_("Homepage:"));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
 	surfer->pr_homepage = gtk_entry_new();
@@ -1725,7 +1746,11 @@ static GtkWidget * _preferences_general(Surfer * surfer)
 	/* tabs */
 	frame = gtk_frame_new(_("Tab handling"));
 	/* focus new tabs */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
 	surfer->pr_focus_tabs = gtk_check_button_new_with_label(
 			_("Focus new tabs"));
@@ -1734,7 +1759,11 @@ static GtkWidget * _preferences_general(Surfer * surfer)
 	gtk_box_pack_start(GTK_BOX(page), frame, FALSE, TRUE, 0);
 	/* downloads */
 	frame = gtk_frame_new(_("Downloads"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	hbox = gtk_vbox_new(FALSE, 4);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
 	widget = gtk_label_new(_("Default download directory:"));
 	gtk_misc_set_alignment(GTK_MISC(widget), 0.0, 0.5);
@@ -1766,10 +1795,18 @@ static GtkWidget * _preferences_network(Surfer * surfer)
 	GtkWidget * hbox;
 	GtkWidget * widget;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	page = gtk_vbox_new(FALSE, 4);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(page), 4);
 	frame = gtk_frame_new(_("Connectivity:"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+#else
 	vbox = gtk_vbox_new(FALSE, 4);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 	widget = gtk_radio_button_new_with_label(NULL, _("Direct connection"));
 	surfer->pr_proxy_radio_direct = widget;
@@ -1781,7 +1818,11 @@ static GtkWidget * _preferences_network(Surfer * surfer)
 				_preferences_on_proxy_http_toggled), surfer);
 	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, TRUE, 0);
 	/* http proxy */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	widget = gtk_label_new(_("Hostname:"));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
 	surfer->pr_proxy_http = gtk_entry_new();
@@ -1804,9 +1845,15 @@ static GtkWidget * _preferences_advanced(Surfer * surfer)
 	GtkWidget * hbox;
 	GtkWidget * widget;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+	page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+	gtk_container_set_border_width(GTK_CONTAINER(page), 4);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
 	page = gtk_vbox_new(FALSE, 4);
 	gtk_container_set_border_width(GTK_CONTAINER(page), 4);
 	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	widget = gtk_label_new(_("User agent:"));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
 	surfer->pr_user_agent = gtk_entry_new();
