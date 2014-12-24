@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-24 19:00+0100\n"
+"POT-Creation-Date: 2014-12-24 19:02+0100\n"
 "PO-Revision-Date: 2010-04-11 12:06+0200\n"
 "Last-Translator: Pierre Pronchery <khorben@defora.org>\n"
 "Language-Team: Italian\n"
@@ -18,8 +18,8 @@ msgstr ""
 
 #: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:965
 #: ../src/surfer.c:969 ../src/surfer.c:1350 ../src/surfer.c:1354
-#: ../tools/helper.c:1483 ../tools/helper.c:1487 ../tools/helper.c:1594
-#: ../tools/helper.c:1598
+#: ../tools/helper.c:1495 ../tools/helper.c:1499 ../tools/helper.c:1606
+#: ../tools/helper.c:1610
 msgid "Question"
 msgstr ""
 
@@ -116,8 +116,8 @@ msgid "Close window when the download is complete"
 msgstr ""
 
 #: ../src/download.c:378 ../src/download.c:383 ../src/download.c:832
-#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1536
-#: ../tools/helper.c:1540
+#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1548
+#: ../tools/helper.c:1552
 msgid "Error"
 msgstr ""
 
@@ -172,7 +172,7 @@ msgid "Code "
 msgstr ""
 
 #: ../src/download.c:805 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
-#: ../tools/helper.c:1539
+#: ../tools/helper.c:1551
 msgid "Unknown error"
 msgstr ""
 
@@ -589,7 +589,7 @@ msgstr ""
 msgid "This file already exists. Overwrite?"
 msgstr ""
 
-#: ../tools/helper.c:324 ../tools/helper.c:1461
+#: ../tools/helper.c:324 ../tools/helper.c:1473
 msgid "Help browser"
 msgstr ""
 
@@ -613,27 +613,27 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
-#: ../tools/helper.c:809
+#: ../tools/helper.c:813
 msgid "Search"
 msgstr ""
 
-#: ../tools/helper.c:874
+#: ../tools/helper.c:878
 msgid "Open page..."
 msgstr ""
 
-#: ../tools/helper.c:889
+#: ../tools/helper.c:897
 msgid "Package: "
 msgstr ""
 
-#: ../tools/helper.c:908
+#: ../tools/helper.c:920
 msgid "Command: "
 msgstr ""
 
-#: ../tools/helper.c:1168
+#: ../tools/helper.c:1180
 msgid "Online help for the DeforaOS desktop"
 msgstr ""
 
-#: ../tools/helper.c:1351
+#: ../tools/helper.c:1363
 #, c-format
 msgid ""
 "Usage: %s [-c][-p package] command\n"
