@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-24 18:57+0100\n"
+"POT-Creation-Date: 2014-12-24 19:00+0100\n"
 "PO-Revision-Date: 2010-04-01 19:40+0200\n"
 "Last-Translator: Calimero <calimeroteknik@free.fr>\n"
 "Language-Team: French\n"
@@ -31,11 +31,11 @@ msgstr ""
 "Plusieurs onglets sont ouverts.\n"
 "Voulez-vous vraiment fermer tous les onglets de cette fenêtre ?"
 
-#: ../src/common/conn.c:204 ../src/download.c:232 ../src/ghtml-gtkhtml.c:923
+#: ../src/common/conn.c:204 ../src/download.c:240 ../src/ghtml-gtkhtml.c:923
 msgid "Resolving..."
 msgstr "Résolution du domaine..."
 
-#: ../src/common/conn.c:253 ../src/download.c:659 ../src/ghtml-gtkhtml.c:973
+#: ../src/common/conn.c:253 ../src/download.c:675 ../src/ghtml-gtkhtml.c:973
 msgid "Connected"
 msgstr "Connecté"
 
@@ -57,7 +57,7 @@ msgstr "Hôte inconnu"
 msgid "Unspecified error"
 msgstr "Erreur non spécifiée"
 
-#: ../src/common/conn.c:348 ../src/download.c:738 ../src/ghtml-gtkhtml.c:1159
+#: ../src/common/conn.c:348 ../src/download.c:754 ../src/ghtml-gtkhtml.c:1159
 msgid "Timeout"
 msgstr "Délai dépassé"
 
@@ -85,100 +85,100 @@ msgstr "Texte non trouvé"
 msgid "Download"
 msgstr "Téléchargement"
 
-#: ../src/download.c:218
+#: ../src/download.c:226
 msgid "Address: "
 msgstr "Adresse: "
 
-#: ../src/download.c:229
+#: ../src/download.c:237
 msgid "File: "
 msgstr "Fichier : "
 
-#: ../src/download.c:231
+#: ../src/download.c:239
 msgid "Status: "
 msgstr "Statut : "
 
-#: ../src/download.c:233
+#: ../src/download.c:241
 msgid "Received: "
 msgstr "Reçu : "
 
-#: ../src/download.c:234
+#: ../src/download.c:242
 msgid "0.0 kB"
 msgstr "0.0 Kio"
 
-#: ../src/download.c:235
+#: ../src/download.c:243
 msgid "Remaining: "
 msgstr "Restant : "
 
-#: ../src/download.c:236
+#: ../src/download.c:244
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: ../src/download.c:242
+#: ../src/download.c:250
 msgid "Close window when the download is complete"
 msgstr "Fermer la fenêtre à la fin du téléchargement"
 
-#: ../src/download.c:362 ../src/download.c:367 ../src/download.c:816
+#: ../src/download.c:378 ../src/download.c:383 ../src/download.c:832
 #: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1536
 #: ../tools/helper.c:1540
 msgid "Error"
 msgstr "Erreur"
 
-#: ../src/download.c:422 ../src/download.c:424 ../src/download.c:521
+#: ../src/download.c:438 ../src/download.c:440 ../src/download.c:537
 msgid "kB"
 msgstr "Kio"
 
-#: ../src/download.c:449
+#: ../src/download.c:465
 #, c-format
 msgid "%.1f %s (%.1f %s/s)"
 msgstr "%.1f %s (%.1f %s/s)"
 
-#: ../src/download.c:468
+#: ../src/download.c:484
 #, c-format
 msgid "%.1f of %.1f %s (%.1f %s/s)"
 msgstr "%.1f de %.1f %s (%.1f %s/s)"
 
-#: ../src/download.c:514
+#: ../src/download.c:530
 msgid "bytes"
 msgstr "octets"
 
-#: ../src/download.c:528
+#: ../src/download.c:544
 msgid "MB"
 msgstr "Mo"
 
-#: ../src/download.c:667
+#: ../src/download.c:683
 msgid "Error "
 msgstr "Erreur "
 
-#: ../src/download.c:692 ../src/download.c:821
+#: ../src/download.c:708 ../src/download.c:837
 msgid "Complete"
 msgstr "Terminé"
 
-#: ../src/download.c:702 ../src/download.c:839
+#: ../src/download.c:718 ../src/download.c:855
 msgid "Downloading"
 msgstr "Téléchargement"
 
-#: ../src/download.c:713
+#: ../src/download.c:729
 msgid "Redirected to"
 msgstr "Redirigé vers"
 
-#: ../src/download.c:716
+#: ../src/download.c:732
 msgid "Redirected"
 msgstr "Redirigé"
 
-#: ../src/download.c:723
+#: ../src/download.c:739
 msgid "Resolved"
 msgstr "Résolu"
 
-#: ../src/download.c:731
+#: ../src/download.c:747
 msgid "Code "
 msgstr "Code "
 
-#: ../src/download.c:789 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
+#: ../src/download.c:805 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
 #: ../tools/helper.c:1539
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
-#: ../src/download.c:866
+#: ../src/download.c:882
 msgid ""
 "Usage: download [-x][-O output][-U user-agent] URL...\n"
 "  -x\tStart in embedded mode\n"
