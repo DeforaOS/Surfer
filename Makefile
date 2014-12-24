@@ -72,6 +72,7 @@ dist:
 		$(PACKAGE)-$(VERSION)/src/common/history.c \
 		$(PACKAGE)-$(VERSION)/src/common/url.c \
 		$(PACKAGE)-$(VERSION)/src/common/project.conf \
+		$(PACKAGE)-$(VERSION)/tools/ghtml-helper.c \
 		$(PACKAGE)-$(VERSION)/tools/helper.c \
 		$(PACKAGE)-$(VERSION)/tools/Makefile \
 		$(PACKAGE)-$(VERSION)/tools/project.conf \
