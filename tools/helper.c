@@ -116,6 +116,14 @@ typedef enum _HelperManualColumn
 #define HMC_LAST HMC_FILENAME
 #define HMC_COUNT (HMC_LAST + 1)
 
+typedef enum _HelperSearchColumn
+{
+	HSC_ICON = 0,
+	HSC_RESULT
+} HelperSearchColumn;
+#define HSC_LAST HSC_RESULT
+#define HSC_COUNT (HSC_LAST + 1)
+
 
 /* prototypes */
 static Helper * _helper_new(void);
@@ -802,8 +810,7 @@ static void _new_search(Helper * helper)
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	/* FIXME complete the model */
-	store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+	store = gtk_list_store_new(HSC_COUNT, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 	helper->search = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	g_signal_connect(helper->search, "row-activated", G_CALLBACK(
 				_helper_on_search_row_activated), helper);
