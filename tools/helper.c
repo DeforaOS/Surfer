@@ -1368,10 +1368,11 @@ static int _error(char const * message, int ret)
 static int _usage(void)
 {
 	fprintf(stderr, _("Usage: %s [-c][-p package] command\n"
-"       helper -d package\n"
-"       helper -s section page\n"
+"       %s -d package\n"
+"       %s -s section page\n"
 "  -d	Open an API reference\n"
-"  -s	Section of the manual page to read from\n"), PROGNAME);
+"  -s	Section of the manual page to read from\n"),
+			PROGNAME, PROGNAME, PROGNAME);
 	return 1;
 }
 
