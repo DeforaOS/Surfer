@@ -369,6 +369,7 @@ static Helper * _helper_new(void)
 	widget = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
+	gtk_notebook_set_scrollable(GTK_NOTEBOOK(helper->notebook), TRUE);
 	helper->store = gtk_tree_store_new(HSC_COUNT,
 			G_TYPE_UINT,		/* HSC_TYPE		*/
 			GDK_TYPE_PIXBUF,	/* HSC_ICON		*/
