@@ -71,9 +71,11 @@ typedef struct _Surfer
 	GtkWidget * menubar;
 #endif
 	GtkWidget * notebook;
+	GtkTreeStore * store;
 	GtkWidget * contents;
 	GtkWidget * gtkdoc;
 	GtkWidget * manual;
+	GtkWidget * entry;
 	GtkWidget * search;
 	GtkWidget * view;
 	GtkToolItem * tb_fullscreen;
@@ -89,39 +91,26 @@ typedef struct _Surfer
 	GtkWidget * ab_window;
 } Helper;
 
-typedef enum _HelperContentsColumn
+typedef enum _HelperStoreType
 {
-	HCC_ICON = 0,
-	HCC_PACKAGE
-} HelperContentsColumn;
-#define HCC_LAST HCC_PACKAGE
-#define HCC_COUNT (HCC_LAST + 1)
+	HST_CONTENTS = 0,
+	HST_GTKDOC,
+	HST_MANUAL
+} HelperStoreType;
 
-typedef enum _HelperGtkDocColumn
+typedef enum _HelperStoreColumn
 {
-	HGC_ICON = 0,
-	HGC_PACKAGE,
-	HGC_DIRECTORY
-} HelperGtkDocColumn;
-#define HGC_LAST HGC_DIRECTORY
-#define HGC_COUNT (HGC_LAST + 1)
-
-typedef enum _HelperManualColumn
-{
-	HMC_ICON = 0,
-	HMC_DIRECTORY,
-	HMC_SECTION,
-	HMC_FILENAME
-} HelperManualColumn;
-#define HMC_LAST HMC_FILENAME
-#define HMC_COUNT (HMC_LAST + 1)
-
-typedef enum _HelperSearchColumn
-{
-	HSC_ICON = 0,
-	HSC_RESULT
-} HelperSearchColumn;
-#define HSC_LAST HSC_RESULT
+	HSC_TYPE = 0,
+	HSC_ICON,
+	HSC_DISPLAY,
+	HSC_GTKDOC_DIRECTORY,
+	HSC_MANUAL_SECTION,
+	HSC_MANUAL_DIRECTORY
+} HelperStoreColumn;
+#define HSC_CONTENTS_PACKAGE HSC_DISPLAY
+#define HSC_GTKDOC_PACKAGE HSC_DISPLAY
+#define HSC_MANUAL_FILENAME HSC_DISPLAY
+#define HSC_LAST HSC_MANUAL_DIRECTORY
 #define HSC_COUNT (HSC_LAST + 1)
 
 
@@ -167,7 +156,7 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 static void _helper_on_manual_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
-static void _helper_on_search_activated(GtkWidget * widget, gpointer data);
+static void _helper_on_search_activated(gpointer data);
 static void _helper_on_search_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 #ifdef EMBEDDED
@@ -289,14 +278,20 @@ static char const * _manual_prefix[] = { MANDIR, "/usr/share/man", NULL };
 /* Helper */
 /* helper_new */
 static void _new_contents(Helper * helper);
+static gboolean _new_contents_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
 static gboolean _new_contents_idle(gpointer data);
 static void _new_contents_package(Helper * helper, char const * contentsdir,
 		GtkTreeStore * store, char const * package);
 static void _new_gtkdoc(Helper * helper);
+static gboolean _new_gtkdoc_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
 static gboolean _new_gtkdoc_idle(gpointer data);
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		GtkTreeStore * store, char const * package);
 static void _new_manual(Helper * helper);
+static gboolean _new_manual_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
 static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, unsigned int section);
@@ -304,6 +299,10 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		GdkPixbuf * pixbuf, char const * manhtmldir,
 		unsigned int section, char const * name);
 static void _new_search(Helper * helper);
+static gboolean _new_search_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
+static gboolean _new_search_filter_do(GtkTreeModel * model, GtkTreeIter * iter,
+		char const * search);
 
 static Helper * _helper_new(void)
 {
@@ -370,6 +369,13 @@ static Helper * _helper_new(void)
 	widget = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(widget), 150);
 	helper->notebook = gtk_notebook_new();
+	helper->store = gtk_tree_store_new(HSC_COUNT,
+			G_TYPE_UINT,		/* HSC_TYPE		*/
+			GDK_TYPE_PIXBUF,	/* HSC_ICON		*/
+			G_TYPE_STRING,		/* HSC_DISPLAY		*/
+			G_TYPE_STRING,		/* HSC_GTKDOC_DIRECTORY	*/
+			G_TYPE_UINT,		/* HSC_MANUAL_SECTION	*/
+			G_TYPE_STRING);		/* HSC_MANUAL_FILENAME	*/
 	_new_gtkdoc(helper);
 	_new_contents(helper);
 	_new_manual(helper);
@@ -390,29 +396,29 @@ static Helper * _helper_new(void)
 static void _new_contents(Helper * helper)
 {
 	GtkWidget * widget;
-	GtkTreeStore * store;
+	GtkTreeModel * model;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
 
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(HCC_COUNT,
-			GDK_TYPE_PIXBUF,	/* icon */
-			G_TYPE_STRING);		/* package */
-	helper->contents = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
+			_new_contents_filter, NULL, NULL);
+	helper->contents = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->contents),
 			FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->contents),
-			HCC_PACKAGE);
+			HSC_CONTENTS_PACKAGE);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", HCC_ICON, NULL);
+			"pixbuf", HSC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
-			renderer, "text", HCC_PACKAGE, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, HCC_PACKAGE);
+			renderer, "text", HSC_CONTENTS_PACKAGE, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HSC_CONTENTS_PACKAGE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->contents), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(helper->contents, "row-activated", G_CALLBACK(
@@ -422,22 +428,29 @@ static void _new_contents(Helper * helper)
 			gtk_label_new(_("Contents")));
 }
 
+static gboolean _new_contents_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_CONTENTS) ? TRUE : FALSE;
+}
+
 static gboolean _new_contents_idle(gpointer data)
 {
 	Helper * helper = data;
-	GtkTreeModel * model;
 	DIR * dir;
 	struct dirent * de;
 
 	helper->source = g_idle_add(_new_manual_idle, helper);
 	helper->p = NULL;
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
 	if((dir = opendir(CONTENTSDIR)) == NULL)
 		return FALSE;
 	while((de = readdir(dir)) != NULL)
 		if(de->d_name[0] != '.')
 			_new_contents_package(helper, CONTENTSDIR,
-					GTK_TREE_STORE(model), de->d_name);
+					helper->store, de->d_name);
 	closedir(dir);
 	return FALSE;
 }
@@ -470,7 +483,8 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 	gtk_tree_store_insert(store, &parent, NULL, -1);
 	gtk_tree_store_set(store, &parent,
 #endif
-			HCC_ICON, pixbuf, HCC_PACKAGE, package, -1);
+			HSC_TYPE, HST_CONTENTS, HSC_ICON, pixbuf,
+			HSC_CONTENTS_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -493,7 +507,8 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 		gtk_tree_store_insert(store, &iter, &parent, -1);
 		gtk_tree_store_set(store, &iter,
 #endif
-				HCC_ICON, pixbuf, HCC_PACKAGE, de->d_name, -1);
+				HSC_TYPE, HST_CONTENTS, HSC_ICON, pixbuf,
+				HSC_CONTENTS_PACKAGE, de->d_name, -1);
 	}
 	closedir(dir);
 	if(pixbuf != NULL)
@@ -503,28 +518,28 @@ static void _new_contents_package(Helper * helper, char const * contentsdir,
 static void _new_gtkdoc(Helper * helper)
 {
 	GtkWidget * widget;
-	GtkTreeStore * store;
+	GtkTreeModel * model;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
 
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(HGC_COUNT,
-			GDK_TYPE_PIXBUF,	/* icon */
-			G_TYPE_STRING,		/* package */
-			G_TYPE_STRING);		/* directory */
-	helper->gtkdoc = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
+			_new_gtkdoc_filter, NULL, NULL);
+	helper->gtkdoc = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->gtkdoc), FALSE);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->gtkdoc), 1);
+	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->gtkdoc),
+			HSC_GTKDOC_PACKAGE);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", HGC_ICON, NULL);
+			"pixbuf", HSC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Package"),
-			renderer, "text", HGC_PACKAGE, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, HGC_PACKAGE);
+			renderer, "text", HSC_GTKDOC_PACKAGE, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HSC_GTKDOC_PACKAGE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->gtkdoc), column);
 	gtk_tree_view_column_clicked(column);
 	g_signal_connect(helper->gtkdoc, "row-activated", G_CALLBACK(
@@ -535,15 +550,22 @@ static void _new_gtkdoc(Helper * helper)
 	helper->source = g_idle_add(_new_gtkdoc_idle, helper);
 }
 
+static gboolean _new_gtkdoc_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_GTKDOC) ? TRUE : FALSE;
+}
+
 static gboolean _new_gtkdoc_idle(gpointer data)
 {
 	Helper * helper = data;
-	GtkTreeModel * model;
 	char const * p;
 	DIR * dir;
 	struct dirent * de;
 
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->gtkdoc));
 	if(helper->p == NULL)
 		helper->p = _gtkdoc_prefix;
 	for(p = *(helper->p); p != NULL; (helper->p)++, p = *(helper->p))
@@ -558,8 +580,7 @@ static gboolean _new_gtkdoc_idle(gpointer data)
 			continue;
 		while((de = readdir(dir)) != NULL)
 			if(de->d_name[0] != '.')
-				_new_gtkdoc_package(helper, p,
-						GTK_TREE_STORE(model),
+				_new_gtkdoc_package(helper, p, helper->store,
 						de->d_name);
 		closedir(dir);
 		(helper->p)++;
@@ -605,7 +626,8 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 	gtk_tree_store_insert(store, &parent, NULL, -1);
 	gtk_tree_store_set(store, &parent,
 #endif
-			HGC_ICON, pixbuf, HGC_PACKAGE, package, -1);
+			HSC_TYPE, HST_GTKDOC, HSC_ICON, pixbuf,
+			HSC_GTKDOC_PACKAGE, package, -1);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -621,8 +643,9 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 	gtk_tree_store_insert(store, &iter, &parent, -1);
 	gtk_tree_store_set(store, &iter,
 #endif
-			HGC_ICON, pixbuf, HGC_PACKAGE, package,
-			HGC_DIRECTORY, gtkdocdir, -1);
+			HSC_TYPE, HST_GTKDOC, HSC_ICON, pixbuf,
+			HSC_GTKDOC_PACKAGE, package,
+			HSC_GTKDOC_DIRECTORY, gtkdocdir, -1);
 	if(pixbuf != NULL)
 		g_object_unref(pixbuf);
 	fclose(fp);
@@ -631,7 +654,7 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 static void _new_manual(Helper * helper)
 {
 	GtkWidget * widget;
-	GtkTreeStore * store;
+	GtkTreeModel * model;
 	GtkCellRenderer * renderer;
 	GtkTreeViewColumn * column;
 
@@ -639,27 +662,23 @@ static void _new_manual(Helper * helper)
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_tree_store_new(HMC_COUNT,
-			GDK_TYPE_PIXBUF,	/* icon */
-			G_TYPE_STRING,		/* directory */
-			G_TYPE_UINT,		/* section */
-			G_TYPE_STRING);		/* filename */
-	helper->manual = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
+			_new_manual_filter, NULL, NULL);
+	helper->manual = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual),
-			HMC_DIRECTORY);
+			HSC_MANUAL_FILENAME);
 	renderer = gtk_cell_renderer_pixbuf_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
-			"pixbuf", HMC_ICON, NULL);
+			"pixbuf", HSC_ICON, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Section"),
-			renderer, "text", HMC_FILENAME, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, HMC_FILENAME);
+			renderer, "text", HSC_MANUAL_FILENAME, NULL);
+	gtk_tree_view_column_set_sort_column_id(column, HSC_MANUAL_FILENAME);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->manual), column);
 	gtk_tree_view_column_clicked(column);
-	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual),
-			HMC_FILENAME);
 	g_signal_connect(helper->manual, "row-activated", G_CALLBACK(
 				_helper_on_manual_row_activated), helper);
 	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
@@ -667,16 +686,23 @@ static void _new_manual(Helper * helper)
 			gtk_label_new(_("Manual")));
 }
 
+static gboolean _new_manual_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_MANUAL) ? TRUE : FALSE;
+}
+
 static gboolean _new_manual_idle(gpointer data)
 {
 	Helper * helper = data;
-	GtkTreeModel * model;
 	char const * p;
 	DIR * dir;
 	struct dirent * de;
 	unsigned int section;
 
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->manual));
 	if(helper->p == NULL)
 		helper->p = _manual_prefix;
 	for(p = *(helper->p); p != NULL; (helper->p)++, p = *(helper->p))
@@ -692,7 +718,7 @@ static gboolean _new_manual_idle(gpointer data)
 		while((de = readdir(dir)) != NULL)
 			if(sscanf(de->d_name, "html%u", &section) == 1)
 				_new_manual_section(helper, p, de->d_name,
-						GTK_TREE_STORE(model), section);
+						helper->store, section);
 		closedir(dir);
 		(helper->p)++;
 		return TRUE;
@@ -748,9 +774,10 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		gtk_tree_store_insert(store, &iter, &parent, -1);
 		gtk_tree_store_set(store, &iter,
 #endif
-				HMC_ICON, pixbuf, HMC_DIRECTORY, manhtmldir,
-				HMC_SECTION, section, HMC_FILENAME, de->d_name,
-				-1);
+				HSC_TYPE, HST_MANUAL, HSC_ICON, pixbuf,
+				HSC_MANUAL_DIRECTORY, manhtmldir,
+				HSC_MANUAL_SECTION, section,
+				HSC_MANUAL_FILENAME, de->d_name, -1);
 	}
 	closedir(dir);
 	if(pixbuf != NULL)
@@ -763,16 +790,20 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 {
 	GtkTreeModel * model = GTK_TREE_MODEL(store);
 	gboolean valid;
+	unsigned int type;
 	gchar * n;
 	int res;
 
 	for(valid = gtk_tree_model_get_iter_first(model, iter); valid == TRUE;
 			valid = gtk_tree_model_iter_next(model, iter))
 	{
-		gtk_tree_model_get(model, iter, HMC_FILENAME, &n, -1);
-		res = strcmp(name, n);
+		gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+		if(type != HSC_MANUAL_SECTION)
+			continue;
+		gtk_tree_model_get(model, iter, HSC_MANUAL_FILENAME, &n, -1);
+		res = (n != NULL) && (strcmp(name, n) == 0);
 		g_free(n);
-		if(res == 0)
+		if(res != 0)
 			break;
 	}
 	if(valid == FALSE)
@@ -783,41 +814,93 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		gtk_tree_store_insert(store, iter, NULL, -1);
 		gtk_tree_store_set(store, iter,
 #endif
-				HMC_ICON, pixbuf, HMC_DIRECTORY, manhtmldir,
-				HMC_SECTION, section, HMC_FILENAME, name, -1);
+				HSC_TYPE, HST_MANUAL, HSC_ICON, pixbuf,
+				HSC_MANUAL_DIRECTORY, manhtmldir,
+				HSC_MANUAL_SECTION, section,
+				HSC_MANUAL_FILENAME, name, -1);
 	}
 	else
-		gtk_tree_store_set(store, iter, HMC_ICON, pixbuf,
-				HMC_DIRECTORY, manhtmldir, HMC_SECTION, section,
-				HMC_FILENAME, name, -1);
+		gtk_tree_store_set(store, iter, HSC_ICON, pixbuf,
+				HSC_MANUAL_DIRECTORY, manhtmldir,
+				HSC_MANUAL_SECTION, section,
+				HSC_MANUAL_FILENAME, name, -1);
 }
 
 static void _new_search(Helper * helper)
 {
 	GtkWidget * vbox;
 	GtkWidget * widget;
-	GtkListStore * store;
+	GtkTreeModel * model;
+	GtkCellRenderer * renderer;
+	GtkTreeViewColumn * column;
 
 #if GTK_CHECK_VERSION(3, 0, 0)
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 #else
 	vbox = gtk_vbox_new(FALSE, 4);
 #endif
-	widget = gtk_entry_new();
-	g_signal_connect(widget, "activate", G_CALLBACK(
+	helper->entry = gtk_entry_new();
+	g_signal_connect_swapped(helper->entry, "activate", G_CALLBACK(
 				_helper_on_search_activated), helper);
-	gtk_box_pack_start(GTK_BOX(vbox), widget, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), helper->entry, FALSE, TRUE, 0);
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	store = gtk_list_store_new(HSC_COUNT, GDK_TYPE_PIXBUF, G_TYPE_STRING);
-	helper->search = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
+			_new_search_filter, helper, NULL);
+	helper->search = gtk_tree_view_new_with_model(model);
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->search), FALSE);
 	g_signal_connect(helper->search, "row-activated", G_CALLBACK(
 				_helper_on_search_row_activated), helper);
+	renderer = gtk_cell_renderer_pixbuf_new();
+	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+			"pixbuf", HSC_ICON, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->search), column);
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+			"text", HSC_DISPLAY, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(helper->search), column);
 	gtk_container_add(GTK_CONTAINER(widget), helper->search);
 	gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), vbox,
 			gtk_label_new(_("Search")));
+}
+
+static gboolean _new_search_filter(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	Helper * helper = data;
+	char const * search;
+	GtkTreeIter child;
+	gboolean valid;
+
+	if((search = gtk_entry_get_text(GTK_ENTRY(helper->entry))) == NULL
+			|| strlen(search) == 0)
+		return FALSE;
+	if(_new_search_filter_do(model, iter, search) == TRUE)
+		return TRUE;
+	for(valid = gtk_tree_model_iter_children(model, &child, iter);
+			valid == TRUE;
+			valid = gtk_tree_model_iter_next(model, &child))
+		if(_new_search_filter_do(model, &child, search) == TRUE)
+			return TRUE;
+	return FALSE;
+}
+
+static gboolean _new_search_filter_do(GtkTreeModel * model, GtkTreeIter * iter,
+		char const * search)
+{
+	gboolean ret;
+	char * display;
+
+	gtk_tree_model_get(model, iter, HSC_DISPLAY, &display, -1);
+	if(display == NULL)
+		return FALSE;
+	ret = (strlen(display) > 0 && strcasestr(display, search) != NULL)
+		? TRUE : FALSE;
+	g_free(display);
+	return ret;
 }
 
 
@@ -1227,7 +1310,10 @@ static void _helper_on_contents_row_activated(GtkWidget * widget,
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
+				model), &iter, &parent);
+	model = GTK_TREE_MODEL(helper->store);
 	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
 	{
 		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
@@ -1237,8 +1323,8 @@ static void _helper_on_contents_row_activated(GtkWidget * widget,
 					FALSE);
 		return;
 	}
-	gtk_tree_model_get(model, &parent, 1, &package, -1);
-	gtk_tree_model_get(model, &iter, 1, &command, -1);
+	gtk_tree_model_get(model, &parent, HSC_CONTENTS_PACKAGE, &package, -1);
+	gtk_tree_model_get(model, &iter, HSC_CONTENTS_PACKAGE, &command, -1);
 	_helper_open_contents(helper, package, command);
 	g_free(package);
 	g_free(command);
@@ -1257,7 +1343,10 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 	gchar * gtkdocdir;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
+				model), &iter, &parent);
+	model = GTK_TREE_MODEL(helper->store);
 	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
 	{
 		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
@@ -1267,7 +1356,8 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 					FALSE);
 		return;
 	}
-	gtk_tree_model_get(model, &iter, 1, &package, 2, &gtkdocdir, -1);
+	gtk_tree_model_get(model, &iter, HSC_GTKDOC_PACKAGE, &package,
+			HSC_GTKDOC_DIRECTORY, &gtkdocdir, -1);
 	_helper_open_gtkdoc(helper, gtkdocdir, package);
 	g_free(package);
 	g_free(gtkdocdir);
@@ -1287,7 +1377,10 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
+				model), &iter, &parent);
+	model = GTK_TREE_MODEL(helper->store);
 	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
 	{
 		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
@@ -1297,8 +1390,9 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 					FALSE);
 		return;
 	}
-	gtk_tree_model_get(model, &iter, 1, &manhtmldir, 2, &section,
-			3, &command, -1);
+	gtk_tree_model_get(model, &iter, HSC_MANUAL_DIRECTORY, &manhtmldir,
+			HSC_MANUAL_SECTION, &section,
+			HSC_MANUAL_FILENAME, &command, -1);
 	_helper_open_man(helper, section, command, manhtmldir);
 	g_free(manhtmldir);
 	g_free(command);
@@ -1306,16 +1400,13 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 
 
 /* helper_on_search_activated */
-static void _helper_on_search_activated(GtkWidget * widget, gpointer data)
+static void _helper_on_search_activated(gpointer data)
 {
 	Helper * helper = data;
-	GtkListStore * store;
-	char const * text;
+	GtkTreeModel * model;
 
-	store = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->search));
-	gtk_list_store_clear(store);
-	text = gtk_entry_get_text(GTK_ENTRY(widget));
-	/* FIXME implement */
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->search));
+	gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(model));
 }
 
 
@@ -1326,9 +1417,11 @@ static void _helper_on_search_row_activated(GtkWidget * widget,
 	Helper * helper = data;
 	GtkTreeModel * model;
 	GtkTreeIter iter;
+	unsigned int type;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, HSC_TYPE, &type, -1);
 	/* FIXME implement */
 }
 
