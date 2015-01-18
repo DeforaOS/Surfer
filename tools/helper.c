@@ -124,8 +124,8 @@ static int _helper_open_contents(Helper * helper, char const * package,
 static int _helper_open_dialog(Helper * helper);
 static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 		char const * package);
-static int _helper_open_man(Helper * helper, int section, char const * page,
-		char const * manhtmldir);
+static int _helper_open_man(Helper * helper, unsigned int section,
+		char const * page, char const * manhtmldir);
 
 static int _error(char const * message, int ret);
 static int _usage(void);
@@ -1102,8 +1102,8 @@ static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 
 
 /* helper_open_man */
-static int _helper_open_man(Helper * helper, int section, char const * page,
-		char const * manhtmldir)
+static int _helper_open_man(Helper * helper, unsigned int section,
+		char const * page, char const * manhtmldir)
 {
 	char const * prefix[] =
 	{
