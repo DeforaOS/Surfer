@@ -244,6 +244,7 @@ msgid "_Inspect this page"
 msgstr "_Inspecter cette page"
 
 #: ../src/ghtml-webkit.c:1033
+#, fuzzy
 msgid "_View image"
 msgstr "Voir l'image"
 
@@ -252,8 +253,9 @@ msgid "_Save image as..."
 msgstr "Enregistrer l'image sous..."
 
 #: ../src/ghtml-webkit.c:1055
+#, fuzzy
 msgid "Open in new _tab"
-msgstr ""
+msgstr "Ouvrir en nouvel onglet"
 
 #: ../src/ghtml-webkit.c:1063
 msgid "Open in new _window"
@@ -264,8 +266,9 @@ msgid "_Save link as..."
 msgstr "Enregistrer le lien sous..."
 
 #: ../src/ghtml-webkit.c:1081
+#, fuzzy
 msgid "_Copy link location"
-msgstr ""
+msgstr "Copier l'adresse du lien"
 
 #: ../src/main.c:60
 #, c-format
@@ -605,7 +608,7 @@ msgstr "Aide en ligne"
 
 #: ../tools/helper.c:421 ../tools/helper.c:543
 msgid "Package"
-msgstr ""
+msgstr "Package"
 
 #: ../tools/helper.c:430
 msgid "Contents"
@@ -625,7 +628,7 @@ msgstr "Manuel"
 
 #: ../tools/helper.c:872
 msgid "Search"
-msgstr ""
+msgstr "Recherche"
 
 #: ../tools/helper.c:973
 msgid "Open page..."
@@ -633,7 +636,7 @@ msgstr "Ouvrir une page..."
 
 #: ../tools/helper.c:992
 msgid "Package: "
-msgstr ""
+msgstr "Package : "
 
 #: ../tools/helper.c:1015
 msgid "Command: "
