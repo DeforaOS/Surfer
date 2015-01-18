@@ -802,7 +802,7 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 			valid = gtk_tree_model_iter_next(model, iter))
 	{
 		gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
-		if(type != HSC_MANUAL_SECTION)
+		if(type != HST_MANUAL)
 			continue;
 		gtk_tree_model_get(model, iter, HSC_MANUAL_FILENAME, &n, -1);
 		res = (n != NULL) && (strcmp(name, n) == 0);
