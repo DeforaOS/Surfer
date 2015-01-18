@@ -407,6 +407,7 @@ static void _new_contents(Helper * helper)
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
 			_new_contents_filter, NULL, NULL);
+	model = gtk_tree_model_sort_new_with_model(model);
 	helper->contents = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->contents),
 			FALSE);
@@ -529,6 +530,7 @@ static void _new_gtkdoc(Helper * helper)
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
 			_new_gtkdoc_filter, NULL, NULL);
+	model = gtk_tree_model_sort_new_with_model(model);
 	helper->gtkdoc = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->gtkdoc), FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->gtkdoc),
@@ -666,6 +668,7 @@ static void _new_manual(Helper * helper)
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
 			_new_manual_filter, NULL, NULL);
+	model = gtk_tree_model_sort_new_with_model(model);
 	helper->manual = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
 	gtk_tree_view_set_search_column(GTK_TREE_VIEW(helper->manual),
@@ -850,6 +853,7 @@ static void _new_search(Helper * helper)
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
 			_new_search_filter, helper, NULL);
+	model = gtk_tree_model_sort_new_with_model(model);
 	helper->search = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->search), FALSE);
 	g_signal_connect(helper->search, "row-activated", G_CALLBACK(
@@ -1311,7 +1315,10 @@ static void _helper_on_contents_row_activated(GtkWidget * widget,
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_sort_convert_iter_to_child_iter(GTK_TREE_MODEL_SORT(
+				model), &parent, &iter);
+	model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
 	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
 				model), &iter, &parent);
 	model = GTK_TREE_MODEL(helper->store);
@@ -1344,7 +1351,10 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 	gchar * gtkdocdir;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_sort_convert_iter_to_child_iter(GTK_TREE_MODEL_SORT(
+				model), &parent, &iter);
+	model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
 	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
 				model), &iter, &parent);
 	model = GTK_TREE_MODEL(helper->store);
@@ -1378,7 +1388,10 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_sort_convert_iter_to_child_iter(GTK_TREE_MODEL_SORT(
+				model), &parent, &iter);
+	model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
 	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
 				model), &iter, &parent);
 	model = GTK_TREE_MODEL(helper->store);
@@ -1407,6 +1420,7 @@ static void _helper_on_search_activated(gpointer data)
 	GtkTreeModel * model;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->search));
+	model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
 	gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(model));
 }
 
@@ -1422,7 +1436,10 @@ static void _helper_on_search_row_activated(GtkWidget * widget,
 	unsigned int type;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_sort_convert_iter_to_child_iter(GTK_TREE_MODEL_SORT(
+				model), &parent, &iter);
+	model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
 	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
 				model), &iter, &parent);
 	model = GTK_TREE_MODEL(helper->store);
