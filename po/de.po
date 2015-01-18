@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-24 19:02+0100\n"
+"POT-Creation-Date: 2015-01-18 08:07-0300\n"
 "PO-Revision-Date: 2010-04-01 19:40+0200\n"
 "Last-Translator: Pierre Pronchery <khorben@defora.org>\n"
 "Language-Team: German\n"
@@ -18,8 +18,8 @@ msgstr ""
 
 #: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:965
 #: ../src/surfer.c:969 ../src/surfer.c:1350 ../src/surfer.c:1354
-#: ../tools/helper.c:1495 ../tools/helper.c:1499 ../tools/helper.c:1606
-#: ../tools/helper.c:1610
+#: ../tools/helper.c:1641 ../tools/helper.c:1645 ../tools/helper.c:1752
+#: ../tools/helper.c:1756
 msgid "Question"
 msgstr "Frage"
 
@@ -116,8 +116,8 @@ msgid "Close window when the download is complete"
 msgstr ""
 
 #: ../src/download.c:378 ../src/download.c:383 ../src/download.c:832
-#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1548
-#: ../tools/helper.c:1552
+#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1694
+#: ../tools/helper.c:1698
 msgid "Error"
 msgstr "Fehler"
 
@@ -172,7 +172,7 @@ msgid "Code "
 msgstr ""
 
 #: ../src/download.c:805 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
-#: ../tools/helper.c:1551
+#: ../tools/helper.c:1697
 msgid "Unknown error"
 msgstr ""
 
@@ -272,7 +272,7 @@ msgstr ""
 msgid "_New window"
 msgstr "_Neue Fenster"
 
-#: ../src/surfer.c:115 ../tools/helper.c:208
+#: ../src/surfer.c:115 ../tools/helper.c:205
 msgid "_Open..."
 msgstr "_Offnen..."
 
@@ -292,7 +292,7 @@ msgstr "_Drücken..."
 msgid "Close _tab"
 msgstr ""
 
-#: ../src/surfer.c:128 ../tools/helper.c:211
+#: ../src/surfer.c:128 ../tools/helper.c:208
 msgid "_Close"
 msgstr "_Schliessen"
 
@@ -308,7 +308,7 @@ msgstr ""
 msgid "_Cut"
 msgstr ""
 
-#: ../src/surfer.c:142 ../tools/helper.c:218
+#: ../src/surfer.c:142 ../tools/helper.c:215
 msgid "Cop_y"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 msgid "_Paste"
 msgstr ""
 
-#: ../src/surfer.c:147 ../tools/helper.c:221
+#: ../src/surfer.c:147 ../tools/helper.c:218
 msgid "Select _All"
 msgstr ""
 
@@ -324,7 +324,7 @@ msgstr ""
 msgid "_Unselect all"
 msgstr ""
 
-#: ../src/surfer.c:156 ../tools/helper.c:229
+#: ../src/surfer.c:156 ../tools/helper.c:226
 msgid "_Find"
 msgstr "_Suchen"
 
@@ -344,7 +344,7 @@ msgstr ""
 msgid "Normal size"
 msgstr ""
 
-#: ../src/surfer.c:173 ../tools/helper.c:236
+#: ../src/surfer.c:173 ../tools/helper.c:233
 msgid "_Fullscreen"
 msgstr ""
 
@@ -368,35 +368,35 @@ msgstr ""
 msgid "Page so_urce"
 msgstr "Q_uellcode"
 
-#: ../src/surfer.c:197 ../tools/helper.c:247
+#: ../src/surfer.c:197 ../tools/helper.c:244
 msgid "_Contents"
 msgstr ""
 
-#: ../src/surfer.c:199 ../tools/helper.c:249
+#: ../src/surfer.c:199 ../tools/helper.c:246
 msgid "_About"
 msgstr "_Info"
 
-#: ../src/surfer.c:210 ../tools/helper.c:260
+#: ../src/surfer.c:210 ../tools/helper.c:257
 msgid "_File"
 msgstr "_Datei"
 
-#: ../src/surfer.c:211 ../tools/helper.c:261
+#: ../src/surfer.c:211 ../tools/helper.c:258
 msgid "_Edit"
 msgstr ""
 
-#: ../src/surfer.c:212 ../tools/helper.c:262
+#: ../src/surfer.c:212 ../tools/helper.c:259
 msgid "_View"
 msgstr ""
 
-#: ../src/surfer.c:213 ../tools/helper.c:263
+#: ../src/surfer.c:213 ../tools/helper.c:260
 msgid "_Help"
 msgstr "_Hilfe"
 
-#: ../src/surfer.c:220 ../tools/helper.c:197
+#: ../src/surfer.c:220 ../tools/helper.c:194
 msgid "Back"
 msgstr "Zurück"
 
-#: ../src/surfer.c:222 ../tools/helper.c:199
+#: ../src/surfer.c:222 ../tools/helper.c:196
 msgid "Forward"
 msgstr ""
 
@@ -589,59 +589,56 @@ msgstr "Achtung"
 msgid "This file already exists. Overwrite?"
 msgstr ""
 
-#: ../tools/helper.c:324 ../tools/helper.c:1473
+#: ../tools/helper.c:331 ../tools/helper.c:1619
 msgid "Help browser"
 msgstr ""
 
-#: ../tools/helper.c:405 ../tools/helper.c:517
+#: ../tools/helper.c:421 ../tools/helper.c:543
 msgid "Package"
 msgstr ""
 
-#: ../tools/helper.c:414
+#: ../tools/helper.c:430
 msgid "Contents"
 msgstr ""
 
-#: ../tools/helper.c:526
+#: ../tools/helper.c:552
 msgid "API reference"
 msgstr ""
 
-#: ../tools/helper.c:648
+#: ../tools/helper.c:681
 msgid "Section"
 msgstr "Sektion"
 
-#: ../tools/helper.c:659
+#: ../tools/helper.c:690
 msgid "Manual"
 msgstr ""
 
-#: ../tools/helper.c:813
+#: ../tools/helper.c:872
 msgid "Search"
 msgstr ""
 
-#: ../tools/helper.c:878
+#: ../tools/helper.c:973
 msgid "Open page..."
 msgstr "_Offnen Seite..."
 
-#: ../tools/helper.c:897
+#: ../tools/helper.c:992
 msgid "Package: "
 msgstr ""
 
-#: ../tools/helper.c:920
+#: ../tools/helper.c:1015
 msgid "Command: "
 msgstr ""
 
-#: ../tools/helper.c:1180
+#: ../tools/helper.c:1275
 msgid "Online help for the DeforaOS desktop"
 msgstr ""
 
-#: ../tools/helper.c:1363
+#: ../tools/helper.c:1508
 #, c-format
 msgid ""
 "Usage: %s [-c][-p package] command\n"
-"       helper -d package\n"
-"       helper -s section page\n"
+"       %s -d package\n"
+"       %s -s section page\n"
 "  -d\tOpen an API reference\n"
 "  -s\tSection of the manual page to read from\n"
 msgstr ""
-
-#~ msgid "Find text"
-#~ msgstr "Text suchen"

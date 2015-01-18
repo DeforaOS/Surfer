@@ -7,20 +7,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-27 17:36+0100\n"
+"POT-Creation-Date: 2015-01-18 08:07-0300\n"
 "PO-Revision-Date: 2014-12-27 23:49+0100\n"
 "Last-Translator: Pierre Pronchery <khorben@defora.org>\n"
 "Language-Team: Spanish\n"
-"Language: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:965
 #: ../src/surfer.c:969 ../src/surfer.c:1350 ../src/surfer.c:1354
-#: ../tools/helper.c:1502 ../tools/helper.c:1506 ../tools/helper.c:1613
-#: ../tools/helper.c:1617
+#: ../tools/helper.c:1641 ../tools/helper.c:1645 ../tools/helper.c:1752
+#: ../tools/helper.c:1756
 msgid "Question"
 msgstr "Pregunta"
 
@@ -123,8 +123,8 @@ msgid "Close window when the download is complete"
 msgstr "Cerrar la ventana cuando se complete la descarga"
 
 #: ../src/download.c:378 ../src/download.c:383 ../src/download.c:832
-#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1555
-#: ../tools/helper.c:1559
+#: ../src/surfer.c:1124 ../src/surfer.c:1128 ../tools/helper.c:1694
+#: ../tools/helper.c:1698
 msgid "Error"
 msgstr "Error"
 
@@ -179,12 +179,11 @@ msgid "Code "
 msgstr "Código "
 
 #: ../src/download.c:805 ../src/ghtml-webkit.c:1255 ../src/surfer.c:1127
-#: ../tools/helper.c:1558
+#: ../tools/helper.c:1697
 msgid "Unknown error"
 msgstr "Error desconocido"
 
 #: ../src/download.c:882
-#, fuzzy
 msgid ""
 "Usage: download [-x][-O output][-U user-agent] URL...\n"
 "  -x\tStart in embedded mode\n"
@@ -226,13 +225,12 @@ msgid "Unsupported method"
 msgstr "Método incompatible"
 
 #: ../src/ghtml-webkit.c:235
-#, fuzzy
 msgid ""
 "Could not load certificate bundle:\n"
 "SSL certificates will not be verified."
 msgstr ""
-"No se pudieron descargar certificados de afiliaciónCertificados SSL no serán "
-"verificados"
+"No se pudieron descargar certificados de afiliación:\n"
+"Certificados SSL no serán verificados."
 
 #: ../src/ghtml-webkit.c:815 ../src/ghtml-webkit.c:844
 msgid "WebKit Web Inspector"
@@ -287,7 +285,7 @@ msgstr "_Nueva pestaña"
 msgid "_New window"
 msgstr "_Nueva ventana"
 
-#: ../src/surfer.c:115 ../tools/helper.c:216
+#: ../src/surfer.c:115 ../tools/helper.c:205
 msgid "_Open..."
 msgstr "_Abrir..."
 
@@ -307,7 +305,7 @@ msgstr "_Imprimir..."
 msgid "Close _tab"
 msgstr "Cerrar _pestaña"
 
-#: ../src/surfer.c:128 ../tools/helper.c:219
+#: ../src/surfer.c:128 ../tools/helper.c:208
 msgid "_Close"
 msgstr "_Cerrar"
 
@@ -323,7 +321,7 @@ msgstr "_Rehacer"
 msgid "_Cut"
 msgstr "_Cortar"
 
-#: ../src/surfer.c:142 ../tools/helper.c:226
+#: ../src/surfer.c:142 ../tools/helper.c:215
 msgid "Cop_y"
 msgstr "Cop_iar"
 
@@ -331,7 +329,7 @@ msgstr "Cop_iar"
 msgid "_Paste"
 msgstr "_Pegar"
 
-#: ../src/surfer.c:147 ../tools/helper.c:229
+#: ../src/surfer.c:147 ../tools/helper.c:218
 msgid "Select _All"
 msgstr "Seleccionar _todo"
 
@@ -339,7 +337,7 @@ msgstr "Seleccionar _todo"
 msgid "_Unselect all"
 msgstr "_Deseleccionar todo"
 
-#: ../src/surfer.c:156 ../tools/helper.c:237
+#: ../src/surfer.c:156 ../tools/helper.c:226
 msgid "_Find"
 msgstr "_Buscar"
 
@@ -359,7 +357,7 @@ msgstr "Zoom out"
 msgid "Normal size"
 msgstr "Tamaño normal"
 
-#: ../src/surfer.c:173 ../tools/helper.c:244
+#: ../src/surfer.c:173 ../tools/helper.c:233
 msgid "_Fullscreen"
 msgstr "_Pantalla completa"
 
@@ -383,36 +381,36 @@ msgstr "_Consola Javascript"
 msgid "Page so_urce"
 msgstr "Fuente de la página"
 
-#: ../src/surfer.c:197 ../tools/helper.c:255
+#: ../src/surfer.c:197 ../tools/helper.c:244
 msgid "_Contents"
 msgstr "_Contenidos"
 
-#: ../src/surfer.c:199 ../tools/helper.c:257
+#: ../src/surfer.c:199 ../tools/helper.c:246
 msgid "_About"
 msgstr "_Acerca de"
 
-#: ../src/surfer.c:210 ../tools/helper.c:268
+#: ../src/surfer.c:210 ../tools/helper.c:257
 msgid "_File"
 msgstr "_Archivo"
 
-#: ../src/surfer.c:211 ../tools/helper.c:269
+#: ../src/surfer.c:211 ../tools/helper.c:258
 msgid "_Edit"
 msgstr "_Editar"
 
-#: ../src/surfer.c:212 ../tools/helper.c:270
+#: ../src/surfer.c:212 ../tools/helper.c:259
 msgid "_View"
 msgstr "_Ver"
 
-#: ../src/surfer.c:213 ../tools/helper.c:271
+#: ../src/surfer.c:213 ../tools/helper.c:260
 msgid "_Help"
 msgstr "_Ayuda"
 
-#: ../src/surfer.c:220 ../tools/helper.c:205
+#: ../src/surfer.c:220 ../tools/helper.c:194
 #, fuzzy
 msgid "Back"
 msgstr "Volver"
 
-#: ../src/surfer.c:222 ../tools/helper.c:207
+#: ../src/surfer.c:222 ../tools/helper.c:196
 #, fuzzy
 msgid "Forward"
 msgstr "Siguiente"
@@ -444,7 +442,7 @@ msgstr "Web surfer"
 #: ../src/surfer.c:393
 #, fuzzy
 msgid " Location: "
-msgstr "Ubicación: "
+msgstr " Ubicación: "
 
 #: ../src/surfer.c:434 ../src/surfer.c:2002 ../src/surfer.c:2006
 msgid "Security information"
@@ -577,9 +575,8 @@ msgid "Port:"
 msgstr "Puerto:"
 
 #: ../src/surfer.c:1857
-#, fuzzy
 msgid "User agent:"
-msgstr "Agente de usuario"
+msgstr "Agente de usuario:"
 
 #: ../src/surfer.c:1863
 msgid "Enable _Javascript"
@@ -610,67 +607,64 @@ msgstr "Aviso"
 msgid "This file already exists. Overwrite?"
 msgstr "Este archivo ya esxiste. ¿Quieres reescribirlo?"
 
-#: ../tools/helper.c:332 ../tools/helper.c:1480
+#: ../tools/helper.c:331 ../tools/helper.c:1619
 #, fuzzy
 msgid "Help browser"
 msgstr "Ayuda"
 
-#: ../tools/helper.c:413 ../tools/helper.c:525
+#: ../tools/helper.c:421 ../tools/helper.c:543
 #, fuzzy
 msgid "Package"
 msgstr "Paquete"
 
-#: ../tools/helper.c:422
+#: ../tools/helper.c:430
 msgid "Contents"
 msgstr "Contenidos"
 
-#: ../tools/helper.c:534
+#: ../tools/helper.c:552
 msgid "API reference"
 msgstr "Referencia API"
 
-#: ../tools/helper.c:656
+#: ../tools/helper.c:681
 #, fuzzy
 msgid "Section"
 msgstr "Secsión"
 
-#: ../tools/helper.c:667
+#: ../tools/helper.c:690
 msgid "Manual"
 msgstr "Manual"
 
-#: ../tools/helper.c:820
+#: ../tools/helper.c:872
 msgid "Search"
 msgstr "Buscar"
 
-#: ../tools/helper.c:885
+#: ../tools/helper.c:973
 msgid "Open page..."
 msgstr "Abrir..."
 
-#: ../tools/helper.c:904
+#: ../tools/helper.c:992
 msgid "Package: "
 msgstr "Paquete: "
 
-#: ../tools/helper.c:927
+#: ../tools/helper.c:1015
 msgid "Command: "
 msgstr "Comando: "
 
-#: ../tools/helper.c:1187
+#: ../tools/helper.c:1275
 msgid "Online help for the DeforaOS desktop"
 msgstr "Ayuda online para el escritorio de DeforaOS"
 
-#: ../tools/helper.c:1370
+#: ../tools/helper.c:1508
 #, c-format
 msgid ""
 "Usage: %s [-c][-p package] command\n"
-"       helper -d package\n"
-"       helper -s section page\n"
+"       %s -d package\n"
+"       %s -s section page\n"
 "  -d\tOpen an API reference\n"
 "  -s\tSection of the manual page to read from\n"
 msgstr ""
 "Usage: %s [-c][-p paquete] comando\n"
-"       ayuda -d paquete\n"
-"       ayuda -s sección de página\n"
+"       %s -d paquete\n"
+"       %s -s sección de página\n"
 "  -d\tAbrir una referencia API\n"
 "  -s\tSección del manual de página para leer desde\n"
-
-#~ msgid "Find text"
-#~ msgstr "Buscar"
