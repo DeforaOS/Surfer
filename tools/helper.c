@@ -1418,12 +1418,39 @@ static void _helper_on_search_row_activated(GtkWidget * widget,
 	Helper * helper = data;
 	GtkTreeModel * model;
 	GtkTreeIter iter;
+	GtkTreeIter parent;
 	unsigned int type;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(
+				model), &iter, &parent);
+	model = GTK_TREE_MODEL(helper->store);
+	if(gtk_tree_model_iter_parent(model, &parent, &iter) == FALSE)
+	{
+		if(gtk_tree_view_row_expanded(GTK_TREE_VIEW(widget), path))
+			gtk_tree_view_collapse_row(GTK_TREE_VIEW(widget), path);
+		else
+			gtk_tree_view_expand_row(GTK_TREE_VIEW(widget), path,
+					FALSE);
+		return;
+	}
 	gtk_tree_model_get(model, &iter, HSC_TYPE, &type, -1);
-	/* FIXME implement */
+	switch(type)
+	{
+		case HST_CONTENTS:
+			_helper_on_contents_row_activated(widget, path, column,
+					helper);
+			break;
+		case HST_GTKDOC:
+			_helper_on_gtkdoc_row_activated(widget, path, column,
+					helper);
+			break;
+		case HST_MANUAL:
+			_helper_on_manual_row_activated(widget, path, column,
+					helper);
+			break;
+	}
 }
 
 
