@@ -244,18 +244,16 @@ msgid "_Inspect this page"
 msgstr "_Inspecter cette page"
 
 #: ../src/ghtml-webkit.c:1033
-#, fuzzy
 msgid "_View image"
-msgstr "Voir l'image"
+msgstr "_Voir l'image"
 
 #: ../src/ghtml-webkit.c:1037
 msgid "_Save image as..."
 msgstr "Enregistrer l'image sous..."
 
 #: ../src/ghtml-webkit.c:1055
-#, fuzzy
 msgid "Open in new _tab"
-msgstr "Ouvrir en nouvel onglet"
+msgstr "Ouvrir en nouvel ongle_t"
 
 #: ../src/ghtml-webkit.c:1063
 msgid "Open in new _window"
@@ -266,9 +264,8 @@ msgid "_Save link as..."
 msgstr "Enregistrer le lien sous..."
 
 #: ../src/ghtml-webkit.c:1081
-#, fuzzy
 msgid "_Copy link location"
-msgstr "Copier l'adresse du lien"
+msgstr "_Copier l'adresse du lien"
 
 #: ../src/main.c:60
 #, c-format
