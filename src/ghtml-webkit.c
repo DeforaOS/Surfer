@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2009-2014 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2009-2015 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Surfer */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -560,7 +560,7 @@ void ghtml_load_url(GtkWidget * widget, char const * url)
 	const char about[] = "<!DOCTYPE html>\n<html>\n"
 		"<head><title>About " PACKAGE "</title></head>\n"
 		"<body>\n<center>\n<h1>" PACKAGE " " VERSION "</h1>\n"
-		"<p>Copyright &copy; 2009-2013 Pierre Pronchery &lt;khorben@"
+		"<p>Copyright &copy; 2009-2015 Pierre Pronchery &lt;khorben@"
 		"defora.org&gt;</p>\n</center>\n</body>\n</html>";
 
 	ghtml = g_object_get_data(G_OBJECT(widget), "ghtml");
