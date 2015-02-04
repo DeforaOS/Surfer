@@ -35,6 +35,7 @@
 #endif
 #include <System.h>
 #ifdef WITH_WEBKIT
+# include <netdb.h>
 # include <arpa/inet.h>
 # include <webkit/webkit.h>
 #else
