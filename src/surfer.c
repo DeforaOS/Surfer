@@ -1691,6 +1691,7 @@ void surfer_view_preferences(Surfer * surfer)
 			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+	gtk_window_set_resizable(GTK_WINDOW(surfer->pr_window), FALSE);
 	g_signal_connect_swapped(surfer->pr_window, "delete-event", G_CALLBACK(
 				_preferences_on_closex), surfer);
 	g_signal_connect(surfer->pr_window, "response", G_CALLBACK(
