@@ -433,20 +433,27 @@ int ghtml_set_proxy(GtkWidget * widget, SurferProxyType type, char const * http,
 #if WEBKIT_CHECK_VERSION(1, 1, 0)
 	SoupSession * session;
 	char buf[32];
-	struct hostent * he;
-	struct in_addr addr;
+	struct addrinfo hints;
+	struct addrinfo * ai;
+	int res;
+	struct sockaddr_in * sa;
 	SoupURI * uri = NULL;
 
 	session = webkit_get_default_session();
 	if(type == SPT_HTTP && http != NULL && strlen(http) > 0)
 	{
-		if((he = gethostbyname(http)) == NULL)
-			return -error_set_code(1, "%s: %s", http, hstrerror(
-						h_errno));
-		memcpy(&addr.s_addr, he->h_addr, sizeof(addr.s_addr));
-		snprintf(buf, sizeof(buf), "http://%s:%u/", inet_ntoa(addr),
-				http_port);
+		memset(&hints, 0, sizeof(hints));
+		/* XXX support more protocols */
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_STREAM;
+		if((res = getaddrinfo(http, NULL, &hints, &ai)) != 0)
+			return -error_set_code(1, "%s: %s", http, gai_strerror(
+						res));
+		sa = (struct sockaddr_in *)ai->ai_addr;
+		snprintf(buf, sizeof(buf), "http://%s:%u/",
+				inet_ntoa(sa->sin_addr), http_port);
 		uri = soup_uri_new(buf);
+		freeaddrinfo(ai);
 	}
 	g_object_set(session, "proxy-uri", uri, NULL);
 	return 0;
