@@ -94,6 +94,6 @@ int main(int argc, char * argv[])
 	if(surfer == NULL)
 		return 2;
 	gtk_main();
-	surfer_delete(surfer);
+	/* surfer is automatically deleted */
 	return 0;
 }
