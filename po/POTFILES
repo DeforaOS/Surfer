@@ -7,3 +7,4 @@
 ../src/main.c
 ../src/surfer.c
 ../tools/helper.c
+../tools/htmlapp.c
