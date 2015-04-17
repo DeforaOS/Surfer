@@ -320,7 +320,7 @@ Surfer * _new_do(char const * url)
 	surfer->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_add_accel_group(GTK_WINDOW(surfer->window), group);
 	g_object_unref(group);
-	gtk_window_set_default_size(GTK_WINDOW(surfer->window), 1024, 768);
+	gtk_window_set_default_size(GTK_WINDOW(surfer->window), 800, 600);
 #if GTK_CHECK_VERSION(2, 6, 0)
 	gtk_window_set_icon_name(GTK_WINDOW(surfer->window), "web-browser");
 #endif
