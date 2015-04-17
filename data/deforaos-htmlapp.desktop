@@ -1,0 +1,11 @@
+[Desktop Entry]
+#FIXME do not list in application menus by default
+Name=HTML Application
+Comment=Simple container for HTML applications
+TryExec=htmlapp
+Exec=htmlapp
+Icon=web-browser
+Type=Application
+Categories=Network;WebBrowser;GTK;
+StartupNotify=true
+MimeType=application/xhtml+xml;text/html
