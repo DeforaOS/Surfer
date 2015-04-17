@@ -70,8 +70,8 @@
 	</refsect1>
 	<refsect1 id="options">
 		<title>Options</title>
-		<para>The name of a command, package or manual page is expected on the command
-			line.</para>
+		<para>The name of a command, package or manual page can be specified on the
+			command line.</para>
 		<para>The following options are available:</para>
 		<variablelist>
 			<varlistentry>
