@@ -304,7 +304,9 @@ static int _error(char const * message, int ret)
 /* usage */
 static int _usage(void)
 {
-	fprintf(stderr, _("Usage: %s [URL]\n"), PROGNAME);
+	fprintf(stderr, _("Usage: %s [-Jj] [URL]\n"
+"  -J	Disable Javascript\n"
+"  -j	Enable Javascript (default)\n"), PROGNAME);
 	return 1;
 }
 
@@ -336,6 +338,13 @@ GtkWidget * surfer_get_view(Surfer * surfer)
 {
 	/* FIXME remove from the API? */
 	return surfer->view;
+}
+
+
+/* surfer_set_enable_javascript */
+void surfer_set_enable_javascript(Surfer * surfer, gboolean enable)
+{
+	ghtml_set_enable_javascript(surfer->view, enable);
 }
 
 
@@ -646,6 +655,7 @@ int main(int argc, char * argv[])
 {
 	int o;
 	HTMLApp * htmlapp;
+	gboolean javascript = TRUE;
 
 	if(setlocale(LC_ALL, "") == NULL)
 		_error("setlocale", 1);
@@ -656,9 +666,15 @@ int main(int argc, char * argv[])
 		g_thread_init(NULL);
 #endif
 	gtk_init(&argc, &argv);
-	while((o = getopt(argc, argv, "")) != -1)
+	while((o = getopt(argc, argv, "jJ")) != -1)
 		switch(o)
 		{
+			case 'J':
+				javascript = FALSE;
+				break;
+			case 'j':
+				javascript = TRUE;
+				break;
 			default:
 				return _usage();
 		}
@@ -666,7 +682,8 @@ int main(int argc, char * argv[])
 		return _usage();
 	if((htmlapp = _htmlapp_new()) == NULL)
 		return 2;
-	else if(argv[optind] != NULL)
+	surfer_set_enable_javascript(htmlapp, javascript);
+	if(argv[optind] != NULL)
 		_htmlapp_open(htmlapp, argv[optind]);
 	else
 		_htmlapp_open_dialog(htmlapp);
