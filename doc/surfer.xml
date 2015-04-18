@@ -76,6 +76,10 @@
 			<citerefentry>
 				<refentrytitle>helper</refentrytitle>
 				<manvolnum>1</manvolnum>
+			</citerefentry>,
+			<citerefentry>
+				<refentrytitle>htmlapp</refentrytitle>
+				<manvolnum>1</manvolnum>
 			</citerefentry>
 	</para>
 	</refsect1>
