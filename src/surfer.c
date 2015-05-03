@@ -2014,6 +2014,7 @@ void surfer_view_security(Surfer * surfer)
 /* callbacks */
 static void _source_on_close(GtkWidget * widget);
 static gboolean _source_on_closex(void);
+static void _source_on_select_all(GtkWidget * widget);
 
 void surfer_view_source(Surfer * surfer)
 {
@@ -2046,7 +2047,12 @@ void surfer_view_source(Surfer * surfer)
 #if GTK_CHECK_VERSION(2, 6, 0)
 	gtk_window_set_icon_name(GTK_WINDOW(window), "web-browser");
 #endif
+	widget = gtk_text_view_new();
 	group = gtk_accel_group_new();
+	cc = g_cclosure_new_swap(G_CALLBACK(_source_on_select_all), widget,
+			NULL);
+	gtk_accel_group_connect(group, GDK_KEY_A, GDK_CONTROL_MASK,
+			GTK_ACCEL_VISIBLE, cc);
 	cc = g_cclosure_new_swap(G_CALLBACK(_source_on_close), window, NULL);
 	gtk_accel_group_connect(group, GDK_KEY_W, GDK_CONTROL_MASK,
 			GTK_ACCEL_VISIBLE, cc);
@@ -2060,7 +2066,6 @@ void surfer_view_source(Surfer * surfer)
 	scrolled = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	widget = gtk_text_view_new();
 	desc = pango_font_description_new();
 	pango_font_description_set_family(desc, "monospace");
 	gtk_widget_modify_font(widget, desc);
@@ -2083,6 +2088,18 @@ static void _source_on_close(GtkWidget * widget)
 static gboolean _source_on_closex(void)
 {
 	return FALSE;
+}
+
+static void _source_on_select_all(GtkWidget * widget)
+{
+	GtkTextBuffer * tbuf;
+	GtkTextIter start;
+	GtkTextIter end;
+
+	tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+	gtk_text_buffer_get_start_iter(tbuf, &start);
+	gtk_text_buffer_get_end_iter(tbuf, &end);
+	gtk_text_buffer_select_range(tbuf, &start, &end);
 }
 
 
