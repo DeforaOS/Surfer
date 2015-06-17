@@ -1,5 +1,6 @@
 [Desktop Entry]
-Name=Help browser
+GenericName=Help browser
+Name=DeforaOS Helper
 Comment=Help for applications, manual pages and programming interfaces (API)
 TryExec=helper
 Exec=helper

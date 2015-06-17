@@ -1,5 +1,6 @@
 [Desktop Entry]
-Name=Web surfer
+GenericName=Web browser
+Name=DeforaOS Surfer
 Comment=Navigator to surf web pages
 TryExec=surfer
 Exec=surfer -- %U

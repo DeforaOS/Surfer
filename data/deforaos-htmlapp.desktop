@@ -1,5 +1,6 @@
 [Desktop Entry]
-Name=HTML Application
+GenericName=HTML Application
+Name=DeforaOS HTMLApp
 Comment=Simple container for HTML applications
 TryExec=htmlapp
 Exec=htmlapp
