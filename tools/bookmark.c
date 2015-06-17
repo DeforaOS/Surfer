@@ -55,7 +55,20 @@ static int _usage(void);
 
 /* functions */
 /* bookmark */
+static int _bookmark_do(char const * title, char const * url, char const * icon,
+		char const * comment);
+
 static int _bookmark(char const * title, char const * url, char const * icon,
+		char const * comment)
+{
+	int ret;
+
+	if((ret = _bookmark_do(title, url, icon, comment)) != 0)
+		error_print(PROGNAME);
+	return ret;
+}
+
+static int _bookmark_do(char const * title, char const * url, char const * icon,
 		char const * comment)
 {
 	int ret = 0;
@@ -69,25 +82,16 @@ static int _bookmark(char const * title, char const * url, char const * icon,
 		homedir = g_get_home_dir();
 	if((p = string_new_append(homedir, "/.local/share/applications", NULL))
 			== NULL)
-	{
-		error_print(PROGNAME);
 		return -1;
-	}
 	if(mkdir(p, 0755) != 0 && errno != EEXIST)
 		ret = error_set_code(1, "%s: %s", p, strerror(errno));
 	string_delete(p);
 	if(ret != 0)
-	{
-		error_print(PROGNAME);
 		return -1;
-	}
 	if(title == NULL)
 		title = url;
 	if((p = string_new(title)) == NULL)
-	{
-		error_print(PROGNAME);
 		return -1;
-	}
 	string_replace(&p, "/", "_");
 	if((filename = string_new_append(homedir, "/.local/share/applications/",
 					p, ".desktop", NULL)) == NULL
@@ -95,7 +99,6 @@ static int _bookmark(char const * title, char const * url, char const * icon,
 	{
 		string_delete(filename);
 		string_delete(p);
-		error_print(PROGNAME);
 		return -1;
 	}
 	if((ret = config_set(config, section, "Type", "URL")) != 0
@@ -105,7 +108,7 @@ static int _bookmark(char const * title, char const * url, char const * icon,
 			|| (ret = config_set(config, section, "Comment",
 					comment)) != 0
 			|| (ret = config_save(config, filename)) != 0)
-		error_print(PROGNAME);
+		ret = -1;
 	config_delete(config);
 	string_delete(filename);
 	string_delete(p);
