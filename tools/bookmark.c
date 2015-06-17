@@ -15,9 +15,12 @@
 
 
 
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 #include <locale.h>
 #include <libintl.h>
 #include <gtk/gtk.h>
@@ -55,7 +58,7 @@ static int _usage(void);
 static int _bookmark(char const * title, char const * url, char const * icon,
 		char const * comment)
 {
-	int ret;
+	int ret = 0;
 	const char section[] = "Desktop Entry";
 	char const * homedir;
 	String * filename = NULL;
@@ -64,6 +67,20 @@ static int _bookmark(char const * title, char const * url, char const * icon,
 
 	if((homedir = getenv("HOME")) == NULL)
 		homedir = g_get_home_dir();
+	if((p = string_new_append(homedir, "/.local/share/applications", NULL))
+			== NULL)
+	{
+		error_print(PROGNAME);
+		return -1;
+	}
+	if(mkdir(p, 0755) != 0 && errno != EEXIST)
+		ret = error_set_code(1, "%s: %s", p, strerror(errno));
+	string_delete(p);
+	if(ret != 0)
+	{
+		error_print(PROGNAME);
+		return -1;
+	}
 	if(title == NULL)
 		title = url;
 	if((p = string_new(title)) == NULL)
