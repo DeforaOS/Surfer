@@ -74,31 +74,41 @@ static int _bookmark_do(char const * title, char const * url, char const * icon,
 	int ret = 0;
 	const char section[] = "Desktop Entry";
 	char const * homedir;
-	String * filename = NULL;
+	String * datahome;
+	String * pathname = NULL;
+	String * filename;
 	Config * config;
-	String * p;
 
-	if((homedir = getenv("HOME")) == NULL)
-		homedir = g_get_home_dir();
-	if((p = string_new_append(homedir, "/.local/share/applications", NULL))
-			== NULL)
+	if((homedir = getenv("XDG_DATA_HOME")) != NULL)
+		datahome = string_new(homedir);
+	else
+	{
+		if((homedir = getenv("HOME")) == NULL)
+			homedir = g_get_home_dir();
+		datahome = string_new_append(homedir,
+				"/.local/share/applications", NULL);
+	}
+	if(datahome == NULL)
 		return -1;
-	if(mkdir(p, 0755) != 0 && errno != EEXIST)
-		ret = error_set_code(1, "%s: %s", p, strerror(errno));
-	string_delete(p);
+	if(mkdir(datahome, 0755) != 0 && errno != EEXIST)
+		ret = error_set_code(1, "%s: %s", datahome, strerror(errno));
 	if(ret != 0)
+	{
+		string_delete(datahome);
 		return -1;
+	}
 	if(title == NULL)
 		title = url;
-	if((p = string_new(title)) == NULL)
+	if((filename = string_new(title)) == NULL)
 		return -1;
-	string_replace(&p, "/", "_");
-	if((filename = string_new_append(homedir, "/.local/share/applications/",
-					p, ".desktop", NULL)) == NULL
+	if(string_replace(&filename, "/", "_") != 0
+			|| (pathname = string_new_append(datahome, "/",
+					filename, ".desktop", NULL)) == NULL
 			|| (config = config_new()) == NULL)
 	{
+		string_delete(pathname);
 		string_delete(filename);
-		string_delete(p);
+		string_delete(datahome);
 		return -1;
 	}
 	if((ret = config_set(config, section, "Type", "URL")) != 0
@@ -107,11 +117,12 @@ static int _bookmark_do(char const * title, char const * url, char const * icon,
 			|| (ret = config_set(config, section, "Icon", icon))
 			|| (ret = config_set(config, section, "Comment",
 					comment)) != 0
-			|| (ret = config_save(config, filename)) != 0)
+			|| (ret = config_save(config, pathname)) != 0)
 		ret = -1;
 	config_delete(config);
 	string_delete(filename);
-	string_delete(p);
+	string_delete(pathname);
+	string_delete(datahome);
 	return ret;
 }
 
