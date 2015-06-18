@@ -46,8 +46,8 @@
 /* bookmark */
 /* private */
 /* prototypes */
-static int _bookmark(char const * title, char const * url, char const * icon,
-		char const * comment);
+static int _bookmark(int force, char const * title, char const * url,
+		char const * icon, char const * comment);
 
 static int _error(char const * message, int ret);
 static int _usage(void);
@@ -55,21 +55,21 @@ static int _usage(void);
 
 /* functions */
 /* bookmark */
-static int _bookmark_do(char const * title, char const * url, char const * icon,
-		char const * comment);
+static int _bookmark_do(int force, char const * title, char const * url,
+		char const * icon, char const * comment);
 
-static int _bookmark(char const * title, char const * url, char const * icon,
-		char const * comment)
+static int _bookmark(int force, char const * title, char const * url,
+		char const * icon, char const * comment)
 {
 	int ret;
 
-	if((ret = _bookmark_do(title, url, icon, comment)) != 0)
+	if((ret = _bookmark_do(force, title, url, icon, comment)) != 0)
 		error_print(PROGNAME);
 	return ret;
 }
 
-static int _bookmark_do(char const * title, char const * url, char const * icon,
-		char const * comment)
+static int _bookmark_do(int force, char const * title, char const * url,
+		char const * icon, char const * comment)
 {
 	int ret = 0;
 	const char section[] = "Desktop Entry";
@@ -112,7 +112,7 @@ static int _bookmark_do(char const * title, char const * url, char const * icon,
 		string_delete(datahome);
 		return -1;
 	}
-	if(stat(pathname, &st) == 0)
+	if(force == 0 && stat(pathname, &st) == 0)
 		ret = -error_set_code(1, "%s: %s", title,
 				"Bookmark already set");
 	else if((ret = config_set(config, section, "Type", "URL")) != 0
@@ -143,7 +143,8 @@ static int _error(char const * message, int ret)
 /* usage */
 static int _usage(void)
 {
-	fprintf(stderr, _("Usage: %s -u [-t title][-i icon][-C comment] URL\n"),
+	fprintf(stderr, _("Usage: %s -u [-f][-t title][-i icon][-C comment]"
+				" URL\n"),
 			PROGNAME);
 	return 1;
 }
@@ -155,6 +156,7 @@ int main(int argc, char * argv[])
 {
 	int o;
 	int url = 0;
+	int force = 0;
 	char const * title = NULL;
 	char const * icon = "stock_internet";
 	char const * comment = NULL;
@@ -163,11 +165,14 @@ int main(int argc, char * argv[])
 		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
-	while((o = getopt(argc, argv, "uC:i:t:")) != -1)
+	while((o = getopt(argc, argv, "uC:fi:t:")) != -1)
 		switch(o)
 		{
 			case 'C':
 				comment = optarg;
+				break;
+			case 'f':
+				force = 1;
 				break;
 			case 'i':
 				icon = optarg;
@@ -183,5 +188,6 @@ int main(int argc, char * argv[])
 		}
 	if((optind + 1) != argc || url == 0)
 		return _usage();
-	return (_bookmark(title, argv[optind], icon, comment) == 0) ? 0 : 2;
+	return (_bookmark(force, title, argv[optind], icon, comment) == 0)
+		? 0 : 2;
 }
