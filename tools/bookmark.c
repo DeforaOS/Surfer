@@ -78,6 +78,7 @@ static int _bookmark_do(char const * title, char const * url, char const * icon,
 	String * pathname = NULL;
 	String * filename;
 	Config * config;
+	struct stat st;
 
 	if((homedir = getenv("XDG_DATA_HOME")) != NULL)
 		datahome = string_new(homedir);
@@ -111,7 +112,10 @@ static int _bookmark_do(char const * title, char const * url, char const * icon,
 		string_delete(datahome);
 		return -1;
 	}
-	if((ret = config_set(config, section, "Type", "URL")) != 0
+	if(stat(pathname, &st) == 0)
+		ret = -error_set_code(1, "%s: %s", title,
+				"Bookmark already set");
+	else if((ret = config_set(config, section, "Type", "URL")) != 0
 			|| (ret = config_set(config, section, "Name", title))
 			|| (ret = config_set(config, section, "URL", url)) != 0
 			|| (ret = config_set(config, section, "Icon", icon))
