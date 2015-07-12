@@ -6,5 +6,6 @@
 ../src/ghtml-webkit.c
 ../src/main.c
 ../src/surfer.c
+../tools/bookmark.c
 ../tools/helper.c
 ../tools/htmlapp.c

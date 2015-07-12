@@ -114,7 +114,7 @@ static int _bookmark_do(int force, char const * title, char const * url,
 	}
 	if(force == 0 && stat(pathname, &st) == 0)
 		ret = -error_set_code(1, "%s: %s", title,
-				"Bookmark already set");
+				_("Bookmark already set"));
 	else if((ret = config_set(config, section, "Type", "URL")) != 0
 			|| (ret = config_set(config, section, "Name", title))
 			|| (ret = config_set(config, section, "URL", url)) != 0
