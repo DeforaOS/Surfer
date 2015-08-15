@@ -1925,8 +1925,6 @@ int main(int argc, char * argv[])
 	else if(argv[optind] != NULL)
 		_helper_open_contents(helper, (package != NULL) ? package
 				: argv[optind], argv[optind]);
-	else
-		_helper_open_dialog(helper);
 	gtk_main();
 	_helper_delete(helper);
 	return 0;
