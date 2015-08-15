@@ -166,6 +166,14 @@ static void _helper_on_open(gpointer data);
 static void _helper_on_view_fullscreen(gpointer data);
 #endif
 
+/* filters */
+static gboolean _helper_filter_contents(GtkTreeModel * model,
+		GtkTreeIter * iter, gpointer data);
+static gboolean _helper_filter_gtkdoc(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
+static gboolean _helper_filter_manual(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data);
+
 
 /* constants */
 #ifndef EMBEDDED
@@ -278,20 +286,14 @@ static char const * _manual_prefix[] = { MANDIR, "/usr/share/man", NULL };
 /* Helper */
 /* helper_new */
 static void _new_contents(Helper * helper);
-static gboolean _new_contents_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data);
 static gboolean _new_contents_idle(gpointer data);
 static void _new_contents_package(Helper * helper, char const * contentsdir,
 		GtkTreeStore * store, char const * package);
 static void _new_gtkdoc(Helper * helper);
-static gboolean _new_gtkdoc_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data);
 static gboolean _new_gtkdoc_idle(gpointer data);
 static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 		GtkTreeStore * store, char const * package);
 static void _new_manual(Helper * helper);
-static gboolean _new_manual_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data);
 static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, unsigned int section);
@@ -406,7 +408,7 @@ static void _new_contents(Helper * helper)
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
-			_new_contents_filter, NULL, NULL);
+			_helper_filter_contents, NULL, NULL);
 	model = gtk_tree_model_sort_new_with_model(model);
 	helper->contents = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->contents),
@@ -428,15 +430,6 @@ static void _new_contents(Helper * helper)
 	gtk_container_add(GTK_CONTAINER(widget), helper->contents);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Contents")));
-}
-
-static gboolean _new_contents_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data)
-{
-	unsigned int type;
-
-	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
-	return (type == HST_CONTENTS) ? TRUE : FALSE;
 }
 
 static gboolean _new_contents_idle(gpointer data)
@@ -529,7 +522,7 @@ static void _new_gtkdoc(Helper * helper)
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
-			_new_gtkdoc_filter, NULL, NULL);
+			_helper_filter_gtkdoc, NULL, NULL);
 	model = gtk_tree_model_sort_new_with_model(model);
 	helper->gtkdoc = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->gtkdoc), FALSE);
@@ -551,15 +544,6 @@ static void _new_gtkdoc(Helper * helper)
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("API reference")));
 	helper->source = g_idle_add(_new_gtkdoc_idle, helper);
-}
-
-static gboolean _new_gtkdoc_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data)
-{
-	unsigned int type;
-
-	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
-	return (type == HST_GTKDOC) ? TRUE : FALSE;
 }
 
 static gboolean _new_gtkdoc_idle(gpointer data)
@@ -667,7 +651,7 @@ static void _new_manual(Helper * helper)
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
-			_new_manual_filter, NULL, NULL);
+			_helper_filter_manual, NULL, NULL);
 	model = gtk_tree_model_sort_new_with_model(model);
 	helper->manual = gtk_tree_view_new_with_model(model);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(helper->manual), FALSE);
@@ -688,15 +672,6 @@ static void _new_manual(Helper * helper)
 	gtk_container_add(GTK_CONTAINER(widget), helper->manual);
 	gtk_notebook_append_page(GTK_NOTEBOOK(helper->notebook), widget,
 			gtk_label_new(_("Manual")));
-}
-
-static gboolean _new_manual_filter(GtkTreeModel * model, GtkTreeIter * iter,
-		gpointer data)
-{
-	unsigned int type;
-
-	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
-	return (type == HST_MANUAL) ? TRUE : FALSE;
 }
 
 static gboolean _new_manual_idle(gpointer data)
@@ -993,7 +968,7 @@ static int _helper_open_dialog(Helper * helper)
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
-			_new_contents_filter, NULL, NULL);
+			_helper_filter_contents, NULL, NULL);
 #if GTK_CHECK_VERSION(2, 24, 0)
 	entry1 = gtk_combo_box_new_with_model_and_entry(model);
 	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(entry1), HSC_DISPLAY);
@@ -1494,6 +1469,40 @@ static void _helper_on_view_fullscreen(gpointer data)
 	_helper_on_fullscreen(helper);
 }
 #endif
+
+
+/* filters */
+/* helper_filter_contents */
+static gboolean _helper_filter_contents(GtkTreeModel * model,
+		GtkTreeIter * iter, gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_CONTENTS) ? TRUE : FALSE;
+}
+
+
+/* helper_filter_gtkdoc */
+static gboolean _helper_filter_gtkdoc(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_GTKDOC) ? TRUE : FALSE;
+}
+
+
+/* helper_filter_manual */
+static gboolean _helper_filter_manual(GtkTreeModel * model, GtkTreeIter * iter,
+		gpointer data)
+{
+	unsigned int type;
+
+	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
+	return (type == HST_MANUAL) ? TRUE : FALSE;
+}
 
 
 /* error */
