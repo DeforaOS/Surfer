@@ -156,7 +156,7 @@ static void _helper_on_gtkdoc_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 static void _helper_on_manual_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
-static void _helper_on_search_activated(gpointer data);
+static void _helper_on_search(gpointer data);
 static void _helper_on_search_row_activated(GtkWidget * widget,
 		GtkTreePath * path, GtkTreeViewColumn * column, gpointer data);
 #ifdef EMBEDDED
@@ -812,6 +812,7 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 static void _new_search(Helper * helper)
 {
 	GtkWidget * vbox;
+	GtkWidget * hbox;
 	GtkWidget * widget;
 	GtkTreeModel * model;
 	GtkCellRenderer * renderer;
@@ -822,6 +823,11 @@ static void _new_search(Helper * helper)
 #else
 	vbox = gtk_vbox_new(FALSE, 4);
 #endif
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+#else
+	hbox = gtk_hbox_new(FALSE, 4);
+#endif
 	helper->entry = gtk_entry_new();
 #if GTK_CHECK_VERSION(2, 16, 0)
 	gtk_entry_set_icon_from_stock(GTK_ENTRY(helper->entry),
@@ -830,8 +836,13 @@ static void _new_search(Helper * helper)
 				_new_search_on_clear), helper);
 #endif
 	g_signal_connect_swapped(helper->entry, "activate", G_CALLBACK(
-				_helper_on_search_activated), helper);
-	gtk_box_pack_start(GTK_BOX(vbox), helper->entry, FALSE, TRUE, 0);
+				_helper_on_search), helper);
+	gtk_box_pack_start(GTK_BOX(hbox), helper->entry, TRUE, TRUE, 0);
+	widget = gtk_button_new_with_mnemonic(_("_Search"));
+	g_signal_connect_swapped(widget, "clicked", G_CALLBACK(
+				_helper_on_search), helper);
+	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -1410,8 +1421,8 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 }
 
 
-/* helper_on_search_activated */
-static void _helper_on_search_activated(gpointer data)
+/* helper_on_search */
+static void _helper_on_search(gpointer data)
 {
 	Helper * helper = data;
 	GtkTreeModel * model;
