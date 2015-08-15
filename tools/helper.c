@@ -305,6 +305,10 @@ static gboolean _new_search_filter(GtkTreeModel * model, GtkTreeIter * iter,
 		gpointer data);
 static gboolean _new_search_filter_do(GtkTreeModel * model, GtkTreeIter * iter,
 		char const * search);
+/* callbacks */
+#if GTK_CHECK_VERSION(2, 16, 0)
+static void _new_search_on_clear(gpointer data);
+#endif
 
 static Helper * _helper_new(void)
 {
@@ -819,6 +823,12 @@ static void _new_search(Helper * helper)
 	vbox = gtk_vbox_new(FALSE, 4);
 #endif
 	helper->entry = gtk_entry_new();
+#if GTK_CHECK_VERSION(2, 16, 0)
+	gtk_entry_set_icon_from_stock(GTK_ENTRY(helper->entry),
+			GTK_ENTRY_ICON_SECONDARY, GTK_STOCK_CLEAR);
+	g_signal_connect_swapped(helper->entry, "icon-press", G_CALLBACK(
+				_new_search_on_clear), helper);
+#endif
 	g_signal_connect_swapped(helper->entry, "activate", G_CALLBACK(
 				_helper_on_search_activated), helper);
 	gtk_box_pack_start(GTK_BOX(vbox), helper->entry, FALSE, TRUE, 0);
@@ -882,6 +892,15 @@ static gboolean _new_search_filter_do(GtkTreeModel * model, GtkTreeIter * iter,
 	g_free(display);
 	return ret;
 }
+
+#if GTK_CHECK_VERSION(2, 16, 0)
+static void _new_search_on_clear(gpointer data)
+{
+	Helper * helper = data;
+
+	gtk_entry_set_text(GTK_ENTRY(helper->entry), "");
+}
+#endif
 
 
 /* helper_delete */
