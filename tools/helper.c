@@ -991,13 +991,16 @@ static int _helper_open_dialog(Helper * helper)
 #endif
 	label = gtk_label_new(_("Package: "));
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(helper->contents));
+	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
+			_new_contents_filter, NULL, NULL);
 #if GTK_CHECK_VERSION(2, 24, 0)
 	entry1 = gtk_combo_box_new_with_model_and_entry(model);
-	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(entry1), 1);
+	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(entry1), HSC_DISPLAY);
 #else
-	entry1 = gtk_combo_box_entry_new_with_model(model, 1);
-	gtk_combo_box_entry_set_text_column(GTK_COMBO_BOX_ENTRY(entry1), 1);
+	entry1 = gtk_combo_box_entry_new_with_model(model, HSC_DISPLAY);
+	gtk_combo_box_entry_set_text_column(GTK_COMBO_BOX_ENTRY(entry1),
+			HSC_DISPLAY);
 #endif
 	entry2 = gtk_entry_new();
 	g_signal_connect(entry1, "changed", G_CALLBACK(
@@ -1043,12 +1046,12 @@ static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data)
 	model = gtk_combo_box_get_model(GTK_COMBO_BOX(widget));
 	if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(widget), &iter) != TRUE)
 		return;
-	gtk_tree_model_get(model, &iter, 1, &command, -1);
+	gtk_tree_model_get(model, &iter, HSC_DISPLAY, &command, -1);
 	if(gtk_tree_model_iter_parent(model, &parent, &iter) == TRUE)
 	{
 		gtk_entry_set_text(GTK_ENTRY(entry2), command);
 		g_free(command);
-		gtk_tree_model_get(model, &parent, 1, &command, -1);
+		gtk_tree_model_get(model, &parent, HSC_DISPLAY, &command, -1);
 	}
 	else
 		gtk_entry_set_text(GTK_ENTRY(entry2), "");
