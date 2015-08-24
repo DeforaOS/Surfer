@@ -23,8 +23,7 @@ static char const _license[] =
  *   * use helpers to draw widgets and load/save/set preferences
  * - support separate backends via plug-ins (with own preferences)
  * - consider putting the location bar below the tabs
- * - consider using GtkSourceView to display the page source
- * - consider moving the find dialog above the status bar */
+ * - consider using GtkSourceView to display the page source */
 
 
 
