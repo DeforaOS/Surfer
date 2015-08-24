@@ -124,7 +124,7 @@ static int _helper_open_contents(Helper * helper, char const * package,
 static int _helper_open_dialog(Helper * helper);
 static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 		char const * package);
-static int _helper_open_man(Helper * helper, unsigned int section,
+static int _helper_open_man(Helper * helper, char const * section,
 		char const * page, char const * manhtmldir);
 
 static int _error(char const * message, int ret);
@@ -296,10 +296,10 @@ static void _new_gtkdoc_package(Helper * helper, char const * gtkdocdir,
 static void _new_manual(Helper * helper);
 static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
-		char const * name, GtkTreeStore * store, unsigned int section);
+		char const * name, GtkTreeStore * store, char const * section);
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		GdkPixbuf * pixbuf, char const * manhtmldir,
-		unsigned int section, char const * name);
+		char const * section, char const * name);
 static void _new_search(Helper * helper);
 static gboolean _new_search_filter(GtkTreeModel * model, GtkTreeIter * iter,
 		gpointer data);
@@ -381,7 +381,7 @@ static Helper * _helper_new(void)
 			GDK_TYPE_PIXBUF,	/* HSC_ICON		*/
 			G_TYPE_STRING,		/* HSC_DISPLAY		*/
 			G_TYPE_STRING,		/* HSC_GTKDOC_DIRECTORY	*/
-			G_TYPE_UINT,		/* HSC_MANUAL_SECTION	*/
+			G_TYPE_STRING,		/* HSC_MANUAL_SECTION	*/
 			G_TYPE_STRING);		/* HSC_MANUAL_FILENAME	*/
 	_new_gtkdoc(helper);
 	_new_contents(helper);
@@ -684,7 +684,6 @@ static gboolean _new_manual_idle(gpointer data)
 	char const * p;
 	DIR * dir;
 	struct dirent * de;
-	unsigned int section;
 
 	if(helper->p == NULL)
 		helper->p = _manual_prefix;
@@ -699,9 +698,10 @@ static gboolean _new_manual_idle(gpointer data)
 		if((dir = opendir(p)) == NULL)
 			continue;
 		while((de = readdir(dir)) != NULL)
-			if(sscanf(de->d_name, "html%u", &section) == 1)
+			if(strncasecmp(de->d_name, "html", 4) == 0
+					&& de->d_name[4] != '\0')
 				_new_manual_section(helper, p, de->d_name,
-						helper->store, section);
+						helper->store, &de->d_name[4]);
 		closedir(dir);
 		(helper->p)++;
 		return TRUE;
@@ -712,7 +712,7 @@ static gboolean _new_manual_idle(gpointer data)
 }
 
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
-		char const * name, GtkTreeStore * store, unsigned int section)
+		char const * name, GtkTreeStore * store, char const * section)
 {
 	const char ext[] = ".html";
 	gchar * p;
@@ -769,7 +769,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		GdkPixbuf * pixbuf, char const * manhtmldir,
-		unsigned int section, char const * name)
+		char const * section, char const * name)
 {
 	GtkTreeModel * model = GTK_TREE_MODEL(store);
 	gboolean valid;
@@ -1110,7 +1110,7 @@ static int _helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
 
 
 /* helper_open_man */
-static int _helper_open_man(Helper * helper, unsigned int section,
+static int _helper_open_man(Helper * helper, char const * section,
 		char const * page, char const * manhtmldir)
 {
 	char const * prefix[] =
@@ -1124,14 +1124,14 @@ static int _helper_open_man(Helper * helper, unsigned int section,
 #ifdef DEBUG
 	fprintf(stderr, "DEBUG: %s(%d, \"%s\")\n", __func__, section, page);
 #endif
-	if(section <= 0 || section >= 10)
+	if(section == NULL)
 		return -1;
 	if(manhtmldir != NULL)
 		p = &manhtmldir;
 	else
 		for(p = prefix; *p != NULL; p++)
 		{
-			snprintf(buf, sizeof(buf), "%s%s%d%s%s%s", *p,
+			snprintf(buf, sizeof(buf), "%s%s%s%s%s%s", *p,
 					"/html", section, "/", page, ".html");
 			if(access(buf, R_OK) == 0)
 				break;
@@ -1139,7 +1139,7 @@ static int _helper_open_man(Helper * helper, unsigned int section,
 	if(*p == NULL)
 		return -1;
 	/* read a manual page */
-	snprintf(buf, sizeof(buf), "%s%s%s%d%s%s%s", "file://", *p, "/html",
+	snprintf(buf, sizeof(buf), "%s%s%s%s%s%s%s", "file://", *p, "/html",
 			section, "/", page, ".html");
 	return _helper_open(helper, buf);
 }
@@ -1306,7 +1306,7 @@ static void _helper_on_help_contents(gpointer data)
 {
 	Helper * helper = data;
 
-	_helper_open_man(helper, 1, PROGNAME, MANDIR);
+	_helper_open_man(helper, "1", PROGNAME, MANDIR);
 }
 #endif
 
@@ -1392,7 +1392,7 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	GtkTreeIter iter;
 	GtkTreeIter parent;
 	gchar * manhtmldir;
-	guint section;
+	gchar * section;
 	gchar * command;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
@@ -1417,6 +1417,7 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 			HSC_MANUAL_FILENAME, &command, -1);
 	_helper_open_man(helper, section, command, manhtmldir);
 	g_free(manhtmldir);
+	g_free(section);
 	g_free(command);
 }
 
@@ -1907,8 +1908,7 @@ int main(int argc, char * argv[])
 	int o;
 	int devel = 0;
 	char const * package = NULL;
-	int section = -1;
-	char * p;
+	char const * section = NULL;
 	Helper * helper;
 
 	if(setlocale(LC_ALL, "") == NULL)
@@ -1924,21 +1924,18 @@ int main(int argc, char * argv[])
 		switch(o)
 		{
 			case 'c':
-				section = -1;
+				section = NULL;
 				devel = 0;
 				break;
 			case 'd':
-				section = -1;
+				section = NULL;
 				devel = 1;
 				break;
 			case 'p':
 				package = optarg;
 				break;
 			case 's':
-				section = strtol(optarg, &p, 10);
-				if(optarg[0] == '\0' || *p != '\0'
-						|| section < 0 || section > 9)
-					return _usage();
+				section = optarg;
 				break;
 			default:
 				return _usage();
@@ -1947,8 +1944,7 @@ int main(int argc, char * argv[])
 		return _usage();
 	if((helper = _helper_new()) == NULL)
 		return 2;
-	if(section > 0)
-		/* XXX check for errors */
+	if(section != NULL)
 		_helper_open_man(helper, section, argv[optind], NULL);
 	else if(argv[optind] != NULL && devel != 0)
 		_helper_open_gtkdoc(helper, NULL, argv[optind]);
