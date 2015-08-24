@@ -1349,6 +1349,7 @@ int surfer_prompt(Surfer * surfer, char const * message,
 	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
 #endif
 			"%s", message);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Question"));
 #if GTK_CHECK_VERSION(2, 14, 0)
 	vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
@@ -1356,6 +1357,7 @@ int surfer_prompt(Surfer * surfer, char const * message,
 	vbox = GTK_DIALOG(dialog)->vbox;
 #endif
 	entry = gtk_entry_new();
+	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 	if(default_value != NULL)
 		gtk_entry_set_text(GTK_ENTRY(entry), default_value);
 	gtk_widget_show(entry);
