@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2010-2014 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2010-2015 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@ PREFIX="/usr/local"
 [ -f "../config.sh" ] && . "../config.sh"
 LOCALEDIR="$PREFIX/share/locale"
 POTFILES="POTFILES"
+PROGNAME="gettext.sh"
 #executables
 DEBUG="_debug"
 INSTALL="install -m 0644"
@@ -52,7 +53,7 @@ _debug()
 #error
 _error()
 {
-	echo "gettext.sh: $@" 1>&2
+	echo "$PROGNAME: $@" 1>&2
 	return 2
 }
 
@@ -60,7 +61,7 @@ _error()
 #usage
 _usage()
 {
-	echo "Usage: gettext.sh [-c|-i|-u][-P prefix] target..." 1>&2
+	echo "Usage: $PROGNAME [-c|-i|-u][-P prefix] target..." 1>&2
 	return 1
 }
 
