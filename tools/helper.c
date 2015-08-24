@@ -342,7 +342,6 @@ static Helper * _helper_new(void)
 #else
 	vbox = gtk_vbox_new(FALSE, 0);
 #endif
-	helper->vbox = vbox;
 #ifndef EMBEDDED
 	/* menubar */
 	helper->menubar = desktop_menubar_create(_helper_menubar, helper,
@@ -388,9 +387,15 @@ static Helper * _helper_new(void)
 	_new_manual(helper);
 	_new_search(helper);
 	gtk_paned_add1(GTK_PANED(widget), helper->notebook);
+#if GTK_CHECK_VERSION(3, 0, 0)
+	helper->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+#else
+	helper->vbox = gtk_vbox_new(FALSE, 0);
+#endif
 	helper->view = ghtml_new(helper);
 	ghtml_set_enable_javascript(helper->view, FALSE);
-	gtk_paned_add2(GTK_PANED(widget), helper->view);
+	gtk_box_pack_start(GTK_BOX(helper->vbox), helper->view, TRUE, TRUE, 0);
+	gtk_paned_add2(GTK_PANED(widget), helper->vbox);
 	gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 	gtk_container_add(GTK_CONTAINER(helper->window), vbox);
 	gtk_widget_grab_focus(helper->view);
