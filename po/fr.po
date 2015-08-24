@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Surfer 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-24 22:53+0200\n"
+"POT-Creation-Date: 2015-08-24 23:54+0200\n"
 "PO-Revision-Date: 2010-04-01 19:40+0200\n"
 "Last-Translator: Calimero <calimeroteknik@free.fr>\n"
 "Language-Team: French\n"
@@ -20,8 +20,8 @@ msgstr ""
 #: ../src/callbacks.c:48 ../src/callbacks.c:58 ../src/surfer.c:964
 #: ../src/surfer.c:968 ../src/surfer.c:1348 ../src/surfer.c:1353
 #: ../tools/helper.c:1699 ../tools/helper.c:1703 ../tools/helper.c:1810
-#: ../tools/helper.c:1814 ../tools/htmlapp.c:432 ../tools/htmlapp.c:436
-#: ../tools/htmlapp.c:543 ../tools/htmlapp.c:547
+#: ../tools/helper.c:1814 ../tools/htmlapp.c:465 ../tools/htmlapp.c:469
+#: ../tools/htmlapp.c:576 ../tools/htmlapp.c:580
 msgid "Question"
 msgstr "Question"
 
@@ -121,7 +121,7 @@ msgstr "Fermer la fenêtre à la fin du téléchargement"
 
 #: ../src/download.c:379 ../src/download.c:384 ../src/download.c:840
 #: ../src/surfer.c:1123 ../src/surfer.c:1127 ../tools/helper.c:1752
-#: ../tools/helper.c:1756 ../tools/htmlapp.c:485 ../tools/htmlapp.c:489
+#: ../tools/helper.c:1756 ../tools/htmlapp.c:518 ../tools/htmlapp.c:522
 msgid "Error"
 msgstr "Erreur"
 
@@ -176,7 +176,7 @@ msgid "Code "
 msgstr "Code "
 
 #: ../src/download.c:813 ../src/ghtml-webkit.c:1262 ../src/surfer.c:1126
-#: ../tools/helper.c:1755 ../tools/htmlapp.c:488
+#: ../tools/helper.c:1755 ../tools/htmlapp.c:521
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
@@ -464,15 +464,15 @@ msgstr ""
 msgid "Save file as..."
 msgstr "Enregistrer sous..."
 
-#: ../src/surfer.c:1208
+#: ../src/surfer.c:1208 ../tools/htmlapp.c:224
 msgid "Open file..."
 msgstr "Ouvrir un fichier..."
 
-#: ../src/surfer.c:1214
+#: ../src/surfer.c:1214 ../tools/htmlapp.c:229
 msgid "HTML files"
 msgstr "Fichiers HTML"
 
-#: ../src/surfer.c:1219
+#: ../src/surfer.c:1219 ../tools/htmlapp.c:238
 msgid "All files"
 msgstr "Tous les fichiers"
 
@@ -642,7 +642,7 @@ msgstr "_Recherche"
 msgid "Search"
 msgstr "Recherche"
 
-#: ../tools/helper.c:987 ../tools/htmlapp.c:196
+#: ../tools/helper.c:987 ../tools/htmlapp.c:201
 msgid "Open page..."
 msgstr "Ouvrir une page..."
 
@@ -669,19 +669,19 @@ msgstr ""
 "  -d\tOuvrir une référence de bibliothèque\n"
 "  -s\tSection du manuel à accéder\n"
 
-#: ../tools/htmlapp.c:135 ../tools/htmlapp.c:410
+#: ../tools/htmlapp.c:135 ../tools/htmlapp.c:443
 msgid "HTML Application"
 msgstr "Application HTML"
 
-#: ../tools/htmlapp.c:214
+#: ../tools/htmlapp.c:219
 msgid "Filename: "
 msgstr "Fichier : "
 
-#: ../tools/htmlapp.c:218
-msgid "Choose a file..."
-msgstr "Choisir un fichier..."
+#: ../tools/htmlapp.c:234
+msgid "Text files"
+msgstr "Fichiers texte"
 
-#: ../tools/htmlapp.c:307
+#: ../tools/htmlapp.c:340
 #, c-format
 msgid ""
 "Usage: %s [-Jj] [URL]\n"
