@@ -22,7 +22,6 @@ static void _on_find_clear(gpointer data);
 #endif
 static void _on_find_clicked(gpointer data);
 static void _on_find_hide(gpointer data);
-static void _on_find_response(GtkWidget * widget, gint response, gpointer data);
 
 void surfer_find(Surfer * surfer, char const * text)
 {
@@ -70,8 +69,6 @@ static void _find_dialog(Surfer * surfer)
 	surfer->fi_wrap = gtk_check_button_new_with_label(_("Wrap"));
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->fi_wrap, FALSE, TRUE, 4);
 	gtk_widget_show_all(hbox);
-	g_signal_connect(surfer->fi_dialog, "response", G_CALLBACK(
-				_on_find_response), surfer);
 	/* find */
 	widget = gtk_button_new_from_stock(GTK_STOCK_FIND);
 	g_signal_connect_swapped(widget, "clicked", G_CALLBACK(
@@ -131,18 +128,4 @@ static void _on_find_hide(gpointer data)
 	Surfer * surfer = data;
 
 	gtk_widget_hide(surfer->fi_dialog);
-}
-
-static void _on_find_response(GtkWidget * widget, gint response, gpointer data)
-{
-	Surfer * surfer = data;
-
-	if(response != GTK_RESPONSE_ACCEPT)
-	{
-		gtk_widget_hide(widget);
-		if(response == GTK_RESPONSE_DELETE_EVENT)
-			surfer->fi_dialog = NULL;
-		return;
-	}
-	_on_find_clicked(surfer);
 }
