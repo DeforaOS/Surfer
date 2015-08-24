@@ -1336,11 +1336,10 @@ void surfer_print(Surfer * surfer)
 int surfer_prompt(Surfer * surfer, char const * message,
 		char const * default_value, char ** value)
 {
-	int ret = 0;
+	int ret;
 	GtkWidget * dialog;
 	GtkWidget * vbox;
 	GtkWidget * entry;
-	int res;
 
 	dialog = gtk_message_dialog_new((surfer != NULL)
 			? GTK_WINDOW(surfer->window) : NULL,
@@ -1362,10 +1361,11 @@ int surfer_prompt(Surfer * surfer, char const * message,
 		gtk_entry_set_text(GTK_ENTRY(entry), default_value);
 	gtk_widget_show(entry);
 	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
-	if((res = gtk_dialog_run(GTK_DIALOG(dialog))) == GTK_RESPONSE_OK)
-		*value = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-	else
-		ret = 1;
+	ret = (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK
+			&& value != NULL
+			&& (*value = strdup(gtk_entry_get_text(
+						GTK_ENTRY(entry)))) != NULL)
+		? 0 : -1;
 	gtk_widget_destroy(dialog);
 	return ret;
 }
