@@ -970,6 +970,8 @@ static void _open_dialog_on_entry1_changed(GtkWidget * widget, gpointer data);
 static int _helper_open_dialog(Helper * helper)
 {
 	int ret;
+	GtkSizeGroup * lgroup;
+	GtkSizeGroup * group;
 	GtkWidget * dialog;
 	GtkWidget * vbox;
 	GtkWidget * hbox;
@@ -980,6 +982,8 @@ static int _helper_open_dialog(Helper * helper)
 	char const * package = NULL;
 	char const * command;
 
+	lgroup = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
+	group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
 	dialog = gtk_dialog_new_with_buttons(_("Open page..."),
 			GTK_WINDOW(helper->window),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -999,7 +1003,9 @@ static int _helper_open_dialog(Helper * helper)
 #else
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
-	label = gtk_label_new(_("Package: "));
+	label = gtk_label_new(_("Package:"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+	gtk_size_group_add_widget(lgroup, label);
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(model),
@@ -1012,7 +1018,9 @@ static int _helper_open_dialog(Helper * helper)
 	gtk_combo_box_entry_set_text_column(GTK_COMBO_BOX_ENTRY(entry1),
 			HSC_DISPLAY);
 #endif
+	gtk_size_group_add_widget(group, entry1);
 	entry2 = gtk_entry_new();
+	gtk_size_group_add_widget(group, entry2);
 	g_signal_connect(entry1, "changed", G_CALLBACK(
 				_open_dialog_on_entry1_changed), entry2);
 	gtk_box_pack_start(GTK_BOX(hbox), entry1, TRUE, TRUE, 0);
@@ -1025,7 +1033,9 @@ static int _helper_open_dialog(Helper * helper)
 #else
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
-	label = gtk_label_new(_("Command: "));
+	label = gtk_label_new(_("Command:"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+	gtk_size_group_add_widget(lgroup, label);
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
 	gtk_box_pack_start(GTK_BOX(hbox), entry2, TRUE, TRUE, 0);
