@@ -184,13 +184,18 @@ static int _htmlapp_open(HTMLApp * htmlapp, char const * url)
 
 
 /* htmlapp_open_dialog */
+static void _open_dialog_on_choose_activate(GtkWidget * widget, gint arg1,
+		gpointer data);
+
 static int _htmlapp_open_dialog(HTMLApp * htmlapp)
 {
 	int ret;
 	GtkWidget * dialog;
 	GtkWidget * vbox;
 	GtkWidget * hbox;
+	GtkWidget * entry;
 	GtkWidget * widget;
+	GtkFileFilter * filter;
 	char const * url = NULL;
 
 	dialog = gtk_dialog_new_with_buttons(_("Open page..."),
@@ -213,17 +218,34 @@ static int _htmlapp_open_dialog(HTMLApp * htmlapp)
 #endif
 	widget = gtk_label_new(_("Filename: "));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
-	widget = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
-	widget = gtk_file_chooser_button_new(_("Choose a file..."),
-			GTK_FILE_CHOOSER_ACTION_OPEN);
+	entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
+	/* file chooser */
+	widget = gtk_file_chooser_dialog_new(_("Open file..."),
+			GTK_WINDOW(dialog), GTK_FILE_CHOOSER_ACTION_OPEN,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	filter = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, _("HTML files"));
+	gtk_file_filter_add_mime_type(filter, "text/html");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(widget), filter);
+	gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(widget), filter);
+	filter = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, _("Text files"));
+	gtk_file_filter_add_mime_type(filter, "text/plain");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(widget), filter);
+	filter = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, _("All files"));
+	gtk_file_filter_add_pattern(filter, "*");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(widget), filter);
+	g_signal_connect(widget, "response", G_CALLBACK(
+				_open_dialog_on_choose_activate), entry);
+	widget = gtk_file_chooser_button_new_with_dialog(widget);
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 	gtk_widget_show_all(vbox);
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
-	{
-		/* FIXME implement */
-	}
+		url = gtk_entry_get_text(GTK_ENTRY(entry));
 	gtk_widget_hide(dialog);
 	if(url == NULL || strlen(url) == 0)
 		ret = -1;
@@ -231,6 +253,17 @@ static int _htmlapp_open_dialog(HTMLApp * htmlapp)
 		ret = _htmlapp_open(htmlapp, url);
 	gtk_widget_destroy(dialog);
 	return ret;
+}
+
+static void _open_dialog_on_choose_activate(GtkWidget * widget, gint arg1,
+		gpointer data)
+{
+	GtkWidget * entry = data;
+
+	if(arg1 != GTK_RESPONSE_ACCEPT)
+		return;
+	gtk_entry_set_text(GTK_ENTRY(entry), gtk_file_chooser_get_filename(
+				GTK_FILE_CHOOSER(widget)));
 }
 
 
