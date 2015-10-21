@@ -51,7 +51,7 @@
 			<command>&name;</command>
 			<arg choice="opt"><option>-J</option></arg>
 			<arg choice="opt"><option>-j</option></arg>
-			<arg>command</arg>
+			<arg choice="opt"><replaceable>URL</replaceable></arg>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 	<refsect1 id="description">
