@@ -1768,7 +1768,11 @@ static GtkWidget * _preferences_general(Surfer * surfer)
 #endif
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
 	widget = gtk_label_new(_("Default download directory:"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+	g_object_set(widget, "halign", GTK_ALIGN_START, NULL);
+#else
 	gtk_misc_set_alignment(GTK_MISC(widget), 0.0, 0.5);
+#endif
 	gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
 	surfer->pr_download_dir = gtk_file_chooser_button_new(
 			_("Choose the default download directory"),
