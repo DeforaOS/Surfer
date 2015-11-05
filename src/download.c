@@ -225,10 +225,11 @@ Download * download_new(DownloadPrefs * prefs, char const * url)
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
 	widget = gtk_label_new(_("Address: "));
-	gtk_widget_modify_font(widget, bold);
 #if GTK_CHECK_VERSION(3, 0, 0)
+	gtk_widget_override_font(widget, bold);
 	g_object_set(widget, "halign", GTK_ALIGN_START, NULL);
 #else
+	gtk_widget_modify_font(widget, bold);
 	gtk_misc_set_alignment(GTK_MISC(widget), 0.0, 0.5);
 #endif
 	gtk_size_group_add_widget(left, widget);
@@ -301,10 +302,11 @@ static void _download_label(GtkWidget * vbox, PangoFontDescription * bold,
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
 	*widget = gtk_label_new(label);
-	gtk_widget_modify_font(*widget, bold);
 #if GTK_CHECK_VERSION(3, 0, 0)
+	gtk_widget_override_font(*widget, bold);
 	g_object_set(*widget, "halign", GTK_ALIGN_START, NULL);
 #else
+	gtk_widget_modify_font(*widget, bold);
 	gtk_misc_set_alignment(GTK_MISC(*widget), 0.0, 0.5);
 #endif
 	gtk_size_group_add_widget(left, *widget);
