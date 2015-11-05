@@ -1558,7 +1558,11 @@ void surfer_show_console(Surfer * surfer, gboolean show)
 	gtk_container_add(GTK_CONTAINER(hbox), widget);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 	/* dialog */
+#if GTK_CHECK_VERSION(3, 0, 0)
+	hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+#else
 	hbox = gtk_hbutton_box_new();
+#endif
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_END);
 	gtk_box_set_spacing(GTK_BOX(hbox), 4);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
