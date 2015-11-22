@@ -1091,7 +1091,7 @@ int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 	prefs.output = filename;
 	prefs.user_agent = NULL;
 	if((download = download_new(&prefs, url)) == NULL)
-		ret = -surfer_error(surfer, error_get(), 1);
+		ret = -surfer_error(surfer, error_get(NULL), 1);
 	else
 		download_set_close(download, surfer->download_close);
 #else
