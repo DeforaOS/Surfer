@@ -418,7 +418,11 @@ int helper_open_dialog(Helper * helper)
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
 	label = gtk_label_new(_("Package:"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+	g_object_set(label, "halign", GTK_ALIGN_START, NULL);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+#endif
 	gtk_size_group_add_widget(lgroup, label);
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	model = gtk_tree_model_filter_new(GTK_TREE_MODEL(helper->store), NULL);
@@ -448,7 +452,11 @@ int helper_open_dialog(Helper * helper)
 	hbox = gtk_hbox_new(FALSE, 4);
 #endif
 	label = gtk_label_new(_("Command:"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+	g_object_set(label, "halign", GTK_ALIGN_START, NULL);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+#endif
 	gtk_size_group_add_widget(lgroup, label);
 	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry2), TRUE);
