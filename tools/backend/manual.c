@@ -83,8 +83,7 @@ static gboolean _new_manual_idle(gpointer data);
 static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, char const * section);
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
-		GdkPixbuf * pixbuf, char const * manhtmldir,
-		char const * section, char const * name);
+		GdkPixbuf * pixbuf, char const * section, char const * name);
 
 static void _new_manual(Helper * helper)
 {
@@ -177,8 +176,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &size, &size);
 	pixbuf = gtk_icon_theme_load_icon(helper->icontheme, "folder", size, 0,
 			NULL);
-	_new_manual_section_lookup(store, &parent, pixbuf, manhtmldir, section,
-			name);
+	_new_manual_section_lookup(store, &parent, pixbuf, section, name);
 	if(pixbuf != NULL)
 	{
 		g_object_unref(pixbuf);
@@ -212,8 +210,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 }
 
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
-		GdkPixbuf * pixbuf, char const * manhtmldir,
-		char const * section, char const * name)
+		GdkPixbuf * pixbuf, char const * section, char const * name)
 {
 	GtkTreeModel * model = GTK_TREE_MODEL(store);
 	gboolean valid;
@@ -242,15 +239,10 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		gtk_tree_store_set(store, iter,
 #endif
 				HSC_TYPE, HST_MANUAL, HSC_ICON, pixbuf,
-				HSC_MANUAL_DIRECTORY, manhtmldir,
+				HSC_MANUAL_DIRECTORY, NULL,
 				HSC_MANUAL_SECTION, section,
 				HSC_MANUAL_FILENAME, name, -1);
 	}
-	else
-		gtk_tree_store_set(store, iter, HSC_ICON, pixbuf,
-				HSC_MANUAL_DIRECTORY, manhtmldir,
-				HSC_MANUAL_SECTION, section,
-				HSC_MANUAL_FILENAME, name, -1);
 }
 
 
