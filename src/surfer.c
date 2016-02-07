@@ -2077,7 +2077,7 @@ void surfer_view_source(Surfer * surfer)
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	desc = pango_font_description_new();
 	pango_font_description_set_family(desc, "monospace");
-	gtk_widget_modify_font(widget, desc);
+	gtk_widget_override_font(widget, desc);
 	pango_font_description_free(desc);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(widget), FALSE);
 	tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
