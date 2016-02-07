@@ -84,9 +84,6 @@ struct _Surfer
 	GtkWidget * fi_case;
 	GtkWidget * fi_back;
 	GtkWidget * fi_wrap;
-
-	/* about */
-	GtkWidget * ab_window;
 };
 
 typedef enum _HelperStoreType
@@ -345,7 +342,6 @@ Helper * helper_new(void)
 	gtk_widget_grab_focus(helper->view);
 	gtk_widget_show_all(helper->window);
 	helper->fi_dialog = NULL;
-	helper->ab_window = NULL;
 	return helper;
 }
 
@@ -355,8 +351,6 @@ void helper_delete(Helper * helper)
 {
 	if(helper->source != 0)
 		g_source_remove(helper->source);
-	if(helper->ab_window != NULL)
-		gtk_widget_destroy(helper->ab_window);
 	if(helper->fi_dialog != NULL)
 		gtk_widget_destroy(helper->fi_dialog);
 	gtk_widget_destroy(helper->window);
@@ -629,40 +623,24 @@ static void _helper_on_fullscreen(gpointer data)
 
 #ifndef EMBEDDED
 /* helper_on_help_about */
-static gboolean _about_on_closex(gpointer data);
-
 static void _helper_on_help_about(gpointer data)
 {
 	Helper * helper = data;
+	GtkWidget * dialog;
 
-	if(helper->ab_window != NULL)
-	{
-		gtk_window_present(GTK_WINDOW(helper->ab_window));
-		return;
-	}
-	helper->ab_window = desktop_about_dialog_new();
-	gtk_window_set_transient_for(GTK_WINDOW(helper->ab_window), GTK_WINDOW(
+	dialog = desktop_about_dialog_new();
+	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(
 				helper->window));
-	desktop_about_dialog_set_authors(helper->ab_window, _authors);
-	desktop_about_dialog_set_comments(helper->ab_window,
+	desktop_about_dialog_set_authors(dialog, _authors);
+	desktop_about_dialog_set_comments(dialog,
 			_("Online help for the DeforaOS desktop"));
-	desktop_about_dialog_set_copyright(helper->ab_window, _copyright);
-	desktop_about_dialog_set_logo_icon_name(helper->ab_window,
-			"help-browser");
-	desktop_about_dialog_set_license(helper->ab_window, _license);
-	desktop_about_dialog_set_name(helper->ab_window, PACKAGE);
-	desktop_about_dialog_set_version(helper->ab_window, VERSION);
-	g_signal_connect_swapped(helper->ab_window, "delete-event", G_CALLBACK(
-				_about_on_closex), helper);
-	gtk_widget_show(helper->ab_window);
-}
-
-static gboolean _about_on_closex(gpointer data)
-{
-	Helper * helper = data;
-
-	gtk_widget_hide(helper->ab_window);
-	return TRUE;
+	desktop_about_dialog_set_copyright(dialog, _copyright);
+	desktop_about_dialog_set_logo_icon_name(dialog, "help-browser");
+	desktop_about_dialog_set_license(dialog, _license);
+	desktop_about_dialog_set_name(dialog, PACKAGE);
+	desktop_about_dialog_set_version(dialog, VERSION);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
 }
 
 
