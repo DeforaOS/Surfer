@@ -28,7 +28,11 @@ static char const * _gtkdoc_prefix[] =
 	DATADIR "/gtk-doc/html", DATADIR "/devhelp/books",
 	"/usr/local/share/gtk-doc/html",
 	"/usr/local/share/devhelp/books",
-	"/usr/share/gtk-doc/html", "/usr/share/devhelp/books", NULL
+	"/usr/share/gtk-doc/html", "/usr/share/devhelp/books",
+#ifdef __NetBSD__
+	"/usr/pkg/share/gtk-doc/html", "/usr/pkg/share/devhelp/books",
+#endif
+	NULL
 };
 
 
