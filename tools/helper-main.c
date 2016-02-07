@@ -53,7 +53,9 @@ static int _usage(void)
 	fprintf(stderr, _("Usage: %s [-c][-p package] command\n"
 "       %s -d package\n"
 "       %s -s section page\n"
+"  -c	Open the documentation for a specific package\n"
 "  -d	Open an API reference\n"
+"  -p	Set the package for the command specified\n"
 "  -s	Section of the manual page to read from\n"),
 			PROGNAME, PROGNAME, PROGNAME);
 	return 1;
