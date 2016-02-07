@@ -215,7 +215,7 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 	GtkTreeModel * model = GTK_TREE_MODEL(store);
 	gboolean valid;
 	unsigned int type;
-	gchar * n;
+	gchar * s;
 	int res;
 
 	for(valid = gtk_tree_model_get_iter_first(model, iter); valid == TRUE;
@@ -224,9 +224,9 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
 		if(type != HST_MANUAL)
 			continue;
-		gtk_tree_model_get(model, iter, HSC_MANUAL_FILENAME, &n, -1);
-		res = (n != NULL) && (strcmp(name, n) == 0);
-		g_free(n);
+		gtk_tree_model_get(model, iter, HSC_MANUAL_SECTION, &s, -1);
+		res = (s != NULL) && (strcmp(section, s) == 0);
+		g_free(s);
 		if(res != 0)
 			break;
 	}
