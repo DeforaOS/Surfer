@@ -84,6 +84,7 @@ static void _new_manual_section(Helper * helper, char const * manhtmldir,
 		char const * name, GtkTreeStore * store, char const * section);
 static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 		GdkPixbuf * pixbuf, char const * section, char const * name);
+static char const * _new_manual_section_lookup_name(char const * section);
 
 static void _new_manual(Helper * helper)
 {
@@ -241,8 +242,41 @@ static void _new_manual_section_lookup(GtkTreeStore * store, GtkTreeIter * iter,
 				HSC_TYPE, HST_MANUAL, HSC_ICON, pixbuf,
 				HSC_MANUAL_DIRECTORY, NULL,
 				HSC_MANUAL_SECTION, section,
-				HSC_MANUAL_FILENAME, name, -1);
+				HSC_MANUAL_FILENAME,
+				_new_manual_section_lookup_name(section), -1);
 	}
+}
+
+static char const * _new_manual_section_lookup_name(char const * section)
+{
+	static struct
+	{
+		char const * section;
+		char const * name;
+	} names[] =
+	{
+		{ "1", "General commands (tools and utilities)" },
+		{ "2", "System calls and error numbers" },
+		{ "3", "System libraries" },
+		{ "3f", "System libraries (Fortran)" },
+		{ "3lua", "System libraries (Lua)" },
+		{ "4", "Kernel interfaces" },
+		{ "5", "File formats" },
+		{ "6", "Online games" },
+		{ "7", "Miscellaneous information pages" },
+		{ "8", "System maintenance procedures and commands" },
+		{ "9", "Kernel internals" },
+		{ "9lua", "Kernel internals (Lua)" }
+	};
+	size_t i;
+
+#ifdef DEBUG
+	fprintf(stderr, "DEBUG: %s(\"%s\")\n", __func__, section);
+#endif
+	for(i = 0; i < sizeof(names) / sizeof(*names); i++)
+		if(strcmp(names[i].section, section) == 0)
+			return names[i].name;
+	return section;
 }
 
 
