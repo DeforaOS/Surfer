@@ -139,6 +139,8 @@ static void _helper_on_help_contents(gpointer data);
 static void _helper_on_open(gpointer data);
 #endif
 #ifndef EMBEDDED
+static void _helper_on_view_collapse_all(gpointer data);
+static void _helper_on_view_expand_all(gpointer data);
 static void _helper_on_view_fullscreen(gpointer data);
 #endif
 
@@ -211,6 +213,11 @@ static const DesktopMenu _menu_edit[] =
 
 static const DesktopMenu _menu_view[] =
 {
+	{ N_("_Expand all"), G_CALLBACK(_helper_on_view_expand_all), NULL,
+		0, 0 },
+	{ N_("_Collapse all"), G_CALLBACK(_helper_on_view_collapse_all), NULL,
+		0, 0 },
+	{ "", NULL, NULL, 0, 0 },
 	{ N_("_Fullscreen"), G_CALLBACK(_helper_on_view_fullscreen),
 # if GTK_CHECK_VERSION(2, 8, 0)
 		GTK_STOCK_FULLSCREEN, 0, 0 },
@@ -681,6 +688,48 @@ static void _helper_on_open(gpointer data)
 
 
 #ifndef EMBEDDED
+/* helper_on_view_collapse_all */
+static void _helper_on_view_collapse_all(gpointer data)
+{
+	Helper * helper = data;
+	int page;
+	GtkWidget * widget;
+
+	if((page = gtk_notebook_get_current_page(
+					GTK_NOTEBOOK(helper->notebook))) < 0)
+		return;
+	if((widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(helper->notebook),
+					page)) == NULL)
+		return;
+	if(!GTK_IS_BIN(widget))
+		return;
+	if((widget = gtk_bin_get_child(GTK_BIN(widget))) == NULL)
+		return;
+	gtk_tree_view_collapse_all(GTK_TREE_VIEW(widget));
+}
+
+
+/* helper_on_view_expand_all */
+static void _helper_on_view_expand_all(gpointer data)
+{
+	Helper * helper = data;
+	int page;
+	GtkWidget * widget;
+
+	if((page = gtk_notebook_get_current_page(
+					GTK_NOTEBOOK(helper->notebook))) < 0)
+		return;
+	if((widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(helper->notebook),
+					page)) == NULL)
+		return;
+	if(!GTK_IS_BIN(widget))
+		return;
+	if((widget = gtk_bin_get_child(GTK_BIN(widget))) == NULL)
+		return;
+	gtk_tree_view_expand_all(GTK_TREE_VIEW(widget));
+}
+
+
 /* helper_on_view_fullscreen */
 static void _helper_on_view_fullscreen(gpointer data)
 {
