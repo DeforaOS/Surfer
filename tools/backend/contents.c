@@ -186,6 +186,7 @@ static void _helper_on_contents_row_activated(GtkWidget * widget,
 	GtkTreeIter parent;
 	gchar * package;
 	gchar * command;
+	(void) column;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	gtk_tree_model_get_iter(model, &iter, path);
@@ -218,6 +219,7 @@ static gboolean _helper_filter_contents(GtkTreeModel * model,
 		GtkTreeIter * iter, gpointer data)
 {
 	unsigned int type;
+	(void) data;
 
 	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
 	return (type == HST_CONTENTS) ? TRUE : FALSE;

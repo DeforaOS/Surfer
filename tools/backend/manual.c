@@ -258,6 +258,7 @@ static void _helper_on_manual_row_activated(GtkWidget * widget,
 	gchar * manhtmldir;
 	gchar * section;
 	gchar * command;
+	(void) column;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	gtk_tree_model_get_iter(model, &iter, path);
@@ -292,6 +293,7 @@ static gboolean _helper_filter_manual(GtkTreeModel * model, GtkTreeIter * iter,
 		gpointer data)
 {
 	unsigned int type;
+	(void) data;
 
 	gtk_tree_model_get(model, iter, HSC_TYPE, &type, -1);
 	return (type == HST_MANUAL) ? TRUE : FALSE;
