@@ -15,9 +15,7 @@
 
 
 
-/* public */
-int helper_open_gtkdoc(Helper * helper, char const * gtkdocdir,
-		char const * package);
+#include "gtkdoc.h"
 
 
 /* private */

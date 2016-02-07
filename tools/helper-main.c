@@ -21,6 +21,9 @@
 #include <libintl.h>
 #include <gtk/gtk.h>
 #include "helper.h"
+#include "backend/contents.h"
+#include "backend/gtkdoc.h"
+#include "backend/manual.h"
 #include "../config.h"
 #define _(string) gettext(string)
 #define N_(string) string

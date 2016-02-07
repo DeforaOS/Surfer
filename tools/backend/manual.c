@@ -15,10 +15,7 @@
 
 
 
-/* public */
-/* prototypes */
-int helper_open_manual(Helper * helper, char const * section, char const * page,
-		char const * manhtmldir);
+#include "manual.h"
 
 
 /* private */

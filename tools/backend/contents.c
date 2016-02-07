@@ -15,11 +15,7 @@
 
 
 
-
-/* public */
-/* prototypes */
-int helper_open_contents(Helper * helper, char const * package,
-		char const * command);
+#include "contents.h"
 
 
 /* private */
