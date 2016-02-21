@@ -45,7 +45,7 @@ XGETTEXT="xgettext --force-po"
 #debug
 _debug()
 {
-	echo "$@" 1>&2
+	echo "$@" 1>&3
 	"$@"
 }
 
@@ -147,6 +147,7 @@ if [ -z "$PACKAGE" ]; then
 fi
 
 LOCALEDIR="$PREFIX/share/locale"
+exec 3>&1
 while [ $# -gt 0 ]; do
 	target="$1"
 	source="${target#$OBJDIR}"
