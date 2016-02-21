@@ -15,6 +15,7 @@
 <refentry>
 	<refentryinfo>
 		<title>&title;</title>
+		<date>@DATE@</date>
 		<productname>&package;</productname>
 		<authorgroup>
 			<author>
