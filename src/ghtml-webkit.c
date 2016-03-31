@@ -429,6 +429,10 @@ int ghtml_set_enable_javascript(GtkWidget * widget, gboolean enable)
 
 
 /* ghtml_set_proxy */
+#if WEBKIT_CHECK_VERSION(1, 1, 0)
+static SoupURI * _set_proxy_address(struct addrinfo * ai);
+#endif
+
 int ghtml_set_proxy(GtkWidget * widget, SurferProxyType type, char const * http,
 		unsigned int http_port)
 {
@@ -437,25 +441,28 @@ int ghtml_set_proxy(GtkWidget * widget, SurferProxyType type, char const * http,
 	char buf[32];
 	struct addrinfo hints;
 	struct addrinfo * ai;
+	struct addrinfo * aip;
 	int res;
-	struct sockaddr_in * sa;
 	SoupURI * uri = NULL;
 
 	session = webkit_get_default_session();
 	if(type == SPT_HTTP && http != NULL && strlen(http) > 0)
 	{
+		snprintf(buf, sizeof(buf), "%hu", http_port);
 		memset(&hints, 0, sizeof(hints));
-		/* XXX support more protocols */
-		hints.ai_family = AF_INET;
+		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
-		if((res = getaddrinfo(http, NULL, &hints, &ai)) != 0)
+		hints.ai_flags = AI_NUMERICSERV;
+		if((res = getaddrinfo(http, buf, &hints, &ai)) != 0)
 			return -error_set_code(1, "%s: %s", http, gai_strerror(
 						res));
-		sa = (struct sockaddr_in *)ai->ai_addr;
-		snprintf(buf, sizeof(buf), "http://%s:%u/",
-				inet_ntoa(sa->sin_addr), http_port);
-		uri = soup_uri_new(buf);
+		for(aip = ai; aip != NULL; aip = aip->ai_next)
+			if((uri = _set_proxy_address(aip)) != NULL)
+				break;
 		freeaddrinfo(ai);
+		if(uri == NULL)
+			return -error_set_code(1, "%s: %s", http,
+					"No suitable address found for proxy");
 	}
 	g_object_set(session, "proxy-uri", uri, NULL);
 	return 0;
@@ -464,6 +471,38 @@ int ghtml_set_proxy(GtkWidget * widget, SurferProxyType type, char const * http,
 	return -error_set_code(1, "%s", strerror(ENOSYS));
 #endif
 }
+
+#if WEBKIT_CHECK_VERSION(1, 1, 0)
+static SoupURI * _set_proxy_address(struct addrinfo * ai)
+{
+	char buf[128];
+	char buf2[128];
+	struct sockaddr_in * sin;
+	struct sockaddr_in6 * sin6;
+
+	switch(ai->ai_family)
+	{
+		case AF_INET:
+			sin = (struct sockaddr_in *)ai->ai_addr;
+			if(inet_ntop(ai->ai_family, &sin->sin_addr, buf,
+						sizeof(buf)) == NULL)
+				return NULL;
+			snprintf(buf2, sizeof(buf2), "http://%s:%hu/", buf,
+					ntohs(sin->sin_port));
+			return soup_uri_new(buf2);
+		case AF_INET6:
+			sin6 = (struct sockaddr_in6 *)ai->ai_addr;
+			if(inet_ntop(ai->ai_family, &sin6->sin6_addr, buf,
+						sizeof(buf)) == NULL)
+				return NULL;
+			snprintf(buf2, sizeof(buf2), "http://[%s]:%hu/", buf,
+					ntohs(sin6->sin6_port));
+			return soup_uri_new(buf2);
+		default:
+			return NULL;
+	}
+}
+#endif
 
 
 /* ghtml_set_user_agent */
