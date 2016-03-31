@@ -1891,8 +1891,8 @@ static GtkWidget * _preferences_network(Surfer * surfer)
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->pr_proxy_http, TRUE, TRUE, 0);
 	widget = gtk_label_new(_("Port:"));
 	gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
-	surfer->pr_proxy_http_port = gtk_spin_button_new_with_range(0, 65535,
-			1.0);
+	surfer->pr_proxy_http_port = gtk_spin_button_new_with_range(0.0,
+			65535.0, 1.0);
 	gtk_box_pack_start(GTK_BOX(hbox), surfer->pr_proxy_http_port, FALSE,
 			TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
