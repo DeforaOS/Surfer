@@ -51,7 +51,7 @@
 #define N_(string) (string)
 
 /* constants */
-#ifdef WITH_MAIN
+#ifndef PROGNAME
 # define PROGNAME	"download"
 #endif
 
@@ -900,6 +900,15 @@ static gboolean _download_on_timeout(gpointer data)
 
 
 #ifdef WITH_MAIN
+/* error */
+static int _error(char const * message, int ret)
+{
+	fputs(PROGNAME ": ", stderr);
+	perror(message);
+	return ret;
+}
+
+
 /* usage */
 static int _usage(void)
 {
@@ -922,7 +931,8 @@ int main(int argc, char * argv[])
 	unsigned int port;
 	Download * download;
 
-	setlocale(LC_ALL, "");
+	if(setlocale(LC_ALL, "") == NULL)
+		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 	memset(&prefs, 0, sizeof(prefs));
