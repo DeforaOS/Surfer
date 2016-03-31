@@ -427,7 +427,7 @@ int ghtml_set_enable_javascript(GtkWidget * widget, gboolean enable)
 
 /* ghtml_set_proxy */
 int ghtml_set_proxy(GtkWidget * ghtml, SurferProxyType type, char const * http,
-		unsigned int http_port)
+		uint16_t http_port)
 {
 	if(type == SPT_NONE)
 		return 0;

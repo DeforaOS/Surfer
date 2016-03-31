@@ -434,7 +434,7 @@ static SoupURI * _set_proxy_address(struct addrinfo * ai);
 #endif
 
 int ghtml_set_proxy(GtkWidget * widget, SurferProxyType type, char const * http,
-		unsigned int http_port)
+		uint16_t http_port)
 {
 #if WEBKIT_CHECK_VERSION(1, 1, 0)
 	SoupSession * session;

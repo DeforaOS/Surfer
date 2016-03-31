@@ -18,6 +18,7 @@
 #ifndef SURFER_SURFER_H
 # define SURFER_SURFER_H
 
+# include <stdint.h>
 # include <System.h>
 # include <gtk/gtk.h>
 
@@ -72,7 +73,7 @@ void surfer_set_homepage(Surfer * surfer, char const * homepage);
 void surfer_set_location(Surfer * surfer, char const * url);
 void surfer_set_progress(Surfer * surfer, gdouble fraction);
 void surfer_set_proxy(Surfer * surfer, SurferProxyType type, char const * http,
-		unsigned int http_port);
+		uint16_t http_port);
 void surfer_set_security(Surfer * surfer, SurferSecurity security);
 void surfer_set_status(Surfer * surfer, char const * status);
 void surfer_set_title(Surfer * surfer, char const * title);

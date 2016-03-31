@@ -646,7 +646,7 @@ void surfer_set_progress(Surfer * surfer, gdouble fraction)
 
 /* surfer_set_proxy */
 void surfer_set_proxy(Surfer * surfer, SurferProxyType type, char const * http,
-		unsigned int http_port)
+		uint16_t http_port)
 {
 	GtkWidget * view;
 	gint n;
@@ -884,6 +884,7 @@ int surfer_config_load(Surfer * surfer)
 	char const * p;
 	char buf[256];
 	unsigned int u;
+	uint16_t u16;
 
 	if((filename = _config_get_filename(SURFER_CONFIG_FILE)) == NULL)
 		return 1;
@@ -895,13 +896,13 @@ int surfer_config_load(Surfer * surfer)
 			&surfer->download_dir);
 	_config_load_integer(surfer->config, NULL, "download_close",
 			&surfer->download_close);
-	if((p = getenv("http_proxy")) != NULL && sscanf(p, "http://%255[^:]:%u",
-				buf, &u) == 2)
+	if((p = getenv("http_proxy")) != NULL
+			&& sscanf(p, "http://%255[^:]:%hu", buf, &u16) == 2)
 	{
 		surfer->proxy_type = SPT_HTTP;
 		buf[sizeof(buf) - 1] = '\0';
 		surfer->proxy_http = strdup(buf);
-		surfer->proxy_http_port = u;
+		surfer->proxy_http_port = u16;
 	}
 	else
 	{
@@ -909,8 +910,8 @@ int surfer_config_load(Surfer * surfer)
 				&surfer->proxy_type);
 		_config_load_string(surfer->config, "proxy", "http",
 				&surfer->proxy_http);
-		_config_load_integer(surfer->config, "proxy", "http_port",
-				&surfer->proxy_http_port);
+		_config_load_integer(surfer->config, "proxy", "http_port", &u);
+		surfer->proxy_http_port = u;
 	}
 	_config_load_string(surfer->config, NULL, "user_agent",
 			&surfer->user_agent);
@@ -1122,9 +1123,9 @@ int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 	else
 	{
 		p = (surfer->proxy_http != NULL)
-			? string_new_format("http://%s:%u/", surfer->proxy_http,
-					surfer->proxy_http_port)
-			: NULL;
+			? string_new_format("http://%s:%hu/",
+					surfer->proxy_http,
+					surfer->proxy_http_port) : NULL;
 		if(g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
 					_download_set_proxy, p, NULL, &error)
 				== FALSE)

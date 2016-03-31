@@ -18,6 +18,7 @@
 #ifndef SURFER_COMMON_H
 # define SURFER_COMMON_H
 
+# include <stdint.h>
 # include <System.h>
 # include <gtk/gtk.h>
 
@@ -34,7 +35,7 @@ struct _Surfer
 	unsigned int download_close;
 	SurferProxyType proxy_type;
 	char * proxy_http;
-	unsigned int proxy_http_port;
+	uint16_t proxy_http_port;
 	char * user_agent;
 	gboolean javascript;
 

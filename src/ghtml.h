@@ -18,6 +18,7 @@
 #ifndef SURFER_GHTML_H
 # define SURFER_GHTML_H
 
+# include <stdint.h>
 # include <gtk/gtk.h>
 # include "surfer.h"
 
@@ -43,7 +44,7 @@ gdouble ghtml_get_zoom(GtkWidget * ghtml);
 
 int ghtml_set_enable_javascript(GtkWidget * ghtml, gboolean enable);
 int ghtml_set_proxy(GtkWidget * ghtml, SurferProxyType type, char const * http,
-		unsigned int http_port);
+		uint16_t http_port);
 int ghtml_set_user_agent(GtkWidget * ghtml, char const * user_agent);
 void ghtml_set_zoom(GtkWidget * ghtml, gdouble zoom);
 

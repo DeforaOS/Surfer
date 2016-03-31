@@ -21,8 +21,9 @@
 
 #include <sys/time.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 #include <libgen.h>
@@ -112,7 +113,7 @@ static unsigned int _download_cnt = 0;
 static int _download_error(Download * download, char const * message, int ret);
 
 static int _download_set_proxy(Download * download, char const * http,
-		unsigned int http_port);
+		uint16_t http_port);
 
 static void _download_refresh(Download * download);
 #ifndef WITH_WEBKIT
@@ -412,7 +413,7 @@ static SoupURI * _set_proxy_address(struct addrinfo * ai);
 #endif
 
 static int _download_set_proxy(Download * download, char const * http,
-		unsigned int http_port)
+		uint16_t http_port)
 {
 #ifdef WITH_WEBKIT
 # if WEBKIT_CHECK_VERSION(1, 1, 0)
@@ -971,7 +972,7 @@ int main(int argc, char * argv[])
 	int cnt;
 	char const * p;
 	char http[256] = "";
-	unsigned int port;
+	uint16_t port;
 	Download * download;
 
 	if(setlocale(LC_ALL, "") == NULL)
