@@ -912,10 +912,10 @@ static int _error(char const * message, int ret)
 /* usage */
 static int _usage(void)
 {
-	fputs(_("Usage: download [-x][-O output][-U user-agent] URL...\n"
+	fprintf(stderr, _("Usage: %s [-x][-O output][-U user-agent] URL...\n"
 "  -x	Start in embedded mode\n"
 "  -O	File to write the remote document to\n"
-"  -U	User-agent string to send\n"), stderr);
+"  -U	User-agent string to send\n"), PROGNAME);
 	return 1;
 }
 
