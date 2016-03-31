@@ -27,6 +27,7 @@
 #ifndef PROGNAME
 # define PROGNAME	"surfer"
 #endif
+
 #ifndef PREFIX
 # define PREFIX		"/usr/local"
 #endif

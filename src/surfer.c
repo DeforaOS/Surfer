@@ -42,6 +42,12 @@ static char const _license[] =
 #define _(string) gettext(string)
 #define N_(string) (string)
 
+/* constants */
+#ifndef PROGNAME
+# define PROGNAME		"surfer"
+# define PROGNAME_DOWNLOAD	"download"
+#endif
+
 /* embed the Download class */
 static unsigned int _surfer_cnt = 0;
 #if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) /* uses GNet */
@@ -54,7 +60,6 @@ static unsigned int _surfer_cnt = 0;
 # endif
 #endif
 #ifdef WITH_DOWNLOAD
-# define PROGNAME "surfer"
 # define _download_cnt _surfer_cnt
 # include "download.c"
 #endif
@@ -1049,6 +1054,10 @@ void surfer_cut(Surfer * surfer)
 
 
 /* surfer_download */
+#ifndef WITH_DOWNLOAD
+static void _download_set_proxy(gpointer data);
+#endif
+
 int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 {
 	int ret = 0;
@@ -1058,8 +1067,9 @@ int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 	DownloadPrefs prefs;
 	Download * download;
 #else
-	char * argv[] = { "download", "-O", NULL, NULL, NULL };
+	char * argv[] = { PROGNAME_DOWNLOAD, "-O", NULL, NULL, NULL };
 	GError * error = NULL;
+	String * p;
 #endif
 
 	if(url == NULL)
@@ -1093,15 +1103,36 @@ int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 	if((download = download_new(&prefs, url)) == NULL)
 		ret = -surfer_error(surfer, error_get(NULL), 1);
 	else
+	{
 		download_set_close(download, surfer->download_close);
+		if(surfer->proxy_http != NULL
+				&& _download_set_proxy(download,
+					surfer->proxy_http,
+					surfer->proxy_http_port) != 0)
+		{
+			download_delete(download);
+			download = NULL;
+			ret = -surfer_error(surfer, error_get(NULL), 1);
+		}
+	}
 #else
 	argv[2] = filename;
 	if((argv[3] = strdup(url)) == NULL)
 		ret = -surfer_error(surfer, strerror(errno), 1);
 	else
 	{
-		g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL,
-				NULL, &error);
+		p = (surfer->proxy_http != NULL)
+			? string_new_format("http://%s:%u/", surfer->proxy_http,
+					surfer->proxy_http_port)
+			: NULL;
+		if(g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
+					_download_set_proxy, p, NULL, &error)
+				== FALSE)
+		{
+			ret = -surfer_error(surfer, error->message, 1);
+			g_error_free(error);
+		}
+		string_delete(p);
 		free(argv[3]);
 	}
 #endif
@@ -1109,12 +1140,26 @@ int surfer_download(Surfer * surfer, char const * url, char const * suggested)
 	return ret;
 }
 
+#ifndef WITH_DOWNLOAD
+static void _download_set_proxy(gpointer data)
+{
+	char * http_proxy = data;
+
+	if(setenv("http_proxy", http_proxy, 1) != 0)
+		surfer_error(NULL, "Could not set the proxy", 1);
+}
+#endif
+
 
 /* surfer_error */
+static int _error_text(char const * message, int ret);
+
 int surfer_error(Surfer * surfer, char const * message, int ret)
 {
 	GtkWidget * dialog;
 
+	if(surfer == NULL)
+		return _error_text(message, ret);
 	dialog = gtk_message_dialog_new((surfer != NULL)
 			? GTK_WINDOW(surfer->window) : NULL,
 			GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -1127,6 +1172,12 @@ int surfer_error(Surfer * surfer, char const * message, int ret)
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Error"));
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
+	return ret;
+}
+
+static int _error_text(char const * message, int ret)
+{
+	fprintf(stderr, "%s: %s\n", PROGNAME, message);
 	return ret;
 }
 
