@@ -46,7 +46,7 @@ _embedded()
 	(cd .. && sh -c "$make OBJDIR='$objdir/' $TARGETS")
 	ret=$?
 	[ $ret -eq 0 ] || echo "$PROGNAME: $1: Could not build for embedded" 1>&2
-	#$RM -r -- "$objdir"
+	$RM -r -- "$objdir"
 	return $ret
 }
 
