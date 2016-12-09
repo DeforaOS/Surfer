@@ -52,4 +52,4 @@ _embedded()
 
 
 #main
-_embedded							|| return 2
+_embedded							|| exit 2
