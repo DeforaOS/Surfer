@@ -512,10 +512,12 @@ int ghtml_set_user_agent(GtkWidget * ghtml, char const * user_agent)
 	SoupSession * session;
 
 	session = webkit_get_default_session();
-	g_object_set(session, "user-agent", user_agent, NULL);
+	g_object_set(session, "user-agent",
+			(user_agent == NULL || strlen(user_agent) == 0)
+			? NULL : user_agent, NULL);
 	return 0;
 #else
-	if(user_agent == NULL)
+	if(user_agent == NULL || strlen(user_agent) == 0)
 		return 0;
 	return -error_set_code(1, "%s", strerror(ENOSYS));
 #endif

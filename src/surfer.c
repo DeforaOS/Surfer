@@ -1298,13 +1298,9 @@ void surfer_open_tab(Surfer * surfer, char const * url)
 		surfer_error(NULL, _("Could not initialize HTML renderer"), 0);
 		return;
 	}
-	if(surfer->proxy_http != NULL)
-		ghtml_set_proxy(widget, surfer->proxy_type, surfer->proxy_http,
-				surfer->proxy_http_port);
-	if(surfer->user_agent == NULL || surfer->user_agent[0] == '\0')
-		ghtml_set_user_agent(widget, NULL);
-	else
-		ghtml_set_user_agent(widget, surfer->user_agent);
+	ghtml_set_proxy(widget, surfer->proxy_type, surfer->proxy_http,
+			surfer->proxy_http_port);
+	ghtml_set_user_agent(widget, surfer->user_agent);
 	ghtml_set_enable_javascript(widget, surfer->javascript);
 	gtk_widget_show_all(widget); /* must be before set_current_page() */
 	if(url != NULL && url[0] != '\0')
