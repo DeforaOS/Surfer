@@ -43,8 +43,8 @@ static char const _license[] =
 #define N_(string) (string)
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME		"surfer"
+#ifndef PROGNAME_SURFER
+# define PROGNAME_SURFER	"surfer"
 #endif
 #ifndef PROGNAME_DOWNLOAD
 # define PROGNAME_DOWNLOAD	"download"
@@ -1181,7 +1181,7 @@ int surfer_error(Surfer * surfer, char const * message, int ret)
 
 static int _error_text(char const * message, int ret)
 {
-	fprintf(stderr, "%s: %s\n", PROGNAME, message);
+	fprintf(stderr, "%s: %s\n", PROGNAME_SURFER, message);
 	return ret;
 }
 
