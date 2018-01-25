@@ -558,6 +558,10 @@ static void _download_refresh(Download * download)
 		snprintf(buf, sizeof(buf), "%.1f%%", total_fraction * 100);
 		gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(
 					download->progress), total_fraction);
+#if GTK_CHECK_VERSION(3, 0, 0)
+		gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(
+					download->progress), TRUE);
+#endif
 		_refresh_remaining(download, rate);
 	}
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(download->progress), buf);

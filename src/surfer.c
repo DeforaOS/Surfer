@@ -443,6 +443,7 @@ Surfer * _new_do(char const * url)
 	gtk_box_pack_start(GTK_BOX(surfer->statusbox), widget, FALSE, TRUE, 0);
 #if !GTK_CHECK_VERSION(2, 16, 0)
 	surfer->progress = gtk_progress_bar_new();
+	gtk_progress_bar_set_text(GTK_PROGRESS(surfer->progress), "");
 	gtk_box_pack_start(GTK_BOX(surfer->statusbox), surfer->progress, FALSE,
 			FALSE, 0);
 #endif
