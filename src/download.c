@@ -52,18 +52,18 @@
 #define N_(string) (string)
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME	"download"
+#ifndef PROGNAME_DOWNLOAD
+# define PROGNAME_DOWNLOAD	"download"
 #endif
 
 #ifndef PREFIX
-# define PREFIX		"/usr/local"
+# define PREFIX			"/usr/local"
 #endif
 #ifndef DATADIR
-# define DATADIR	PREFIX "/share"
+# define DATADIR		PREFIX "/share"
 #endif
 #ifndef LOCALEDIR
-# define LOCALEDIR	DATADIR "/locale"
+# define LOCALEDIR		DATADIR "/locale"
 #endif
 
 
@@ -384,7 +384,7 @@ static int _download_error(Download * download, char const * message, int ret)
 
 	if(ret < 0)
 	{
-		fputs(PROGNAME ": ", stderr);
+		fputs(PROGNAME_DOWNLOAD ": ", stderr);
 		perror(message);
 		return -ret;
 	}
@@ -951,7 +951,7 @@ static gboolean _download_on_timeout(gpointer data)
 /* error */
 static int _error(char const * message, int ret)
 {
-	fputs(PROGNAME ": ", stderr);
+	fputs(PROGNAME_DOWNLOAD ": ", stderr);
 	perror(message);
 	return ret;
 }
@@ -963,7 +963,7 @@ static int _usage(void)
 	fprintf(stderr, _("Usage: %s [-x][-O output][-U user-agent] URL...\n"
 "  -x	Start in embedded mode\n"
 "  -O	File to write the remote document to\n"
-"  -U	User-agent string to send\n"), PROGNAME);
+"  -U	User-agent string to send\n"), PROGNAME_DOWNLOAD);
 	return 1;
 }
 

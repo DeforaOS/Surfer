@@ -45,6 +45,8 @@ static char const _license[] =
 /* constants */
 #ifndef PROGNAME
 # define PROGNAME		"surfer"
+#endif
+#ifndef PROGNAME_DOWNLOAD
 # define PROGNAME_DOWNLOAD	"download"
 #endif
 
