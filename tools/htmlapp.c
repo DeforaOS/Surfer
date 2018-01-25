@@ -35,17 +35,17 @@
 #define N_(string) string
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME	"htmlapp"
+#ifndef PROGNAME_HTMLAPP
+# define PROGNAME_HTMLAPP	"htmlapp"
 #endif
 #ifndef PREFIX
-# define PREFIX		"/usr/local"
+# define PREFIX			"/usr/local"
 #endif
 #ifndef DATADIR
-# define DATADIR	PREFIX "/share"
+# define DATADIR		PREFIX "/share"
 #endif
 #ifndef LOCALEDIR
-# define LOCALEDIR	DATADIR "/locale"
+# define LOCALEDIR		DATADIR "/locale"
 #endif
 
 
@@ -327,7 +327,7 @@ static void _htmlapp_on_open(gpointer data)
 /* error */
 static int _error(char const * message, int ret)
 {
-	fputs(PROGNAME ": ", stderr);
+	fputs(PROGNAME_HTMLAPP ": ", stderr);
 	perror(message);
 	return ret;
 }
@@ -338,7 +338,7 @@ static int _usage(void)
 {
 	fprintf(stderr, _("Usage: %s [-Jj] [URL]\n"
 "  -J	Disable Javascript\n"
-"  -j	Enable Javascript (default)\n"), PROGNAME);
+"  -j	Enable Javascript (default)\n"), PROGNAME_HTMLAPP);
 	return 1;
 }
 
@@ -483,7 +483,8 @@ void surfer_console_message(Surfer * surfer, char const * message,
 		char const * source, long line)
 {
 	/* FIXME really implement */
-	fprintf(stderr, "%s: %s:%ld: %s\n", PROGNAME, source, line, message);
+	fprintf(stderr, "%s: %s:%ld: %s\n", PROGNAME_HTMLAPP, source, line,
+			message);
 }
 
 
@@ -677,7 +678,7 @@ void surfer_view_source(Surfer * surfer)
 /* surfer_warning */
 void surfer_warning(Surfer * surfer, char const * message)
 {
-	fprintf(stderr, "%s: %s\n", PROGNAME, message);
+	fprintf(stderr, "%s: %s\n", PROGNAME_HTMLAPP, message);
 }
 
 
