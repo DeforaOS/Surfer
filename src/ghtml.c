@@ -26,6 +26,8 @@
 # include "ghtml-gtktextview.c"
 #elif defined(WITH_WEBKIT)
 # include "ghtml-webkit.c"
+#elif defined(WITH_WEBKIT2)
+# include "ghtml-webkit2.c"
 #else /* default */
 # include "ghtml-gtkmozembed.c"
 #endif

@@ -35,12 +35,18 @@
 # include <gtk/gtkx.h>
 #endif
 #include <System.h>
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT)
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netdb.h>
 # include <arpa/inet.h>
 # include <webkit/webkit.h>
+#elif defined(WITH_WEBKIT2)
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netdb.h>
+# include <arpa/inet.h>
+# include <webkit2/webkit2.h>
 #else
 # define GNET_EXPERIMENTAL
 # include <gnet.h>
@@ -80,7 +86,7 @@ struct _Download
 
 	struct timeval tv;
 
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 	WebKitDownload * conn;
 #else
 	FILE * fp;
@@ -119,7 +125,7 @@ static int _download_set_proxy(Download * download, char const * http,
 		uint16_t http_port);
 
 static void _download_refresh(Download * download);
-#ifndef WITH_WEBKIT
+#if !defined(WITH_WEBKIT) && !defined(WITH_WEBKIT2)
 static int _download_write(Download * download);
 #endif
 
@@ -129,7 +135,7 @@ static void _download_on_cancel(gpointer data);
 static gboolean _download_on_closex(gpointer data);
 static void _download_on_embedded(gpointer data);
 
-#ifndef WITH_WEBKIT
+#if !defined(WITH_WEBKIT) && !defined(WITH_WEBKIT2)
 static void _download_on_http(GConnHttp * conn, GConnHttpEvent * event,
 		gpointer data);
 #endif
@@ -333,7 +339,7 @@ void download_delete(Download * download)
 {
 	if(download->timeout != 0)
 		g_source_remove(download->timeout);
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 	if(download->conn != NULL)
 	{
 		webkit_download_cancel(download->conn);
@@ -409,7 +415,7 @@ static int _download_error(Download * download, char const * message, int ret)
 
 
 /* download_set_proxy */
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 # if WEBKIT_CHECK_VERSION(1, 1, 0)
 static SoupURI * _set_proxy_address(struct addrinfo * ai);
 # endif
@@ -418,7 +424,7 @@ static SoupURI * _set_proxy_address(struct addrinfo * ai);
 static int _download_set_proxy(Download * download, char const * http,
 		uint16_t http_port)
 {
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 # if WEBKIT_CHECK_VERSION(1, 1, 0)
 	SoupSession * session;
 	struct addrinfo hints;
@@ -459,7 +465,7 @@ static int _download_set_proxy(Download * download, char const * http,
 #endif
 }
 
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 # if WEBKIT_CHECK_VERSION(1, 1, 0)
 static SoupURI * _set_proxy_address(struct addrinfo * ai)
 {
@@ -621,7 +627,7 @@ static void _refresh_unit(guint64 size, double * fraction, char const ** unit,
 
 
 /* download_write */
-#ifndef WITH_WEBKIT
+#if !defined(WITH_WEBKIT) && !defined(WITH_WEBKIT2)
 static int _download_write(Download * download)
 {
 	gchar * buf;
@@ -693,7 +699,7 @@ static void _download_on_embedded(gpointer data)
 
 
 /* download_on_http */
-#ifndef WITH_WEBKIT
+#if !defined(WITH_WEBKIT) && !defined(WITH_WEBKIT2)
 static void _http_connected(Download * download);
 static void _http_error(GConnHttpEventError * event, Download * download);
 static void _http_data_complete(GConnHttpEventData * event,
@@ -837,7 +843,7 @@ static gboolean _download_on_idle(gpointer data)
 {
 	Download * download = data;
 	DownloadPrefs * prefs = &download->prefs;
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 	char * p = NULL;
 	char * cwd = NULL;
 	size_t len;
@@ -894,7 +900,7 @@ static gboolean _download_on_timeout(gpointer data)
 {
 	gboolean ret = TRUE;
 	Download * d = data;
-#ifdef WITH_WEBKIT
+#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
 	WebKitDownloadStatus status;
 	guint64 received = d->data_received;
 
