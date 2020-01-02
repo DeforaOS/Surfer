@@ -52,6 +52,9 @@
 #define N_(string) (string)
 
 /* constants */
+#ifndef PROGNAME_BROWSER
+# define PROGNAME_BROWSER	"browser"
+#endif
 #ifndef PROGNAME_DOWNLOAD
 # define PROGNAME_DOWNLOAD	"download"
 #endif
@@ -648,7 +651,7 @@ static void _download_on_browse(gpointer data)
 {
 	Download * download = data;
 	GError * error = NULL;
-	char * argv[] = { "browser", NULL, NULL };
+	char * argv[] = { PROGNAME_BROWSER, NULL, NULL };
 
 	if(download->prefs.output == NULL)
 		return;
