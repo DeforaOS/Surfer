@@ -987,8 +987,10 @@ int main(int argc, char * argv[])
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 	memset(&prefs, 0, sizeof(prefs));
+#if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) || defined(WITH_WEBKIT)
 	if(g_thread_supported() == FALSE)
 		g_thread_init(NULL);
+#endif
 	gtk_init(&argc, &argv);
 	while((o = getopt(argc, argv, "O:U:x")) != -1)
 		switch(o)
