@@ -75,8 +75,7 @@ int main(int argc, char * argv[])
 		_error("setlocale", 1);
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
-#if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) || defined(WITH_WEBKIT) \
-	|| defined(WITH_WEBKIT2)
+#if defined(WITH_GTKHTML) || defined(WITH_GTKTEXTVIEW) || defined(WITH_WEBKIT)
 	if(g_thread_supported() == FALSE)
 		g_thread_init(NULL);
 #endif
