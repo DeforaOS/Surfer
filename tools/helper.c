@@ -36,20 +36,20 @@ static char const _license[] =
 #define N_(string) string
 
 /* constants */
-#ifndef PROGNAME
-# define PROGNAME	"helper"
+#ifndef PROGNAME_HELPER
+# define PROGNAME_HELPER	"helper"
 #endif
 #ifndef PREFIX
-# define PREFIX		"/usr/local"
+# define PREFIX			"/usr/local"
 #endif
 #ifndef DATADIR
-# define DATADIR	PREFIX "/share"
+# define DATADIR		PREFIX "/share"
 #endif
 #ifndef CONTENTSDIR
-# define CONTENTSDIR	DATADIR "/doc/html"
+# define CONTENTSDIR		DATADIR "/doc/html"
 #endif
 #ifndef MANDIR
-# define MANDIR		DATADIR "/man"
+# define MANDIR			DATADIR "/man"
 #endif
 
 
@@ -649,7 +649,7 @@ static void _helper_on_help_contents(gpointer data)
 {
 	Helper * helper = data;
 
-	helper_open_manual(helper, "1", PROGNAME, MANDIR);
+	helper_open_manual(helper, "1", PROGNAME_HELPER, MANDIR);
 }
 #endif
 
@@ -721,7 +721,7 @@ static void _helper_on_view_fullscreen(gpointer data)
 /* error */
 static int _error(char const * message, int ret)
 {
-	fputs(PROGNAME ": ", stderr);
+	fputs(PROGNAME_HELPER ": ", stderr);
 	perror(message);
 	return ret;
 }
@@ -872,7 +872,8 @@ void surfer_console_message(Surfer * surfer, char const * message,
 		char const * source, long line)
 {
 	/* FIXME really implement */
-	fprintf(stderr, "%s: %s:%ld: %s\n", PROGNAME, source, line, message);
+	fprintf(stderr, "%s: %s:%ld: %s\n", PROGNAME_HELPER, source, line,
+			message);
 }
 
 
@@ -1068,5 +1069,5 @@ void surfer_view_source(Surfer * surfer)
 /* surfer_warning */
 void surfer_warning(Surfer * surfer, char const * message)
 {
-	fprintf(stderr, "%s: %s\n", PROGNAME, message);
+	fprintf(stderr, "%s: %s\n", PROGNAME_HELPER, message);
 }
