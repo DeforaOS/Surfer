@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2010-2015 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2010-2020 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -25,8 +25,8 @@
 
 
 #variables
+CONFIGSH="${0%/gettext.sh}/../config.sh"
 PREFIX="/usr/local"
-[ -f "../config.sh" ] && . "../config.sh"
 LOCALEDIR="$PREFIX/share/locale"
 POTFILES="POTFILES"
 PROGNAME="gettext.sh"
@@ -39,6 +39,8 @@ MSGINIT="msginit"
 MSGMERGE="msgmerge"
 RM="rm -f"
 XGETTEXT="xgettext --force-po"
+
+[ -f "$CONFIGSH" ] && . "$CONFIGSH"
 
 
 #functions
@@ -112,7 +114,7 @@ _gettext_pot()
 clean=0
 install=0
 uninstall=0
-while getopts "ciuP:" name; do
+while getopts "ciO:uP:" name; do
 	case "$name" in
 		c)
 			clean=1
@@ -120,6 +122,9 @@ while getopts "ciuP:" name; do
 		i)
 			uninstall=0
 			install=1
+			;;
+		O)
+			export "${OPTARG%%=*}"="${OPTARG#*=}"
 			;;
 		u)
 			install=0
@@ -135,7 +140,7 @@ while getopts "ciuP:" name; do
 	esac
 done
 shift $(($OPTIND - 1))
-if [ $# -eq 0 ]; then
+if [ $# -lt 1 ]; then
 	_usage
 	exit $?
 fi

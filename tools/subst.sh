@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2012-2016 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2012-2020 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,6 @@ LIBEXECDIR=
 MANDIR=
 PROGNAME="subst.sh"
 SYSCONFDIR=
-[ -f "$CONFIGSH" ] && . "$CONFIGSH"
 #executables
 CHMOD="chmod"
 DATE="date"
@@ -46,6 +45,8 @@ INSTALL="install"
 MKDIR="mkdir -m 0755 -p"
 RM="rm -f"
 SED="sed"
+
+[ -f "$CONFIGSH" ] && . "$CONFIGSH"
 
 
 #functions
@@ -70,7 +71,7 @@ _subst()
 				LDSO="/libexec/ld-elf.so.1"
 			;;
 			Linux)
-				LDSO="/lib/ld-linux-$(uname -p).so.2"
+				LDSO="/lib/ld-linux-$(uname -m | tr _ -).so.2"
 				;;
 			*)
 				LDSO="/libexec/ld.elf_so"
@@ -112,6 +113,8 @@ _subst()
 		#create
 		source="${target#$OBJDIR}"
 		source="${source}.in"
+		([ -z "$OBJDIR" ] || $DEBUG $MKDIR -- "${target%/*}") \
+								|| return 2
 		$DEBUG $SED -e "s;@PACKAGE@;$PACKAGE;g" \
 			-e "s;@VERSION@;$VERSION;g" \
 			-e "s;@PREFIX@;$PREFIX;g" \
@@ -123,8 +126,8 @@ _subst()
 			-e "s;@LIBDIR@;$LIBDIR;g" \
 			-e "s;@LIBEXECDIR@;$LIBEXECDIR;g" \
 			-e "s;@MANDIR@;$MANDIR;g" \
-			-e "s;@SYSCONFDIR@;$SYSCONFDIR;g" \
 			-e "s;@PWD@;$PWD;g" \
+			-e "s;@SYSCONFDIR@;$SYSCONFDIR;g" \
 			-- "$source" > "$target"
 		if [ $? -ne 0 ]; then
 			$RM -- "$target" 2> "$DEVNULL"
@@ -190,7 +193,7 @@ while getopts "ciuO:P:" name; do
 	esac
 done
 shift $(($OPTIND - 1))
-if [ $# -eq 0 ]; then
+if [ $# -lt 1 ]; then
 	_usage
 	exit $?
 fi
