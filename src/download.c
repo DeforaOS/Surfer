@@ -843,7 +843,7 @@ static gboolean _download_on_idle(gpointer data)
 {
 	Download * download = data;
 	DownloadPrefs * prefs = &download->prefs;
-#if defined(WITH_WEBKIT) || defined(WITH_WEBKIT2)
+#if defined(WITH_WEBKIT)
 	char * p = NULL;
 	char * cwd = NULL;
 	size_t len;
@@ -869,6 +869,35 @@ static gboolean _download_on_idle(gpointer data)
 	request = webkit_network_request_new(download->url);
 	download->conn = webkit_download_new(request);
 	webkit_download_set_destination_uri(download->conn, p);
+	free(p);
+	free(cwd);
+	webkit_download_start(download->conn);
+#elif defined(WITH_WEBKIT2)
+	char * p = NULL;
+	char * cwd = NULL;
+	size_t len;
+	WebKitNetworkRequest * request;
+
+	download->timeout = 0;
+	if(prefs->output[0] != '/' && (cwd = getcwd(NULL, 0)) == NULL)
+	{
+		_download_error(download, prefs->output, 0);
+		download_cancel(download);
+		return FALSE;
+	}
+	len = ((cwd != NULL) ? strlen(cwd) : 0) + strlen(prefs->output) + 7;
+	if((p = malloc(len)) == NULL)
+	{
+		_download_error(download, prefs->output, 0);
+		download_cancel(download);
+		free(cwd);
+		return FALSE;
+	}
+	snprintf(p, len, "%s%s%s%s", "file:", (cwd != NULL) ? cwd : "",
+			(cwd != NULL) ? "/" : "", prefs->output);
+	request = webkit_network_request_new(download->url);
+	download->conn = webkit_download_new(request);
+	webkit_download_set_destination(download->conn, p);
 	free(p);
 	free(cwd);
 	webkit_download_start(download->conn);
