@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright (c) 2010 Pierre Pronchery <khorben@defora.org> */
+/* Copyright (c) 2008-2020 Pierre Pronchery <khorben@defora.org> */
 /* This file is part of DeforaOS Desktop Surfer */
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 # include "ghtml-gtktextview.c"
 #elif defined(WITH_WEBKIT)
 # include "ghtml-webkit.c"
+#elif defined(WITH_WEBKIT2)
+# include "ghtml-webkit2.c"
 #else /* default */
 # include "ghtml-gtkmozembed.c"
 #endif
