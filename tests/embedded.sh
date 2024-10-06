@@ -52,4 +52,31 @@ _embedded()
 
 
 #main
+clean=0
+while getopts "cO:P:" name; do
+	case "$name" in
+		c)
+			clean=1
+			;;
+		O)
+			export "${OPTARG%%=*}"="${OPTARG#*=}"
+			;;
+		P)
+			#XXX ignored for compatibility
+			;;
+		?)
+			_usage
+			exit $?
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+if [ $# -lt 1 ]; then
+	_usage
+	exit $?
+fi
+
+#clean
+[ $clean -ne 0 ] && exit 0
+
 _embedded							|| exit 2
