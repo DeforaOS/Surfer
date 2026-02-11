@@ -1,6 +1,6 @@
 #!/bin/sh
 #$Id$
-#Copyright (c) 2012-2020 Pierre Pronchery <khorben@defora.org>
+#Copyright (c) 2012-2026 Pierre Pronchery <khorben@defora.org>
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are met:
@@ -28,14 +28,17 @@
 CONFIGSH="${0%/docbook.sh}/../config.sh"
 PREFIX="/usr/local"
 PROGNAME="docbook.sh"
+XSL_HTML="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"
+XSL_MAN="http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl"
+XSL_PDF="http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"
 #executables
 DEBUG="_debug"
 FOP="fop"
 INSTALL="install -m 0644"
 MKDIR="mkdir -m 0755 -p"
 RM="rm -f"
-XMLLINT="xmllint"
-XSLTPROC="xsltproc --nonet --xinclude"
+XMLLINT="xmllint --noent --nonet --xinclude --path ${PWD}"
+XSLTPROC="xsltproc --nonet --xinclude --path ${PWD}"
 
 [ -f "$CONFIGSH" ] && . "$CONFIGSH"
 
@@ -60,18 +63,20 @@ _docbook()
 	ext="${ext##.}"
 	case "$ext" in
 		html)
-			XSL="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"
+			XSL="$XSL_HTML"
 			[ -f "${source%.*}.xsl" ] && XSL="${source%.*}.xsl"
 			[ -f "${target%.*}.xsl" ] && XSL="${target%.*}.xsl"
 			if [ -f "${target%.*}.css.xml" ]; then
-				XSLTPROC="$XSLTPROC --param custom.css.source \"${target%.*}.css.xml\" --param generate.css.header 1"
+				XSLTPROC_PARAMS="--param custom.css.source \"${target%.*}.css.xml\" --param generate.css.header 1"
 			elif [ -f "${source%.*}.css.xml" ]; then
-				XSLTPROC="$XSLTPROC --param custom.css.source \"${source%.*}.css.xml\" --param generate.css.header 1"
+				XSLTPROC_PARAMS="--param custom.css.source \"${source%.*}.css.xml\" --param generate.css.header 1"
+			else
+				XSLTPROC_PARAMS=
 			fi
-			$DEBUG $XSLTPROC -o "$target" "$XSL" "$source"
+			$DEBUG $XSLTPROC $XSLTPROC_PARAMS -o "$target" "$XSL" "$source"
 			;;
 		pdf)
-			XSL="http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"
+			XSL="$XSL_PDF"
 			[ -f "${source%.*}.xsl" ] && XSL="${source%.*}.xsl"
 			[ -f "${target%.*}.xsl" ] && XSL="${target%.*}.xsl"
 			$DEBUG $XSLTPROC -o "${target%.*}.fo" "$XSL" "$source" &&
@@ -79,7 +84,7 @@ _docbook()
 			$RM -- "${target%.*}.fo"
 			;;
 		1|2|3|4|5|6|7|8|9)
-			XSL="http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl"
+			XSL="$XSL_MAN"
 			$DEBUG $XSLTPROC -o "$target" "$XSL" "$source"
 			;;
 		*)
@@ -161,6 +166,9 @@ while [ $# -gt 0 ]; do
 	target="$1"
 	shift
 
+	#clean
+	[ $clean -eq 0 ] || continue
+
 	#determine the type
 	ext="${target##*.}"
 	ext="${ext##.}"
@@ -170,7 +178,7 @@ while [ $# -gt 0 ]; do
 			source="${target#$OBJDIR}"
 			source="${source%.*}.xml"
 			xpath="string(/refentry/refmeta/manvolnum)"
-			section=$($XMLLINT --xpath "$xpath" "$source")
+			section=$($DEBUG $XMLLINT --xpath "$xpath" "$source")
 			if [ $? -eq 0 -a -n "$section" ]; then
 				instdir="$MANDIR/html$section"
 			fi
@@ -186,9 +194,6 @@ while [ $# -gt 0 ]; do
 			exit 2
 			;;
 	esac
-
-	#clean
-	[ "$clean" -ne 0 ] && continue
 
 	#uninstall
 	if [ "$uninstall" -eq 1 ]; then
